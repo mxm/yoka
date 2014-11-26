@@ -21,32 +21,32 @@
 #=======================================================================================================================
 
 # Home directory of Java JVM installation (JAVA_HOME)
-{{#env.java.home}}env.java.home: {{env.java.home}}{{/env.java.home}}{{^env.java.home}}# env.java.home: /usr/lib/jvm/java-7-oracle{{/env.java.home}}
-{{#env.java.opts}}env.java.opts: {{env.java.opts}}{{/env.java.opts}}{{^env.java.opts}}# env.java.opts:{{/env.java.opts}}
+env.java.home: {{java_home}}
+# env.java.opts:
 
 #==============================================================================
 # Common
 #==============================================================================
 
-{{#jobmanager.rpc.address}}jobmanager.rpc.address: {{jobmanager.rpc.address}}{{/jobmanager.rpc.address}}{{^jobmanager.rpc.address}}jobmanager.rpc.address: localhost{{/jobmanager.rpc.address}}
+jobmanager.rpc.address: {{master}}
 
-{{#jobmanager.rpc.port}}jobmanager.rpc.port: {{jobmanager.rpc.port}}{{/jobmanager.rpc.port}}{{^jobmanager.rpc.port}}jobmanager.rpc.port: 6123{{/jobmanager.rpc.port}}
+jobmanager.rpc.port: 6123
 
-{{#jobmanager.heap.mb}}jobmanager.heap.mb: {{jobmanager.heap.mb}}{{/jobmanager.heap.mb}}{{^jobmanager.heap.mb}}jobmanager.heap.mb: 256{{/jobmanager.heap.mb}}
+jobmanager.heap.mb: 256
 
-{{#taskmanager.heap.mb}}taskmanager.heap.mb: {{taskmanager.heap.mb}}{{/taskmanager.heap.mb}}{{^taskmanager.heap.mb}}taskmanager.heap.mb: 512{{/taskmanager.heap.mb}}
+taskmanager.heap.mb: 512
 
-{{#taskmanager.numberOfTaskSlots}}taskmanager.numberOfTaskSlots: {{taskmanager.numberOfTaskSlots}}{{/taskmanager.numberOfTaskSlots}}{{^taskmanager.numberOfTaskSlots}}taskmanager.numberOfTaskSlots: -1{{/taskmanager.numberOfTaskSlots}}
+taskmanager.numberOfTaskSlots: {{number_taskslots}}
 
-{{#parallelization.degree.default}}parallelization.degree.default: {{parallelization.degree.default}}{{/parallelization.degree.default}}{{^parallelization.degree.default}}parallelization.degree.default: 1{{/parallelization.degree.default}}
+parallelization.degree.default: {{parallelization}}
 
 #==============================================================================
 # Web Frontend
 #==============================================================================
 
-{{#jobmanager.web.port}}jobmanager.web.port: {{jobmanager.web.port}}{{/jobmanager.web.port}}{{^jobmanager.web.port}}jobmanager.web.port: 8081{{/jobmanager.web.port}}
+jobmanager.web.port: 8081
 
-{{#webclient.port}}webclient.port: {{webclient.port}}{{/webclient.port}}{{^webclient.port}}webclient.port: 8080{{/webclient.port}}
+webclient.port: 8080
 
 #==============================================================================
 # Advanced
@@ -54,7 +54,7 @@
 
 # The number of buffers for the network stack.
 #
-{{#taskmanager.network.numberOfBuffers}}taskmanager.network.numberOfBuffers: {{taskmanager.network.numberOfBuffers}}{{/taskmanager.network.numberOfBuffers}}{{^taskmanager.network.numberOfBuffers}}# taskmanager.network.numberOfBuffers: 2048{{/taskmanager.network.numberOfBuffers}}
+# taskmanager.network.numberOfBuffers: 2048
 
 # Directories for temporary files.
 #
@@ -70,7 +70,7 @@
 # If not specified, the system-specific Java temporary directory (java.io.tmpdir
 # property) is taken.
 #
-{{#taskmanager.tmp.dirs}}taskmanager.tmp.dirs: {{taskmanager.tmp.dirs}}{{/taskmanager.tmp.dirs}}{{^taskmanager.tmp.dirs}}# taskmanager.tmp.dirs: /tmp{{/taskmanager.tmp.dirs}}
+# taskmanager.tmp.dirs: /tmp
 
 # Path to the Hadoop configuration directory.
 #
@@ -81,4 +81,4 @@
 # You can also directly specify the paths to hdfs-default.xml and hdfs-site.xml
 # via keys 'fs.hdfs.hdfsdefault' and 'fs.hdfs.hdfssite'.
 #
-{{#fs.hdfs.hadoopconf}}fs.hdfs.hadoopconf: {{fs.hdfs.hadoopconf}}{{/fs.hdfs.hadoopconf}}{{^fs.hdfs.hadoopconf}}# fs.hdfs.hadoopconf: /path/to/hadoop/conf/{{/fs.hdfs.hadoopconf}} 
+# fs.hdfs.hadoopconf: /path/to/hadoop/conf/

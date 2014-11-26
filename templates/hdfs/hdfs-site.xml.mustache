@@ -4,7 +4,15 @@
     <value>hdfs://{{master}}:50040/</value>
   </property>
   <property>
-    <name>dfs.data.dir</name>
-    <value>{{datapath}}</value>
+    <name>fs.defaultFS</name>
+    <value>hdfs://{{master}}:50040/</value>
+  </property>
+  <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>file://{{namenode_path}}/</value>
+  </property>
+  <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>file://{{datanode_path}}</value>
   </property>
 </configuration> 

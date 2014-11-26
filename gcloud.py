@@ -11,7 +11,7 @@ from fabric.api import env
 gcloud_file = "gcloud_conf.data"
 
 class Configuration(object):
-    #master/slave format: (hostname, internal_ip, external_ip)
+
     def __init__(self, master, slaves):
         self.master = master
         self.slaves = slaves
@@ -157,8 +157,8 @@ def init():
     slaves = config.get_slaves_ips()
     if ips and hostnames and master and slaves:
         env.hosts = ips
-        env.master = master
-        env.slaves = slaves
+        env.master = config.get_master_name()
+        env.slaves = config.get_slaves_names()
         env.hostnames = hostnames
         env.roledefs = {'slaves' : slaves, 'master' : [master]}
         env.key_filename = "~/.ssh/google_compute_engine"
