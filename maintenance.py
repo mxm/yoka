@@ -41,10 +41,14 @@ def generate_key():
 
 @task
 def set_master_key():
-    (publickey, privatekey) = execute(generate_key, role='master')[env.master]
+    (publickey, privatekey) = execute(generate_key, role='master').values()[0]
     run("echo '%s' > ~/.ssh/id_rsa.pub" % publickey, quiet=True)
     run("echo '%s' > ~/.ssh/id_rsa" % privatekey, quiet=True)
     run("echo '%s' >> ~/.ssh/authorized_keys" % publickey, quiet=True)
+    ssh_config = """Host *
+    StrictHostKeyChecking no
+    UserKnownHostsFile=/dev/null"""
+    run("echo '%s' > ~/.ssh/config" % ssh_config)
 
 
 @task
