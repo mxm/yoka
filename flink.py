@@ -1,5 +1,5 @@
 from __future__ import with_statement
-from fabric.decorators import task, roles
+from fabric.decorators import task, roles, parallel
 from fabric.api import env, run, cd
 import config as conf
 from maintenance import pull_from_master
@@ -7,7 +7,7 @@ from utils import process_template
 
 @task
 @roles('master')
-def install_dependencies():
+def install():
     run("git clone %s %s" % (conf.FLINK_REPOSITORY, conf.FLINK_PATH))
     with cd("flink"):
         run("git checkout %s" % conf.FLINK_COMMIT)
@@ -15,7 +15,7 @@ def install_dependencies():
 
 @task
 @roles('master')
-def configure_flink():
+def configure():
     context = {
         'master' : env.master,
         'java_home' : conf.JAVA_HOME,
@@ -32,19 +32,20 @@ def configure_flink():
 
 @task
 @roles('slaves')
-def pull_flink():
+@parallel
+def pull():
     pull_from_master(conf.FLINK_PATH)
 
 @task
 @roles('master')
-def flink_master(action="start"):
+def master(action="start"):
     path = run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf.FLINK_PATH)
     with cd(path):
         run('nohup bash bin/jobmanager.sh %s cluster' % action)
 
 @task
 @roles('slaves')
-def flink_slaves(action="start"):
+def slaves(action="start"):
     path = run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf.FLINK_PATH)
     with cd(path):
         run('nohup bash bin/taskmanager.sh %s' % action)

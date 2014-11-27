@@ -7,19 +7,17 @@ from utils import process_template
 
 @task
 @roles('master')
-def install_hadoop():
+def install():
     run("curl %s | tar xz" % conf.HADOOP_SOURCE)
     run("mv hadoop* %s" % conf.HADOOP_PATH)
 
-@task
-@parallel
-def create_hdfs_dir():
+def format_hdfs_master():
     run("mkdir %s" % conf.HDFS_DATAPATH)
-
+    run("%s/bin/hdfs namenode -format" % conf.HADOOP_PATH)
 
 @task
 @roles('master')
-def configure_hdfs():
+def configure():
     set_java_home("%s/%s/hadoop-env.sh" % (conf.HADOOP_PATH, conf.HDFS_CONFIG_PATH))
     context =  {'master': env.master,
                 'namenode_path': conf.HDFS_NAMENODE_PATH,
@@ -30,25 +28,20 @@ def configure_hdfs():
     slaves = '\n'.join(env.slaves)
     context2 = {'slaves' : slaves}
     process_template("hdfs", "slaves.mustache", context2, destination)
-
-@task
-@roles('master')
-def format_hdfs_master():
-    run("%s/bin/hdfs namenode -format" % conf.HADOOP_PATH)
+    format_hdfs_master()
 
 @task
 @roles('slaves')
-#@parallel
-def pull_hadoop():
+@parallel
+def pull():
     pull_from_master(conf.HADOOP_PATH)
-    #pull_from_master(conf.HDFS_DATAPATH)
 
 @task
 @roles('master')
-def hdfs_master(action="start"):
+def master(action="start"):
     sudo("%s/sbin/hadoop-daemon.sh --config %s/%s --script hdfs %s namenode" % (conf.HADOOP_PATH, conf.HADOOP_PATH, conf.HDFS_CONFIG_PATH, action))
 
 @task
 @roles('slaves')
-def hdfs_slaves(action="start"):
+def slaves(action="start"):
     sudo("%s/sbin/hadoop-daemon.sh --config %s/%s --script hdfs %s datanode" % (conf.HADOOP_PATH, conf.HADOOP_PATH, conf.HDFS_CONFIG_PATH, action))

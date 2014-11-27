@@ -52,7 +52,7 @@ def set_master_key():
 
 
 @task
-#@parallel
+@parallel
 @roles('slaves')
 def pull_from_master(path):
     run("scp -r %s:'%s' ~" % (env.master, path), quiet=False)
