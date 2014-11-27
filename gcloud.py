@@ -97,8 +97,8 @@ def create_instances():
         "--boot-disk-type 'pd-standard'",
         "-q"
     ).execute()
-    create_config()
-
+    Configuration.delete()
+    init()
 
 @task
 @runs_once
@@ -113,6 +113,7 @@ def delete_instances():
         "-q"
     ).execute()
     Configuration.delete()
+    init()
 
 @task
 @runs_once

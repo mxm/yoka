@@ -1,5 +1,6 @@
 from fabric.decorators import task, roles, parallel, runs_once
 from fabric.api import sudo, run, execute, env
+import config as conf
 
 @task
 @parallel
@@ -36,14 +37,15 @@ def set_java_home(file="~/.bashrc"):
 @runs_once
 @roles('master')
 def generate_key():
-    run("ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''")
+    run("yes | ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''")
     return (run("cat ~/.ssh/id_rsa.pub", quiet=True), run("cat ~/.ssh/id_rsa", quiet=True))
 
 @task
-def set_master_key():
+def set_key():
     (publickey, privatekey) = execute(generate_key, role='master').values()[0]
     run("echo '%s' > ~/.ssh/id_rsa.pub" % publickey, quiet=True)
     run("echo '%s' > ~/.ssh/id_rsa" % privatekey, quiet=True)
+    run("chmod 700 ~/.ssh/id_rsa")
     run("echo '%s' >> ~/.ssh/authorized_keys" % publickey, quiet=True)
     ssh_config = """Host *
     StrictHostKeyChecking no

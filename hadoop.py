@@ -8,11 +8,13 @@ from utils import process_template
 @task
 @roles('master')
 def install():
+    run("rm -rf '%s'" % conf.HADOOP_PATH)
     run("curl %s | tar xz" % conf.HADOOP_SOURCE)
     run("mv hadoop* %s" % conf.HADOOP_PATH)
 
 def format_hdfs_master():
-    run("mkdir %s" % conf.HDFS_DATAPATH)
+    run("rm -rf '%s'" % conf.HDFS_NAMENODE_PATH)
+    run("mkdir %s" % conf.HDFS_NAMENODE_PATH)
     run("%s/bin/hdfs namenode -format" % conf.HADOOP_PATH)
 
 @task
