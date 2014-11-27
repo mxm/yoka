@@ -1,7 +1,7 @@
 from __future__ import with_statement
 import types
 import config as conf
-from fabric.api import local, run, put
+from fabric.api import local, run, put, execute
 
 import pystache
 
@@ -33,7 +33,7 @@ def exec_on(command, master_or_slaves):
     if isinstance(command, types.FunctionType):
         execute(command, role=master_or_slaves)
     else:
-        execute(run(command), role=master_or_slaves)
+        execute(lambda: run(command), role=master_or_slaves)
 
 """ Execute command on master """
 def master(command):
