@@ -57,4 +57,4 @@ def set_key():
 @parallel
 @roles('slaves')
 def pull_from_master(path):
-    run("scp -r %s:'%s' ~" % (env.master, path), quiet=False)
+    run("rsync -a --progress %s:'%s' ~" % (env.master, path), quiet=False)
