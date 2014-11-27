@@ -45,6 +45,7 @@ def master(action="start"):
 
 @task
 @roles('slaves')
+@parallel
 def slaves(action="start"):
     path = run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf.FLINK_PATH)
     with cd(path):

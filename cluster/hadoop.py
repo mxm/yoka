@@ -45,5 +45,6 @@ def master(action="start"):
 
 @task
 @roles('slaves')
+@parallel
 def slaves(action="start"):
     sudo("%s/sbin/hadoop-daemon.sh --config %s/%s --script hdfs %s datanode" % (conf.HADOOP_PATH, conf.HADOOP_PATH, conf.HDFS_CONFIG_PATH, action))
