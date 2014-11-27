@@ -49,3 +49,8 @@ def slaves(action="start"):
     path = run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf.FLINK_PATH)
     with cd(path):
         run('nohup bash bin/taskmanager.sh %s' % action)
+
+@task
+@roles('master')
+def run_jar(jar, *args):
+    print "running %s with args: %s" % (jar, args)

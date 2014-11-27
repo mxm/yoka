@@ -1,4 +1,5 @@
 from __future__ import with_statement
+import types
 import config as conf
 from fabric.api import local, run, put
 
@@ -28,14 +29,29 @@ class RemoteCommand(Command):
     def execute(self):
         run(self.command)
 
+def exec_on(command, master_or_slaves):
+    if isinstance(command, types.FunctionType):
+        execute(command, role=master_or_slaves)
+    else:
+        execute(run(command), role=master_or_slaves)
+
+""" Execute command on master """
+def master(command):
+    exec_on(command, 'master')
+
+""" Execute command on slaves """
+def slaves(command):
+    exec_on(command, 'slaves')
+
+
+def render_template(template_path, context):
+    renderer = pystache.Renderer()
+    return renderer.render_path(template_path, context)
 
 def process_template(module, template, context, destination):
     renderer = pystache.Renderer()
     template_path = "%s/%s/%s" % (conf.TEMPLATE_PATH, module, template)
-    config_content = renderer.render_path(
-        template_path,
-        context
-    )
+    config_context = render_template(template_path, context)
     src = "%s/%s" % (conf.TMP, template[:-9])
     with open(src, 'w') as f:
         f.write(config_content)
