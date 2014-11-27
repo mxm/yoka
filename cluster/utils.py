@@ -50,8 +50,8 @@ def render_template(template_path, context):
 
 def process_template(module, template, context, destination):
     renderer = pystache.Renderer()
-    template_path = "%s/%s/%s" % (conf.TEMPLATE_PATH, module, template)
-    config_context = render_template(template_path, context)
+    template_path = "%s/%s/%s" % (conf.CLUSTER_TEMPLATE_PATH, module, template)
+    config_content = render_template(template_path, context)
     src = "%s/%s" % (conf.TMP, template[:-9])
     with open(src, 'w') as f:
         f.write(config_content)

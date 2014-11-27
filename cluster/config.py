@@ -23,7 +23,7 @@ HADOOP_PATH="/home/%s/hadoop" % USER
 
 JAVA_HOME = "/usr/lib/jvm/java-1.7.0-openjdk-amd64"
 
-TEMPLATE_PATH="templates"
+CLUSTER_TEMPLATE_PATH="cluster/templates"
 
 HDFS_CONFIG_PATH = "etc/hadoop"
 HDFS_NAMENODE_PATH = "/home/%s/hdfs-namenode" % USER
