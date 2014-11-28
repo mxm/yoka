@@ -17,7 +17,7 @@ class Command(object):
         return self.command
 
     def execute(self):
-        raise NotImplmentedError
+        raise NotImplementedError()
 
 class LocalCommand(Command):
 
@@ -43,13 +43,15 @@ def master(command):
 def slaves(command):
     exec_on(command, 'slaves')
 
+def exec_bash(script):
+    return run("cd /tmp && cat <<'EOF' | bash \n%s \nEOF" % script)
+
 
 def render_template(template_path, context):
     renderer = pystache.Renderer()
     return renderer.render_path(template_path, context)
 
 def process_template(module, template, context, destination):
-    renderer = pystache.Renderer()
     template_path = "%s/%s/%s" % (conf.CLUSTER_TEMPLATE_PATH, module, template)
     config_content = render_template(template_path, context)
     src = "%s/%s" % (conf.TMP, template[:-9])

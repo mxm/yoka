@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from fabric.decorators import task, roles, parallel
-from fabric.api import env, run, cd
+from fabric.api import env, run, cd, put
 import config as conf
 from maintenance import pull_from_master
 from utils import process_template
@@ -13,6 +13,9 @@ def install():
         run("git checkout %s" % conf.FLINK_COMMIT)
         run("mvn clean install -DskipTests")
 
+def get_flink_dist_path():
+    return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf.FLINK_PATH)
+
 @task
 @roles('master')
 def configure():
@@ -22,8 +25,7 @@ def configure():
         'number_taskslots' : conf.FLINK_NUMBER_TASK_SLOTS,
         'parallelization' : conf.FLINK_PARALLELIZATION,
     }
-    destination = run("cd %s/flink-dist/target/flink*/flink*/conf;pwd" % conf.FLINK_PATH)
-    print destination
+    destination = get_flink_dist_path() + "/conf"
     process_template("flink", "flink-conf.yaml.mustache", context, destination)
     slaves = '\n'.join(env.slaves)
     context2 = {'slaves' : slaves}
@@ -53,5 +55,9 @@ def slaves(action="start"):
 
 @task
 @roles('master')
-def run_jar(jar, *args):
-    print "running %s with args: %s" % (jar, args)
+def run_jar(path, jar_name, args):
+    print "running %s with args: %s" % (jar_name, args)
+    put("%s/%s" % (path, jar_name), conf.FLINK_PATH)
+    with cd(get_flink_dist_path()):
+        job_args = ' '.join(args)
+        run("bin/flink run '%s/%s' '%s'" % (conf.FLINK_PATH, jar_name, job_args))

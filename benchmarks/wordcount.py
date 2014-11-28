@@ -1,7 +1,7 @@
 from fabfile import FlinkBenchmarkSuite, FlinkBenchmark
 
 from cluster.maintenance import install
-from cluster.utils import render_template, master
+from cluster.utils import master, render_template, exec_bash
 from cluster.flink import run_jar
 
 #ARGS="$HDFS_WC $HDFS_WC_OUT"
@@ -18,17 +18,21 @@ class Run(FlinkBenchmark):
         super(Run, self).setup()
         master(lambda: install("wget"))
         master(lambda: install("ruby"))
+        master(lambda: install("bzip2"))
+        master(lambda: install("aspell"))
         generate_wc_data = render_template(
             "benchmarks/gen_wc_data.sh.mustache",
             self.params
         )
-        master("cat <<EOF | bash \n %s \nEOF" % generate_wc_data)
+        master(lambda: exec_bash(generate_wc_data))
 
     def run(self):
-        run_jar("bla.jar", [1,2,3])
+        fun = lambda: run_jar("benchmarks",
+                              "flink-java-examples-0.8-incubating-SNAPSHOT-WordCount.jar",
+                              ["file:///tmp/wc-data/generated-wc.txt", "/tmp/wc-out/"])
+        master(fun)
 
     def shutdown(self):
-        pass
         super(Run, self).shutdown()
 
 
