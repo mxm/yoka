@@ -15,7 +15,7 @@ def upgrade():
 @task
 @parallel
 def install(package):
-    sudo("apt-get -y install %s" % package)
+    sudo("apt-get -y install %s > /dev/null" % package)
 
 @task
 @parallel
