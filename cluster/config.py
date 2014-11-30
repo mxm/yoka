@@ -13,8 +13,12 @@ GCE_MACHINE_PREFIX = "benchmark-"
 FLINK_PATH = "/home/%s/flink" % USER
 FLINK_REPOSITORY = "https://github.com/apache/incubator-flink"
 FLINK_COMMIT = "master"
+
 FLINK_NUMBER_TASK_SLOTS = 8
 FLINK_PARALLELIZATION = 1
+FLINK_JOBMANAGER_HEAP = 256
+FLINK_TASKMANAGER_HEAP = 512
+FLINK_TASKMANAGER_NUM_BUFFERS = 2048
 
 PEEL_DIR = "/home/max/Dev/DataArtisans/peel"
 

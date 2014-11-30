@@ -32,9 +32,9 @@ jobmanager.rpc.address: {{master}}
 
 jobmanager.rpc.port: 6123
 
-jobmanager.heap.mb: 256
+jobmanager.heap.mb: {{jobmanager_heap}}
 
-taskmanager.heap.mb: 512
+taskmanager.heap.mb: {{taskmanager_heap}}
 
 taskmanager.numberOfTaskSlots: {{number_taskslots}}
 
@@ -54,7 +54,7 @@ webclient.port: 8080
 
 # The number of buffers for the network stack.
 #
-# taskmanager.network.numberOfBuffers: 2048
+taskmanager.network.numberOfBuffers: {{taskmanager_num_buffers}}
 
 # Directories for temporary files.
 #

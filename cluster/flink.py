@@ -24,6 +24,9 @@ def configure():
         'java_home' : conf.JAVA_HOME,
         'number_taskslots' : conf.FLINK_NUMBER_TASK_SLOTS,
         'parallelization' : conf.FLINK_PARALLELIZATION,
+        'jobmanager_heap' : conf.FLINK_JOBMANAGER_HEAP,
+        'taskmanager_heap' : conf.FLINK_PARALLELIZATION,
+        'taskmanager_num_buffers' : conf.FLINK_NUMBER_TASK_SLOTS,
     }
     destination = get_flink_dist_path() + "/conf"
     process_template("flink", "flink-conf.yaml.mustache", context, destination)
