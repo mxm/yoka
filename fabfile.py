@@ -12,7 +12,7 @@ class Experiment(object):
     def setup(self):
         raise NotImplementedError()
 
-    def run(self, job):
+    def run(self):
         raise NotImplementedError()
 
     def shutdown(self):
