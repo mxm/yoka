@@ -41,7 +41,7 @@ def pull():
 @task
 @roles('master')
 def master(action="start"):
-    path = run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf.FLINK_PATH)
+    path = get_flink_dist_path()
     with cd(path):
         run('nohup bash bin/jobmanager.sh %s cluster' % action)
 
@@ -49,7 +49,7 @@ def master(action="start"):
 @roles('slaves')
 @parallel
 def slaves(action="start"):
-    path = run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf.FLINK_PATH)
+    path = get_flink_dist_path()
     with cd(path):
         run('nohup bash bin/taskmanager.sh %s' % action)
 
@@ -60,4 +60,5 @@ def run_jar(path, jar_name, args):
     put("%s/%s" % (path, jar_name), conf.FLINK_PATH)
     with cd(get_flink_dist_path()):
         job_args = ' '.join(args)
-        run("bin/flink run '%s/%s' '%s'" % (conf.FLINK_PATH, jar_name, job_args))
+        run("bin/flink run -v '%s/%s' %s"
+            % ( conf.FLINK_PATH, jar_name, job_args))
