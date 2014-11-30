@@ -48,3 +48,9 @@ def master(action="start"):
 @parallel
 def slaves(action="start"):
     sudo("%s/sbin/hadoop-daemon.sh --config %s/%s --script hdfs %s datanode" % (conf.HADOOP_PATH, conf.HADOOP_PATH, conf.HDFS_CONFIG_PATH, action))
+
+
+def copy_to_hdfs(src, dest):
+    run("%s/bin/hdfs dfs -put '%s' 'hdfs://%s:50040/%s'"
+        % (conf.HADOOP_PATH, src, env.master, dest)
+        )
