@@ -23,7 +23,7 @@ custom_flink_conf['taskmanager_num_buffers'] = 1024
 custom_flink = Flink(custom_flink_conf)
 
 benchmarks = [
-    Benchmark(
+    Benchmark("WordCount1000",
         [hadoop, flink],
         WordCount({
             'id' : 1,
@@ -31,15 +31,7 @@ benchmarks = [
         })
     ),
 
-    Benchmark(
-        [hadoop, flink],
-        WordCount({
-            'id' : 1,
-            'num_lines' : 1000
-        })
-    ),
-
-    Benchmark(
+    Benchmark("WordCount1000-custom",
         [hadoop, custom_flink],
         WordCount({
             'id' : 3,

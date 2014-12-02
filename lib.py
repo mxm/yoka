@@ -16,9 +16,12 @@ class Experiment(object):
 
 class Benchmark(Experiment):
 
-    execution_time = None
+    id = None
+    start_time = None
+    duration = None
 
-    def __init__(self, systems, experiment):
+    def __init__(self, id, systems, experiment):
+        self.id = id
         self.systems = systems
         self.experiment = experiment
 
@@ -29,9 +32,9 @@ class Benchmark(Experiment):
         self.experiment.setup()
 
     def run(self):
-        start = time()
+        self.start_time = time()
         self.experiment.run()
-        self.execution_time = time() - start
+        self.duration = time() - self.start_time
 
     def shutdown(self):
         self.experiment.shutdown()
@@ -40,7 +43,7 @@ class Benchmark(Experiment):
             system.reset()
 
     def __str__(self):
-        return str(self.execution_time)
+        return str(self.duration)
 
 class System(object):
 
