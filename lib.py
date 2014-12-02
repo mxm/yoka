@@ -35,9 +35,9 @@ class Benchmark(Experiment):
 
     def shutdown(self):
         self.experiment.shutdown()
-        for sys in reversed(self.systems):
-            sys.stop()
-            sys.reset()
+        for system in reversed(self.systems):
+            system.stop()
+            system.reset()
 
     def __str__(self):
         return str(self.execution_time)
@@ -84,16 +84,14 @@ class ClusterSuite(Experiment):
 
     def setup(self):
         self.cluster.setup()
-        for sys in self.systems:
-            sys.install()
+        for system in self.systems:
+            system.install()
 
     def run(self):
         for benchmark in self.benchmarks:
-            try:
-                benchmark.setup()
-                benchmark.run()
-            finally:
-                benchmark.shutdown()
+            benchmark.setup()
+            benchmark.run()
+            benchmark.shutdown()
 
     def shutdown(self):
         self.cluster.shutdown()

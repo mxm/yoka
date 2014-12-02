@@ -44,6 +44,7 @@ def generate_key():
     return (run("cat ~/.ssh/id_rsa.pub", quiet=True), run("cat ~/.ssh/id_rsa", quiet=True))
 
 @task
+@parallel
 def set_key():
     (publickey, privatekey) = execute(generate_key, role='master').values()[0]
     run("echo '%s' > ~/.ssh/id_rsa.pub" % publickey, quiet=True)

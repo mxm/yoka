@@ -10,7 +10,6 @@ from configs import flink_config as conf
 @roles('master')
 def install():
     sudo("rm -rf '%s'" % conf['path'])
-    sudo("rm -rf '%s'" % conf['git_repository'])
     run("git clone %s %s" % (conf['git_repository'], conf['path']))
 
 def get_flink_dist_path():
@@ -30,7 +29,6 @@ def configure():
     slaves = '\n'.join(env.slaves)
     context2 = {'slaves' : slaves}
     process_template("flink", "slaves.mustache", context2, destination)
-
 
 @task
 @roles('slaves')

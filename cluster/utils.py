@@ -51,9 +51,9 @@ def render_template(template_path, context):
     return renderer.render_path(template_path, context)
 
 def process_template(module, template, context, destination):
-    template_path = "%s/%s/%s" % (conf.CLUSTER_TEMPLATE_PATH, module, template)
+    template_path = "%s/%s/%s" % ("cluster/templates/", module, template)
     config_content = render_template(template_path, context)
-    src = "%s/%s" % (conf.TMP, template[:-9])
+    src = "%s/%s" % ("/tmp/", template[:-9])
     with open(src, 'w') as f:
         f.write(config_content)
     put(src, "%s" % destination)
