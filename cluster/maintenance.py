@@ -1,6 +1,6 @@
 from fabric.decorators import task, roles, parallel, runs_once
 from fabric.api import sudo, run, execute, env
-import config as conf
+
 
 @task
 @parallel
@@ -26,10 +26,13 @@ def install_dependencies():
     install("git")
     install("curl")
 
+def find_java_home():
+    return run("readlink -f /usr/bin/javac | sed 's:bin/javac::'")
+
 @task
 @parallel
 def set_java_home(file="~/.bashrc"):
-    java_home = conf.JAVA_HOME
+    java_home = find_java_home()
     run("echo 'export JAVA_HOME=%s' >> %s" % (java_home, file))
     sudo("echo 'export JAVA_HOME=%s' >> %s" % (java_home, "/root/.bashrc"))
 
@@ -57,4 +60,4 @@ def set_key():
 @parallel
 @roles('slaves')
 def pull_from_master(path):
-    run("rsync -a --progress %s:'%s' ~" % (env.master, path), quiet=False)
+    run("rsync -a --progress --exclude 'logs' %s:'%s' ~" % (env.master, path), quiet=False)

@@ -1,12 +1,11 @@
 from __future__ import with_statement
 import types
-import config as conf
 from fabric.api import local, run, put, execute
-
 import pystache
 
 def compile_command(*args):
     return ' '.join(args)
+
 
 class Command(object):
 

@@ -1,33 +1,30 @@
 from __future__ import with_statement
 from fabric.decorators import task, roles, parallel
-from fabric.api import env, run, cd, put
-import config as conf
-from maintenance import pull_from_master
+from fabric.api import env, run, cd, put, sudo
+from maintenance import pull_from_master, find_java_home
 from utils import process_template
+
+from configs import flink_config as conf
 
 @task
 @roles('master')
 def install():
-    run("git clone %s %s" % (conf.FLINK_REPOSITORY, conf.FLINK_PATH))
-    with cd("flink"):
-        run("git checkout %s" % conf.FLINK_COMMIT)
-        run("mvn clean install -DskipTests")
+    sudo("rm -rf '%s'" % conf['path'])
+    sudo("rm -rf '%s'" % conf['git_repository'])
+    run("git clone %s %s" % (conf['git_repository'], conf['path']))
 
 def get_flink_dist_path():
-    return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf.FLINK_PATH)
+    return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf['path'])
 
 @task
 @roles('master')
 def configure():
-    context = {
-        'master' : env.master,
-        'java_home' : conf.JAVA_HOME,
-        'number_taskslots' : conf.FLINK_NUMBER_TASK_SLOTS,
-        'parallelization' : conf.FLINK_PARALLELIZATION,
-        'jobmanager_heap' : conf.FLINK_JOBMANAGER_HEAP,
-        'taskmanager_heap' : conf.FLINK_PARALLELIZATION,
-        'taskmanager_num_buffers' : conf.FLINK_NUMBER_TASK_SLOTS,
-    }
+    with cd("flink"):
+        run("git checkout %s" % conf['git_commit'])
+        run("mvn install -DskipTests")
+    context = conf
+    context['java_home'] = find_java_home()
+    context['master'] = env.master
     destination = get_flink_dist_path() + "/conf"
     process_template("flink", "flink-conf.yaml.mustache", context, destination)
     slaves = '\n'.join(env.slaves)
@@ -39,7 +36,7 @@ def configure():
 @roles('slaves')
 @parallel
 def pull():
-    pull_from_master(conf.FLINK_PATH)
+    pull_from_master(conf['path'])
 
 @task
 @roles('master')
@@ -60,8 +57,8 @@ def slaves(action="start"):
 @roles('master')
 def run_jar(path, jar_name, args):
     print "running %s with args: %s" % (jar_name, args)
-    put("%s/%s" % (path, jar_name), conf.FLINK_PATH)
+    put("%s/%s" % (path, jar_name), conf['path'])
     with cd(get_flink_dist_path()):
         job_args = ' '.join(args)
         run("bin/flink run -v '%s/%s' %s"
-            % ( conf.FLINK_PATH, jar_name, job_args))
+            % (conf['path'], jar_name, job_args))

@@ -1,11 +1,11 @@
 from fabric.decorators import task, roles, runs_once
-import config as conf
 from utils import LocalCommand
 import json
 import pickle
 import os
 
 from fabric.api import env
+from configs import compute_engine_config as conf
 
 
 gcloud_file = "gcloud_conf.data"
@@ -56,7 +56,7 @@ class Configuration(object):
         try:
             with open(gcloud_file, 'rb') as input:
                 config = pickle.load(input)
-            return config
+                return config
         except:
             return None
 
@@ -74,10 +74,8 @@ def install_gcloud():
 @task
 @runs_once
 def authenticate():
-    local("gcloud config set project %s" % conf.GCE_PROJECT_NAME)
+    local("gcloud config set project %s" % conf['project_name'])
     local("gcloud auth login")
-
-    setup()
 
 @task
 @runs_once
@@ -86,14 +84,14 @@ def create_instances():
         print "Old instancecs exist. Not creating new instances."
         return
     LocalCommand(
-        "gcloud compute --project %s" % conf.GCE_PROJECT_NAME,
+        "gcloud compute --project %s" % conf['project_name'],
         "instances create %s" % ' '.join(get_hostnames()),
-        "--zone %s" % conf.GCE_ZONE,
-        "--machine-type %s" % conf.GCE_MACHINE_TYPE,
+        "--zone %s" % conf['zone'],
+        "--machine-type %s" % conf['machine_type'],
         "--network 'default'",
         "--maintenance-policy 'MIGRATE'",
         "--scopes 'https://www.googleapis.com/auth/devstorage.read_only'",
-        "--image '%s'" % conf.GCE_DISK_IMAGE,
+        "--image '%s'" % conf['disk_image'],
         "--boot-disk-type 'pd-standard'",
         "-q"
     ).execute()
@@ -107,20 +105,19 @@ def delete_instances():
         print "No hostnames configured. Cannot delete instances."
         return
     LocalCommand(
-        "gcloud compute --project %s" % conf.GCE_PROJECT_NAME,
+        "gcloud compute --project %s" % conf['project_name'],
         "instances delete %s" % ' '.join(env.hostnames),
-        "--zone %s" % conf.GCE_ZONE,
+        "--zone %s" % conf['zone'],
         "-q"
     ).execute()
     Configuration.delete()
     init()
 
 @task
-@runs_once
 def create_config():
     output = LocalCommand(
         "gcloud compute instances list",
-        "--regexp '%s.*'" % conf.GCE_MACHINE_PREFIX,
+        "--regexp '%s.*'" % conf['prefix'],
         "--format json"
     ).execute(capture=True)
     data = json.loads(output)
@@ -138,10 +135,10 @@ def create_config():
     return Configuration.load()
 
 def get_master_hostname():
-    return conf.GCE_MACHINE_PREFIX + "master"
+    return conf['prefix'] + "master"
 
 def get_hostnames():
-    workers = [conf.GCE_MACHINE_PREFIX + "worker" + str(x) for x in xrange(0, conf.NUM_WORKERS)]
+    workers = [conf['prefix'] + "worker" + str(x) for x in xrange(0, conf['num_workers'])]
     workers.append(get_master_hostname())
     return workers
 
@@ -164,4 +161,4 @@ def init():
         env.roledefs = {'slaves' : slaves, 'master' : [master]}
         env.key_filename = "~/.ssh/google_compute_engine"
 
-init()
+#init()
