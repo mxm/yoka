@@ -34,7 +34,8 @@ class WordCount(Experiment):
                                % (env.master, self.params['id']),
                                "hdfs://%s:50040/tmp/wc-out%d/"
                                % (env.master, self.params['id'])
-                              ]
+                              ],
+                              upload=True
                         )
         )
 

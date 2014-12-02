@@ -53,10 +53,12 @@ def slaves(action="start"):
 
 @task
 @roles('master')
-def run_jar(path, jar_name, args):
+def run_jar(path, jar_name, args, upload=False):
     print "running %s with args: %s" % (jar_name, args)
-    put("%s/%s" % (path, jar_name), conf['path'])
+    job_args = ' '.join(args)
+    if upload:
+        put("%s/%s" % (path, jar_name), conf['path'])
+        path = conf['path']
     with cd(get_flink_dist_path()):
-        job_args = ' '.join(args)
         run("bin/flink run -v '%s/%s' %s"
-            % (conf['path'], jar_name, job_args))
+            % (path, jar_name, job_args))
