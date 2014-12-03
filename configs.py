@@ -15,6 +15,7 @@ flink_config = {
     'taskmanager_heap' : 512,
     'jobmanager_heap' : 256,
     'taskmanager_num_buffers' : 2048,
+    'jvm_opts' : "",
 }
 
 """
