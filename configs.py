@@ -16,6 +16,10 @@ flink_config = {
     'jobmanager_heap' : 256,
     'taskmanager_num_buffers' : 2048,
     'jvm_opts' : "",
+    'extra_config_entries' : [
+        { 'entry' : "#this: wontdoanything" },
+        { 'entry' : "#another: entry"},
+    ]
 }
 
 """

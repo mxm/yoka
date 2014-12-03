@@ -57,6 +57,13 @@ webclient.port: 8080
 #
 taskmanager.network.numberOfBuffers: {{taskmanager_num_buffers}}
 
+# Additional arguments
+
+{{#extra_config_entries}}
+{{entry}}
+{{/extra_config_entries}}
+
+
 # Directories for temporary files.
 #
 # Add a delimited list for multiple directories, using the system directory
