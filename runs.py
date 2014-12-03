@@ -26,19 +26,20 @@ custom_flink = Flink(custom_flink_conf)
 
 benchmarks = [
     Benchmark("WordCount1000",
-        [hadoop, flink],
-        WordCount({
+        systems = [hadoop, flink],
+        experiment = WordCount({
             'id' : 1,
             'num_lines' : 1000
         })
     ),
 
     Benchmark("WordCount1000-custom",
-        [hadoop, custom_flink],
-        WordCount({
+        systems = [hadoop, custom_flink],
+        experiment = WordCount({
             'id' : 3,
             'num_lines' : 1000
-        })
+        }),
+        times = 2
     )
 ]
 

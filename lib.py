@@ -20,10 +20,11 @@ class Benchmark(Experiment):
     start_time = None
     duration = None
 
-    def __init__(self, id, systems, experiment):
+    def __init__(self, id, systems, experiment, times = 1):
         self.id = id
         self.systems = systems
         self.experiment = experiment
+        self.times = 1
 
     def setup(self):
         for system in self.systems:
@@ -93,9 +94,10 @@ class ClusterSuite(Experiment):
 
     def run(self):
         for benchmark in self.benchmarks:
-            benchmark.setup()
-            benchmark.run()
-            benchmark.shutdown()
+            for i in range(0, benchmark.times):
+                benchmark.setup()
+                benchmark.run()
+                benchmark.shutdown()
 
     def shutdown(self):
         self.cluster.shutdown()
