@@ -80,7 +80,8 @@ class Cluster(object):
 
 class ClusterSuite(Experiment):
 
-    def __init__(self, cluster, systems, benchmarks):
+    def __init__(self, id, cluster, systems, benchmarks):
+        self.id = id
         self.cluster = cluster
         self.systems = systems
         self.benchmarks = benchmarks
@@ -98,3 +99,6 @@ class ClusterSuite(Experiment):
 
     def shutdown(self):
         self.cluster.shutdown()
+
+    def __str__(self):
+        return self.id

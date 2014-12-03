@@ -10,6 +10,8 @@ from configs import compute_engine_config, hadoop_config, flink_config
 # import experiment's main class
 from experiments.wordcount import WordCount
 
+from results import Results
+
 cluster = ComputeEngine(compute_engine_config)
 hadoop = Hadoop(hadoop_config)
 flink = Flink(flink_config)
@@ -40,11 +42,11 @@ benchmarks = [
     )
 ]
 
-suite = ClusterSuite(cluster, systems, benchmarks)
+suite = ClusterSuite("DefaultSuite", cluster, systems, benchmarks)
 
 suite.setup()
 suite.run()
 suite.shutdown()
 
-for b in suite.benchmarks:
-    print b
+results = Results(suite)
+results.save_results()
