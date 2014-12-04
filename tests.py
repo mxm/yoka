@@ -1,9 +1,9 @@
 import unittest
 import os
 
-from lib import Experiment, ClusterSuite
+from lib import System, Experiment, Benchmark, ClusterSuite
 from clusters import ComputeEngine
-from systems import Hadoop, Flink
+#from systems import Hadoop, Flink
 from configs import compute_engine_config, hadoop_config, flink_config
 
 import results
@@ -11,19 +11,33 @@ import results
 results.DB_FILE = 'test.db'
 
 cluster = ComputeEngine(compute_engine_config)
-hadoop = Hadoop(hadoop_config)
-flink = Flink(flink_config)
+#hadoop = Hadoop(hadoop_config)
+#flink = Flink(flink_config)
 
-systems = [hadoop, flink]
+class StupidSystem(System):
+
+    def __init__(self, name):
+        self.name = name
+
+    def install(self):
+        pass
+    def configure(self):
+        pass
+    def reset(self):
+        pass
+    def start(self):
+        pass
+    def stop(self):
+        pass
+    def save_log(self, unique_full_path):
+        pass
+    def __str__(self):
+        return self.name
+
+
+systems = [StupidSystem("stupid1"), StupidSystem("stupid2")]
 
 class TestExperiment(Experiment):
-
-
-    start_time = 23
-    duration = 42
-
-    def __init__(self, id):
-        self.id = id
 
     def setup(self):
         pass
@@ -35,34 +49,54 @@ class TestExperiment(Experiment):
         pass
 
 benchmarks = [
-    TestExperiment("Test1"),
-    TestExperiment("Test2"),
-    TestExperiment("Test3"),
+    Benchmark("Test1",
+              systems=systems,
+              experiment = TestExperiment(),
+              times = 1
+              ),
+    Benchmark("Test2",
+              systems=systems,
+              experiment = TestExperiment(),
+              times = 10
+              ),
+    Benchmark("Test3",
+              systems=systems,
+              experiment = TestExperiment(),
+              times = 3
+              ),
 ]
+
 
 class TestResults(unittest.TestCase):
 
     def setup(self):
-        pass
+        try:
+            os.remove(results.DB_FILE)
+        except:
+            pass
 
     def test_save(self):
         suite = ClusterSuite("SuiteTest", cluster, systems, benchmarks)
-        for b in suite.benchmarks:
-            b.run()
-        res = results.Results(suite)
-        res.save_results()
+        # skip setup and shutdown, just run the tests
+        suite.run()
+        #check corresponding db entries
         suite_id = suite.id
+        suite_uid = suite.uid
         for b in suite.benchmarks:
-            data = (suite_id, b.id, b.start_time, b.duration)
+            data = (suite_uid, suite_id, b.id)
             with results.DB() as db:
                 c = db.cursor()
                 c.execute("""
                 SELECT * FROM results
-                WHERE suite_id = ? and bench_id = ? and start_time = ? and duration = ?
+                WHERE suite_uid = ? and suite_id = ? and
+                bench_id = ?
                 """, data)
-                self.assertTrue(c.fetchall().__len__() > 0)
+                self.assertEquals(c.fetchall().__len__(), b.times)
 
     def tearDown(self):
-        os.remove(results.DB_FILE)
+        pass
+
+#class TestGCloud(unittest.TestCase):
+
 
 unittest.main()
