@@ -154,9 +154,10 @@ def init():
     master = config.get_master_ip()
     slaves = config.get_slaves_ips()
     # dictionary which gives each slave an id
-    slave_ids = {}
+    ids = {}
+    ids[master] = 0
     for (slave_id, slave) in enumerate(slaves):
-        slave_ids[slave] = slave_id
+        ids[slave] = slave_id+1
     if ips and hostnames and master and slaves:
         env.hosts = ips
         env.master = config.get_master_name()
@@ -164,7 +165,7 @@ def init():
         env.hostnames = hostnames
         env.roledefs = {'slaves' : slaves, 'master' : [master]}
         env.key_filename = "~/.ssh/google_compute_engine"
-        env.slave_ids = slave_ids
+        env.ids = ids
         env.keepalive = 60
 
 init()

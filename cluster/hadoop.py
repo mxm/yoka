@@ -59,3 +59,11 @@ def copy_to_hdfs(src, dest):
     run("%s/bin/hdfs dfs -put '%s' 'hdfs://%s:50040/%s'"
         % (conf['path'], src, env.master, dest)
         )
+
+def delete_from_hdfs(path):
+     run("%s/bin/hdfs dfs -rm 'hdfs://%s:50040/%s'"
+        % (path, env.master, dest)
+        )
+
+def get_hdfs_address():
+    return "hdfs://%s:50040/" % env.master

@@ -3,7 +3,7 @@ from lib import Experiment
 from cluster.maintenance import install
 from cluster.utils import master, render_template, exec_bash
 from cluster.flink import run_jar
-from cluster.hadoop import copy_to_hdfs
+from cluster.hadoop import copy_to_hdfs, delete_from_hdfs
 
 from fabric.api import env
 
@@ -24,7 +24,7 @@ class WordCount(Experiment):
         )
         master(lambda: exec_bash(generate_wc_data))
         master(lambda: copy_to_hdfs("/tmp/wc-data/generated-wc.txt",
-                                    "generated-wc%d.txt" % self.params['id']))
+                                    "generated-wc.txt"))
 
 
     def run(self):
@@ -32,8 +32,8 @@ class WordCount(Experiment):
                               "flink-java-examples-0.8-incubating-SNAPSHOT-WordCount.jar",
                               ["hdfs://%s:50040/generated-wc%d.txt"
                                % (env.master, self.params['id']),
-                               "hdfs://%s:50040/tmp/wc-out%d/"
-                               % (env.master, self.params['id'])
+                               "hdfs://%s:50040/tmp/wc-out/"
+                               % env.master
                               ],
                               upload=True
                         )
@@ -41,3 +41,5 @@ class WordCount(Experiment):
 
     def shutdown(self):
         master("rm -rf /tmp/wc-data/generated-wc.txt")
+        master(lambda: delete_from_hdfs("generated-wc.txt"))
+        master(lambda: delete_from_hdfs("/tmp/wc-out"))

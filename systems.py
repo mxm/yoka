@@ -27,7 +27,7 @@ class Hadoop(System):
         execute(hadoop.slaves, 'stop')
         execute(hadoop.master, 'stop')
 
-    def save_logs(self, log_name):
+    def save_log(self, log_name):
         pass
 
     def __str__(self):

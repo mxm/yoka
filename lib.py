@@ -71,7 +71,7 @@ class System(object):
     def stop(self):
         raise NotImplementedError()
 
-    def save_log(self):
+    def save_log(self, destination):
         raise NotImplementedError()
 
     def __str__(self):

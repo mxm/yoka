@@ -2,5 +2,4 @@
 
 source env/bin/activate
 
-#fab -f fabfile.py "$@"
-python fabfile.py
+python runs.py 2>&1 | tee output.log

@@ -1,4 +1,7 @@
 from __future__ import with_statement
-from fabric.api import execute
+from fabric.decorators import task
+from fabric.api import execute, env
+
+from cluster.utils import get_slave_id
 
 from cluster import gcloud, maintenance, hadoop, flink, utils

@@ -37,17 +37,19 @@ def set_java_home(file="~/.bashrc"):
     sudo("echo 'export JAVA_HOME=%s' >> %s" % (java_home, "/root/.bashrc"))
 
 @task
-@runs_once
 @roles('master')
+@runs_once
 def generate_key():
     run("yes | ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''")
-    return (run("cat ~/.ssh/id_rsa.pub", quiet=True), run("cat ~/.ssh/id_rsa", quiet=True))
+    print run("echo aha > access_log")
+    return (run("cat ~/.ssh/id_rsa.pub", quiet=False), run("cat ~/.ssh/id_rsa", quiet=True))
 
 @task
-@parallel
+# calls runs_once method, not safe to be parallel
+#@parallel
 def set_key():
     (publickey, privatekey) = execute(generate_key).values()[0]
-    run("echo '%s' > ~/.ssh/id_rsa.pub" % publickey, quiet=True)
+    run("echo '%s' > ~/.ssh/id_rsa.pub" % publickey, quiet=False)
     run("echo '%s' > ~/.ssh/id_rsa" % privatekey, quiet=True)
     run("chmod 700 ~/.ssh/id_rsa")
     run("echo '%s' >> ~/.ssh/authorized_keys" % publickey, quiet=True)
@@ -61,4 +63,4 @@ def set_key():
 @parallel
 @roles('slaves')
 def pull_from_master(path, dest="~"):
-    run("rsync -a --progress --exclude 'logs' %s:'%s' %s" % (env.master, path, dest), quiet=False)
+    run("rsync -a --progress --exclude 'logs' %s:%s %s" % (env.master, path, dest), quiet=False)
