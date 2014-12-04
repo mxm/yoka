@@ -46,7 +46,7 @@ def generate_key():
 @task
 @parallel
 def set_key():
-    (publickey, privatekey) = execute(generate_key, role='master').values()[0]
+    (publickey, privatekey) = execute(generate_key).values()[0]
     run("echo '%s' > ~/.ssh/id_rsa.pub" % publickey, quiet=True)
     run("echo '%s' > ~/.ssh/id_rsa" % privatekey, quiet=True)
     run("chmod 700 ~/.ssh/id_rsa")
@@ -60,5 +60,5 @@ def set_key():
 @task
 @parallel
 @roles('slaves')
-def pull_from_master(path):
-    run("rsync -a --progress --exclude 'logs' %s:'%s' ~" % (env.master, path), quiet=False)
+def pull_from_master(path, dest="~"):
+    run("rsync -a --progress --exclude 'logs' %s:'%s' %s" % (env.master, path, dest), quiet=False)

@@ -1,6 +1,6 @@
 from __future__ import with_statement
 import types
-from fabric.api import local, run, put, execute
+from fabric.api import env, local, run, put, execute
 import pystache
 
 def compile_command(*args):
@@ -57,3 +57,9 @@ def process_template(module, template, context, destination):
     with open(src, 'w') as f:
         f.write(config_content)
     put(src, "%s" % destination)
+
+def copy_log(log_path, dest):
+    local("rsync -aP %s:%s %s" % (env.host_string, log_path, dest))
+
+def get_slave_id(host_name):
+    return str(env.slave_ips[host_name])

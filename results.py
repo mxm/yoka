@@ -13,35 +13,55 @@ class DB(object):
         self.conn.close()
 
 
-class Results(object):
+class Result(object):
 
-    def __init__(self, suite):
+    def __init__(self, suite, benchmark, log_paths):
         self.suite = suite
+        self.benchmark = benchmark
+        self.log_paths = log_paths
         self.create_db()
 
     """ Create db if it does not exist """
     def create_db(self):
         with DB() as db:
             c = db.cursor()
-            c.execute('''
+            c.executescript('''
             CREATE TABLE IF NOT EXISTS "results" (
               "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+              "suite_uid" TEXT NO NULL,
               "suite_id" TEXT NOT NULL,
               "bench_id" TEXT NOT NULL,
               "duration" REAL NOT NULL,
-              "start_time" TEXT
+              "start_time" TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS "logs" (
+              "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+              "id_result" TEXT NOT NULL,
+              "system" TEXT NOT NULL,
+              "log_path" TEXT NOT NULL
             );
             ''')
 
-    def save_results(self):
+    def save(self):
         with DB() as db:
             c = db.cursor()
-            suite_id = self.suite.id
-            for benchmark in self.suite.benchmarks:
-                data = (suite_id, benchmark.id, benchmark.start_time, benchmark.duration)
+            data = (self.suite.uid, self.suite.id,
+                    self.benchmark.id,
+                    self.benchmark.start_time,
+                    self.benchmark.duration)
+            c.execute("""
+            INSERT INTO "results"
+              ('suite_uid', 'suite_id', 'bench_id', 'start_time', 'duration')
+            VALUES
+              (?,?,?,?,?)
+            """, data)
+            result_id = c.lastrowid
+            for system in self.log_paths.keys():
+                path = self.log_paths[system]
+                log_data = (result_id, str(system), path)
                 c.execute("""
-                INSERT INTO "results"
-                  ('suite_id', 'bench_id', 'start_time', 'duration')
+                INSERT INTO "logs"
+                  ('id_result', 'system', 'log_path')
                 VALUES
-                  (?,?,?,?)
-                """, data)
+                  (?,?,?)
+                """, log_data)

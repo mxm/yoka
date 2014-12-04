@@ -2,7 +2,7 @@ from __future__ import with_statement
 from fabric.decorators import task, roles, parallel
 from fabric.api import env, run, cd, put, sudo
 from maintenance import pull_from_master, find_java_home
-from utils import process_template
+from utils import process_template, copy_log, get_slave_id
 
 from configs import flink_config as conf
 
@@ -12,16 +12,18 @@ def install():
     sudo("rm -rf '%s'" % conf['path'])
     run("git clone %s %s" % (conf['git_repository'], conf['path']))
 
+@task
+@roles('master')
 def get_flink_dist_path():
     return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf['path'])
 
 @task
 @roles('master')
 def configure():
-    with cd("flink"):
+    with cd("%s" % conf['path']):
         run("git checkout %s" % conf['git_commit'])
         run("mvn install -DskipTests")
-    context = conf
+    context = conf.copy()
     context['java_home'] = find_java_home()
     context['master'] = env.master
     destination = get_flink_dist_path() + "/conf"
@@ -63,3 +65,23 @@ def run_jar(path, jar_name, args, clazz=None, upload=False):
         class_loader = "-c '%s'" % clazz if clazz else ""
         run("bin/flink run -v %s '%s/%s' %s"
             % (class_loader, path, jar_name, job_args))
+
+@task
+@roles('master')
+def copy_log_master(dest_path):
+    local("mkdir -p '%s'" % dest_path)
+    path = get_flink_dist_path()
+    log_file = "flink-*-jobmanager-*.log"
+    copy_log("%s/%s" % (path, log_file),
+             "%s/flink_jobmanager.log" % dest_path
+    )
+
+@task
+@roles('slaves')
+def copy_log_slaves(dest_path):
+    local("mkdir -p '%s'" % dest_path)
+    path = get_flink_dist_path()
+    log_file = "flink-*-taskmanager-*.log"
+    copy_log("%s/%s" % (path, log_file),
+             "%s/flink_taskmanager_%s.log" % (dest_path, get_slave_id(env.host_name))
+    )

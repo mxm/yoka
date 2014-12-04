@@ -10,7 +10,6 @@ from configs import compute_engine_config, hadoop_config, flink_config
 # import experiment's main class
 from experiments.wordcount import WordCount
 
-from results import Results
 
 cluster = ComputeEngine(compute_engine_config)
 hadoop = Hadoop(hadoop_config)

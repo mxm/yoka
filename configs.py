@@ -18,7 +18,7 @@ flink_config = {
     'jvm_opts' : "",
     'extra_config_entries' : [
         { 'entry' : "#this: wontdoanything" },
-        { 'entry' : "#another: entry"},
+        { 'entry' : "#another: entry" },
     ]
 }
 
