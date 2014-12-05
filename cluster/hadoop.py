@@ -18,6 +18,7 @@ def format_hdfs_master():
     run("mkdir %s" % conf['namenode_path'])
     run("%s/bin/hdfs namenode -format" % conf['path'])
 
+@task
 @roles('slaves')
 def delete_data_slaves():
     sudo("rm -rf '%s'" % conf['datanode_path'])
