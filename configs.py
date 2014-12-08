@@ -41,7 +41,7 @@ Standard Google Compute Engine config
 compute_engine_config = {
     'num_workers' : 2,
     'project_name' : "braided-keel-768",
-    'zone' : "europe-west1-b",
+    'zone' : "europe-west1-c",
     'machine_type' : "n1-standard-2",
     'disk_image' : "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/backports-debian-7-wheezy-v20141108",
     'prefix' : "benchmark-",
