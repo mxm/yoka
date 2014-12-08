@@ -35,6 +35,7 @@ class Benchmark(Experiment):
 
     def setup(self):
         for system in self.systems:
+            system.set_config()
             if not self.executed:
                 system.configure()
             system.start()
@@ -61,11 +62,15 @@ class Generator(Benchmark):
 
 class System(object):
 
+    module = None
     once_per_suite = False
     skip_targets = []
 
     def __init__(self, config):
         self.config = config
+
+    def set_config(self):
+        self.module.conf = self.config
 
     def install(self):
         raise NotImplementedError()

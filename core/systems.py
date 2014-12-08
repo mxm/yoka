@@ -5,11 +5,11 @@ from fabric.api import execute, local
 
 class Hadoop(System):
 
+    module = hadoop
     once_per_suite = True
 
     def __init__(self, config):
         self.config = config
-        hadoop.conf = self.config
 
     def install(self):
         if 'install' not in self.skip_targets:
@@ -42,11 +42,11 @@ class Hadoop(System):
 
 class Flink(System):
 
+    module = flink
     once_per_suite = False
 
     def __init__(self, config):
         self.config = config
-        flink.conf = self.config
 
     def install(self):
         if 'install' not in self.skip_targets:
