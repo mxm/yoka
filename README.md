@@ -58,9 +58,10 @@ Run
 
 To run py-bench, execute
 
-    ./pybench.sh
+    ./pybench.sh <runfile>
 
-Look at the provided examples to get an idea how to write your own runs.
+The runs.py is an example of a runfile. You can use it as base to write your own
+runs.
 
 
 Evaluation
