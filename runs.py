@@ -1,10 +1,10 @@
 import sys
 
-from lib import Benchmark, ClusterSuite
+from core.lib import Benchmark, ClusterSuite
 
 # import cluster and systems classes
-from clusters import ComputeEngine
-from systems import Hadoop, Flink
+from core.clusters import ComputeEngine
+from core.systems import Hadoop, Flink
 
 # import standard configs
 from configs import compute_engine_config, hadoop_config, flink_config

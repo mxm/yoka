@@ -1,12 +1,12 @@
 import unittest
 import os
 
-from lib import System, Experiment, Benchmark, ClusterSuite
-from clusters import ComputeEngine
+from core.lib import System, Experiment, Benchmark, ClusterSuite
+from core.clusters import ComputeEngine
 #from systems import Hadoop, Flink
 from configs import compute_engine_config, hadoop_config, flink_config
 
-import results
+import core.results as results
 
 results.DB_FILE = 'test.db'
 

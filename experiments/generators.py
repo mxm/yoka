@@ -3,11 +3,11 @@ from cluster.utils import master
 from cluster.flink import run_jar
 from cluster.hadoop import get_hdfs_address
 
-from systems import Flink
+from core.systems import Flink
 from configs import flink_config
 
-from lib import Experiment, Benchmark
-from utils import GitRepository
+from core.lib import Experiment, Benchmark
+from core.utils import GitRepository
 
 flink_perf_repo = "https://github.com/project-flink/flink-perf"
 

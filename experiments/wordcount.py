@@ -1,4 +1,4 @@
-from lib import Experiment
+from core.lib import Experiment
 
 from cluster.maintenance import install
 from cluster.utils import master, render_template, exec_bash
