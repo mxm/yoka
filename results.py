@@ -28,11 +28,12 @@ class Result(object):
             c.executescript('''
             CREATE TABLE IF NOT EXISTS "results" (
               "id" INTEGER PRIMARY KEY AUTOINCREMENT,
-              "suite_uid" TEXT NO NULL,
+              "suite_uid" TEXT NOT NULL,
               "suite_id" TEXT NOT NULL,
               "bench_id" TEXT NOT NULL,
-              "duration" REAL NOT NULL,
-              "start_time" TEXT NOT NULL
+              "duration" REAL,
+              "start_time" TEXT,
+              "failed" INTEGER NOT NULL
             );
             CREATE TABLE IF NOT EXISTS "logs" (
               "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,18 +43,20 @@ class Result(object):
             );
             ''')
 
-    def save(self):
+    def save(self, failed=False):
         with DB() as db:
             c = db.cursor()
             data = (self.suite.uid, self.suite.id,
                     self.benchmark.id,
                     self.benchmark.start_time,
-                    self.benchmark.duration)
+                    self.benchmark.duration,
+                    failed
+            )
             c.execute("""
             INSERT INTO "results"
-              ('suite_uid', 'suite_id', 'bench_id', 'start_time', 'duration')
+              ('suite_uid', 'suite_id', 'bench_id', 'start_time', 'duration', 'failed')
             VALUES
-              (?,?,?,?,?)
+              (?,?,?,?,?,?)
             """, data)
             result_id = c.lastrowid
             for system in self.log_paths.keys():

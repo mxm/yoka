@@ -1,6 +1,6 @@
 import sys
 
-from lib import Experiment, Benchmark, ClusterSuite
+from lib import Benchmark, ClusterSuite
 
 # import cluster and systems classes
 from clusters import ComputeEngine

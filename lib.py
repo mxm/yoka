@@ -1,5 +1,9 @@
 from time import time
 
+import log
+
+logger = log.get_logger(__name__)
+
 from results import Result
 
 class Experiment(object):
@@ -49,9 +53,16 @@ class Benchmark(Experiment):
             system.reset()
 
     def __str__(self):
-        return str(self.duration)
+        return str(self.id)
+
+# reuse the same logic the Benchmark class
+class Generator(Benchmark):
+    pass
 
 class System(object):
+
+    once_per_suite = False
+    skip_targets = []
 
     def __init__(self, config):
         self.config = config
@@ -92,24 +103,43 @@ class Cluster(object):
 
 class ClusterSuite(Experiment):
 
-    def __init__(self, id, cluster, systems, benchmarks):
+    def __init__(self, id, cluster, systems, generators, benchmarks):
         self.id = id
         self.uid = "%s_%d" % (id, int(time()))
         self.cluster = cluster
         self.systems = systems
+        self.generators = generators
         self.benchmarks = benchmarks
 
     def setup(self):
         self.cluster.setup()
         for system in self.systems:
             system.install()
+            if system.once_per_suite:
+                system.configure()
+                system.start()
 
     def run(self):
+        # generate data
+        for generator in self.generators:
+            generator.setup()
+            generator.run()
+            generator.shutdown()
+        # execute benchmarks
         for benchmark in self.benchmarks:
             for run_id in range(0, benchmark.times):
-                benchmark.setup()
-                benchmark.run()
-                benchmark.shutdown()
+                failed = False
+                try:
+                    benchmark.setup()
+                    benchmark.run()
+                except:
+                    logger.exception("Exception in %s run %d" % (benchmark, run_id))
+                    failed = True
+                finally:
+                    try:
+                        benchmark.shutdown()
+                    except:
+                        pass
                 # get system logs
                 log_paths = {}
                 for system in self.systems:
@@ -121,12 +151,22 @@ class ClusterSuite(Experiment):
                     log_paths[system] = unique_full_path
                 # save result
                 result = Result(self, benchmark, log_paths)
-                result.save()
-
+                result.save(failed)
 
 
     def shutdown(self):
+        for system in self.systems:
+            if system.once_per_suite:
+                system.stop()
         self.cluster.shutdown()
+
+    def execute(self):
+        logger.info("Setting up cluster")
+        self.setup()
+        logger.info("Running benchmarks")
+        self.run()
+        logger.info("Shutting down cluster")
+        self.shutdown()
 
     def __str__(self):
         return self.id
