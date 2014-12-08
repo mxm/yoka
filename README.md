@@ -1,11 +1,14 @@
 py-bench
 ========
 
-py-bench is a framework for running benchmarks on PaaS services. Currently, only Google Compute Engine is supported but py-bench can be extended to support other PaaS providers.
+py-bench is a framework for running performance tests on PaaS
+services. Currently, only Google Compute Engine is supported but py-bench can be
+extended to support other PaaS providers.
 
-With py-bench, you can define cluster suites which benchmark a set of experiments.
-Experiments depend on systems which can be started along with the experiments.
-Right now, py-bench supports HDFS and Flink as configurable systems.
+With py-bench, you can define cluster suites which performance test a set of
+experiments. Experiments depend on systems which can be started along with the
+experiments. Right now, py-bench supports HDFS and Flink as configurable
+systems.
 
 Install
 -------
@@ -24,9 +27,8 @@ The installation script will install the dependencies listed in requirements.txt
 Configure
 ---------
 
-All standard configs are defined in configs.py. The configs can be modified
-for a benchmark run by overriding values.
-
+All standard configs are defined in configs.py. By overriding values, the
+configs can be modified for a performance test.
 
 Run
 ---
@@ -41,9 +43,9 @@ Look at the provided examples to get an idea how to write your own runs.
 Evaluation
 ----------
 
-The results of each benchmark run are stored in the results.db database.
-The "results" table holds the benchmark times. The "logs" table holds the
-path to the system logs which are available in the /logs directory.
+The results of each performance test are stored in the results.db database.  The
+"results" table holds the run times. The "logs" table holds the path to the
+system logs which are available in the /logs directory.
 
 Development
 -----------
