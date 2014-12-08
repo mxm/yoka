@@ -37,13 +37,14 @@ Then authenticate against the Google Compute Engine
     gcloud config set account <ACCOUNTNAME>
     gcloud auth login
 
+Set the appropriate project:
+
+    gcloud config set project <PROJECTNAME>
+
 Generate SSH key files:
 
     gcloud compute config-ssh
 
-Set the appropriate project:
-
-    gcloud config set project <PROJECTNAME>
 
 
 Configure
