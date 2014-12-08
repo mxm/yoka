@@ -76,7 +76,7 @@ class TestResults(unittest.TestCase):
             pass
 
     def test_save(self):
-        suite = ClusterSuite("SuiteTest", cluster, systems, benchmarks)
+        suite = ClusterSuite("SuiteTest", cluster, systems, [], benchmarks)
         # skip setup and shutdown, just run the tests
         suite.run()
         #check corresponding db entries
