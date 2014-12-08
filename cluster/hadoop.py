@@ -1,5 +1,5 @@
-from fabric.decorators import task, roles, runs_once, parallel
-from fabric.api import env, cd, run, put, sudo
+from fabric.decorators import task, roles, parallel
+from fabric.api import env, run, sudo
 from maintenance import pull_from_master, set_java_home
 from utils import process_template
 
@@ -57,14 +57,14 @@ def slaves(action="start"):
 
 
 def copy_to_hdfs(src, dest):
-    run("%s/bin/hdfs dfs -put '%s' 'hdfs://%s:50040/%s'"
+    run("%s/bin/hdfs dfs -put -f '%s' 'hdfs://%s:50040/%s'"
         % (conf['path'], src, env.master, dest)
-        )
+    )
 
 def delete_from_hdfs(path):
      run("%s/bin/hdfs dfs -rm 'hdfs://%s:50040/%s'"
-        % (path, env.master, dest)
-        )
+        % (conf['path'], env.master, path)
+     )
 
 def get_hdfs_address():
     return "hdfs://%s:50040/" % env.master

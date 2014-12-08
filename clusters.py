@@ -9,7 +9,8 @@ class ComputeEngine(Cluster):
     def setup(self):
         gcloud.conf = self.config
         execute(gcloud.create_instances)
-        #maintenance.upgrade()
+        execute(maintenance.update_package_cache)
+        #execute(maintenance.upgrade)
         execute(maintenance.install_dependencies)
         execute(maintenance.set_java_home)
         execute(maintenance.set_key)

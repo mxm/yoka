@@ -20,7 +20,6 @@ def install(package):
 @task
 @parallel
 def install_dependencies():
-    update_package_cache()
     install("openjdk-7-jdk")
     install("maven")
     install("git")
@@ -63,4 +62,4 @@ def set_key():
 @parallel
 @roles('slaves')
 def pull_from_master(path, dest="~"):
-    run("rsync -a --progress --exclude 'logs' %s:%s %s" % (env.master, path, dest), quiet=False)
+    run("rsync -aP %s:%s %s || true" % (env.master, path, dest), quiet=False)
