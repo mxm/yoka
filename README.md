@@ -13,6 +13,8 @@ systems.
 Install
 -------
 
+### py-bench
+
 Install Python 2.7, Virtualenv for Python, and the Python development files. In Debian, this command does the trick:
 
     sudo apt-get install python2.7 python-dev python-virtualenv
@@ -22,7 +24,27 @@ Then run:
     git clone https://github.com/mxm/flink-perf-new
     ./install.sh
 
-The installation script will install the dependencies listed in requirements.txt
+The installation script will install the dependencies listed in requirements.txt.
+
+### Google Compute Engine
+
+For using Google Compute Engine, please install the gcloud tool, i.e. using
+
+    curl https://sdk.cloud.google.com | bash
+
+Then authenticate against the Google Compute Engine
+
+    gcloud config set account <ACCOUNTNAME>
+    gcloud auth login
+
+Generate SSH key files:
+
+    gcloud compute config-ssh
+
+Set the appropriate project:
+
+    gcloud config set project <PROJECTNAME>
+
 
 Configure
 ---------
