@@ -22,6 +22,7 @@ Install Python 2.7, Virtualenv for Python, and the Python development files. In 
 Then run:
 
     git clone https://github.com/mxm/flink-perf-new
+    cd flink-perf-new
     ./install.sh
 
 The installation script will install the dependencies listed in requirements.txt.
