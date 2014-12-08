@@ -33,6 +33,14 @@ To run py-bench, execute
 
 Look at the provided examples to get an idea how to write your own runs.
 
+
+Evaluation
+----------
+
+The results of each benchmark run are stored in the results.db database.
+The "results" table holds the benchmark times. The "logs" table holds the
+path to the system logs which are available in the /logs directory.
+
 Development
 -----------
 
