@@ -11,6 +11,7 @@ from core.utils import GitRepository
 
 flink_perf_repo = "https://github.com/project-flink/flink-perf"
 
+
 class Text(Experiment):
     """
      int dop = Integer.valueOf(args[0]);
@@ -31,7 +32,6 @@ class Text(Experiment):
         repo.checkout("master")
         repo.maven("clean install")
 
-
         fun = lambda: run_jar("%s/flink-jobs/target" % repo.get_absolute_path(),
                               "flink-jobs-*.jar",
                               args = [self.dop, self.out_path, self.size_gb],
@@ -42,6 +42,31 @@ class Text(Experiment):
     def shutdown(self):
         pass
 
+
+class ALS(Experiment):
+
+    def setup(self):
+        self.out_path = get_hdfs_address() + "/als-benchmark"
+        pass
+
+    def run(self):
+        repo = GitRepository(flink_perf_repo, "flink-perf")
+        repo.clone()
+        repo.checkout("master")
+        repo.maven("clean install")
+
+        fun = lambda: run_jar("%s/flink-jobs/target" % repo.get_absolute_path(),
+                              "flink-jobs-*.jar",
+                              args = [40000000, 5000000, 8, 2, 700, 300, self.out_path],
+                              clazz = "com.github.projectflink.als.ALSDataGeneration")
+
+        master(fun)
+
+    def shutdown(self):
+        pass
+
+
 systems = [Flink(flink_config)]
 
-text_generator = Benchmark('text_generator',systems, Text())
+text_generator = Benchmark('text_generator', systems, Text())
+als_generator = Benchmark('als_generator', systems, ALS())
