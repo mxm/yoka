@@ -19,8 +19,8 @@ class WordCountNew(Experiment):
         wordcount_in = "%s/tmp/grep_out_%d" % (get_hdfs_address(), int(time()))
         wordcount_out = "%s/text" % get_hdfs_address()
         def code():
-            run_jar("~/flink/flink-examples/target/", # TODO conf['path'],
-                    "flink-jobs-*.jar",
+            run_jar("%s/examples/" % get_flink_dist_path(),
+                    "flink-java-*WordCount.jar",
                     args = [wordcount_out, wordcount_in],
                     clazz = "org.apache.flink.examples.java.wordcount.WordCount")
         master(code)
