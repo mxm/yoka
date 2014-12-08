@@ -10,7 +10,11 @@ Right now, py-bench supports HDFS and Flink as configurable systems.
 Install
 -------
 
-Install Python 2.7, then run
+Install Python 2.7, Virtualenv for Python, and the Python development files. In Debian, this command does the trick:
+
+    sudo apt-get install python2.7 python-dev python-virtualenv
+
+Then run:
 
     git clone https://github.com/mxm/flink-perf-new
     ./install.sh
