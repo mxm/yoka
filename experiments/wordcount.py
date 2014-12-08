@@ -30,8 +30,8 @@ class WordCount(Experiment):
     def run(self):
         master (lambda: run_jar("experiments/wordcount_files/",
                               "flink-java-examples-0.8-incubating-SNAPSHOT-WordCount.jar",
-                              ["hdfs://%s:50040/generated-wc%d.txt"
-                               % (env.master, self.params['id']),
+                              ["hdfs://%s:50040/generated-wc.txt"
+                               % env.master,
                                "hdfs://%s:50040/tmp/wc-out/"
                                % env.master
                               ],
