@@ -22,7 +22,7 @@ class Grep(Experiment):
             run_jar("~/flink-perf/flink-jobs/target",
                     "flink-jobs-*.jar",
                     args = [grep_in, grep_out, "these", "are", "test", "words"],
-                    clazz = "com.github.projectflink.generators.GrepJob")
+                    clazz = "com.github.projectflink.grep.GrepJob")
         master(code)
 
     def shutdown(self):
