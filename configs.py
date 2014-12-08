@@ -32,6 +32,7 @@ hadoop_config = {
     'config_path' : "etc/hadoop",
     'namenode_path' : "/home/%s/hdfs-namenode" % USER,
     'datanode_path' : "/home/%s/hdfs-datanode" % USER,
+    'replication_factor' : 3,
 }
 
 """
