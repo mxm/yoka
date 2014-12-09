@@ -18,7 +18,8 @@ class StupidSystem(System):
 
     def __init__(self, name):
         self.name = name
-
+    def set_config(self):
+        pass
     def install(self):
         pass
     def configure(self):
