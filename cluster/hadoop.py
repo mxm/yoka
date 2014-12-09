@@ -32,10 +32,10 @@ def configure():
                 'datanode_path': conf['datanode_path']
     }
     destination = conf['path'] + "/" + conf['config_path']
-    process_template("hdfs", "hdfs-site.xml.mustache", context, destination)
+    process_template("hadoop", "hdfs-site.xml.mustache", context, destination)
     slaves = '\n'.join(env.slaves)
     context2 = {'slaves' : slaves}
-    process_template("hdfs", "slaves.mustache", context2, destination)
+    process_template("hadoop", "slaves.mustache", context2, destination)
     format_hdfs_master()
 
 @task
