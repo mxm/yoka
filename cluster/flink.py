@@ -72,17 +72,19 @@ def run_jar(path, jar_name, args, clazz=None, upload=False):
 def copy_log_master(dest_path):
     local("mkdir -p '%s'" % dest_path)
     path = get_flink_dist_path() + "/log"
-    log_file = "flink-*-jobmanager-*.log"
-    copy_log("%s/%s" % (path, log_file),
-             "%s/flink_jobmanager.log" % dest_path
-    )
+    log_file = "flink-*-jobmanager-*"
+    for extension in ["log", "out"]:
+        copy_log("%s/%s.%s" % (path, log_file, extension),
+                 "%s/flink_jobmanager.%s" % (dest_path, extension)
+        )
 
 @task
 @roles('slaves')
 def copy_log_slaves(dest_path):
     local("mkdir -p '%s'" % dest_path)
     path = get_flink_dist_path() + "/log"
-    log_file = "flink-*-taskmanager-*.log"
-    copy_log("%s/%s" % (path, log_file),
-             "%s/flink_taskmanager_%s.log" % (dest_path, get_slave_id(env.host_string))
-    )
+    log_file = "flink-*-taskmanager-*"
+    for extension in ["log", "out"]:
+        copy_log("%s/%s.%s" % (path, log_file, extension),
+                 "%s/flink_taskmanager_%s.%s" % (dest_path, get_slave_id(env.host_string), extension)
+        )
