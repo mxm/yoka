@@ -48,7 +48,8 @@ class Result(object):
             c = db.cursor()
             data = (self.suite.uid, self.suite.id,
                     self.benchmark.id,
-                    self.benchmark.start_time,
+                    # set precision to seconds
+                    int(self.benchmark.start_time),
                     self.benchmark.duration,
                     failed
             )
