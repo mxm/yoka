@@ -42,7 +42,7 @@ def configure():
     # configure tez
     destination = conf['path']
     process_template(module="tez",
-                     template="tez-site.xml.mustache.mustache",
+                     template="tez-site.xml.mustache",
                      context={'hdfs_path' : hdfs_path},
                      destination=destination)
     # configure client
