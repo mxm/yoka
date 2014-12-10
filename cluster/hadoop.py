@@ -79,3 +79,17 @@ def delete_from_hdfs(path):
 
 def get_hdfs_address():
     return "hdfs://%s:50040/" % env.master
+
+@task
+@roles('master')
+def run_jar(path, jar_name, args, clazz=None, upload=False):
+    print "running %s with args: %s" % (jar_name, args)
+    args = [str(a) for a in args]
+    job_args = ' '.join(args)
+    if upload:
+        put("%s/%s" % (path, jar_name), conf['path'])
+        path = conf['path']
+    with cd(conf['path']):
+        class_loader = "%s" % clazz if clazz else ""
+        run("bin/hadoop jar %s/%s %s %s"
+            % (path, jar_name, class_loader, job_args))
