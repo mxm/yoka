@@ -1,0 +1,56 @@
+<configuration>
+    <!-- http://www.cloudera.com/content/cloudera/en/documentation/cdh4/v4-2-0/CDH4-Installation-Guide/cdh4ig_topic_11_4.html -->
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce.shuffle</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+        <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+    </property>
+    <property>
+    <name>yarn.resourcemanager.address</name>
+      <value>{{master}}:8032</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.scheduler.address</name>
+        <value>{{master}}:8030</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.resource-tracker.address</name>
+        <value>{{master}}:8031</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.admin.address</name>
+        <value>{{master}}:8033</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.webapp.address</name>
+        <value>{{master}}:8088</value>
+    </property>
+    <!--
+    <property>
+        <description>Classpath for typical applications.</description>
+        <name>yarn.application.classpath</name>
+        <value>
+            $HADOOP_CONF_DIR,
+            $HADOOP_COMMON_HOME/*,$HADOOP_COMMON_HOME/lib/*,
+            $HADOOP_HDFS_HOME/*,$HADOOP_HDFS_HOME/lib/*,
+            $HADOOP_MAPRED_HOME/*,$HADOOP_MAPRED_HOME/lib/*,
+            $YARN_HOME/*,$YARN_HOME/lib/*
+        </value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.local-dirs</name>
+        <value>/data/1/yarn/local,/data/2/yarn/local,/data/3/yarn/local</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.log-dirs</name>
+        <value>/data/1/yarn/logs,/data/2/yarn/logs,/data/3/yarn/logs</value>
+    </property>
+    <property>
+        <description>Where to aggregate logs</description>
+        <name>yarn.nodemanager.remote-app-log-dir</name>
+        <value>/var/log/hadoop-yarn/apps</value>
+    </property>-->
+</configuration>

@@ -4,6 +4,10 @@ from cluster import hadoop, flink
 from fabric.api import execute, local
 
 class Hadoop(System):
+    """
+    Installs, configures, and starts
+    Hadoop v2 including HDFS, YARN, and MapReduce
+    """
 
     module = hadoop
     once_per_suite = True
