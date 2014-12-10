@@ -54,7 +54,7 @@ Standard Tez config
 """
 tez_config = {
         'git_repository' : 'https://github.com/apache/tez.git',
-        'git_commit' : '043c2c1511f1134add20e98e69a0fab49702667f', # 0.5.3 rc1
+        'git_commit' : 'master',
         'path' : "/home/%s/tez" % USER,
         'path_client' : "/home/%s/tez_client/" % USER,
     }
