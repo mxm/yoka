@@ -1,5 +1,5 @@
 from fabric.decorators import task, roles, parallel
-from fabric.api import env, run, sudo
+from fabric.api import env, run, sudo, put, cd
 from maintenance import pull_from_master, set_java_home
 from utils import process_template
 
@@ -62,10 +62,13 @@ def slaves(action="start"):
     sudo("%s/sbin/hadoop-daemon.sh --config %s/%s --script hdfs %s datanode" % (conf['path'], conf['path'], conf['config_path'], action))
     sudo("%s/sbin/yarn-daemon.sh --config %s/%s %s nodemanager" % (conf['path'], conf['path'], conf['config_path'], action))
 
-
+def mkdir_hdfs(dir):
+    run("%s/bin/hdfs dfs -mkdir -p 'hdfs://%s:50040/%s'"
+        % (conf['path'], env.master, dir)
+    )
 
 def copy_to_hdfs(src, dest):
-    run("%s/bin/hdfs dfs -put -f '%s' 'hdfs://%s:50040/%s'"
+    run("%s/bin/hdfs dfs -put -f -p '%s' 'hdfs://%s:50040/%s'"
         % (conf['path'], src, env.master, dest)
     )
 

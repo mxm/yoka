@@ -4,4 +4,4 @@ from fabric.api import execute, env
 
 from cluster.utils import get_slave_id
 
-from cluster import gcloud, maintenance, hadoop, flink, utils
+from cluster import gcloud, maintenance, hadoop, flink, tez, utils

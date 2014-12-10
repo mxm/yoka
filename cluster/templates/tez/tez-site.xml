@@ -1,0 +1,6 @@
+<configuration>
+    <property>
+        <name>tez.lib.uris</name>
+        <value>${fs.defaultFS}{{ hdfs_path }}</value>
+    </property>
+</configuration>

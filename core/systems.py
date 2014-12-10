@@ -1,7 +1,7 @@
-from lib import System
+from core.lib import System
 
-from cluster import hadoop, flink
-from fabric.api import execute, local
+from cluster import hadoop, flink, tez
+from fabric.api import execute
 
 class Hadoop(System):
     """
@@ -42,6 +42,38 @@ class Hadoop(System):
 
     def __str__(self):
         return "hadoop"
+
+
+class Tez(System):
+
+    module = tez
+    once_per_suite = True
+
+    def __init__(self, config):
+        self.config = config
+
+    def install(self):
+        if 'install' not in self.skip_targets:
+            execute(tez.install)
+
+    def configure(self):
+        if 'configure' not in self.skip_targets:
+            execute(tez.configure)
+
+    def reset(self):
+        pass
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def save_log(self, log_name):
+        pass
+
+    def __str__(self):
+        return "tez"
 
 
 class Flink(System):
