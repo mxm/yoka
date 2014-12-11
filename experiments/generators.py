@@ -29,7 +29,7 @@ class Text(Experiment):
     def run(self):
         repo = GitRepository(flink_perf_repo, "flink-perf")
         repo.clone()
-        repo.checkout("master")
+        repo.checkout("01e6fdae78fd8bc858129d67d3ef5aef6009b8b2")
         repo.maven("clean install")
 
         def code():
