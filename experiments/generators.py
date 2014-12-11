@@ -1,4 +1,3 @@
-from fabric.api import env
 from cluster.utils import master
 from cluster.flink import run_jar
 from cluster.hadoop import get_hdfs_address
@@ -6,7 +5,7 @@ from cluster.hadoop import get_hdfs_address
 from core.systems import Flink
 from configs import flink_config
 
-from core.lib import Experiment, Benchmark
+from core.lib import Experiment, Generator
 from core.utils import GitRepository
 
 flink_perf_repo = "https://github.com/project-flink/flink-perf"
@@ -19,8 +18,9 @@ class Text(Experiment):
      long finalSizeGB = Integer.valueOf(args[2]);
     """
 
-    dop = 4
-    size_gb = 1
+    def __init__(self, size_gb, dop):
+        self.dop = dop
+        self.size_gb = size_gb
 
     def setup(self):
         self.out_path = get_hdfs_address() + "/text"
@@ -32,12 +32,13 @@ class Text(Experiment):
         repo.checkout("master")
         repo.maven("clean install")
 
-        fun = lambda: run_jar("%s/flink-jobs/target" % repo.get_absolute_path(),
-                              "flink-jobs-*.jar",
-                              args = [self.dop, self.out_path, self.size_gb],
-                              clazz = "com.github.projectflink.generators.Text")
+        def code():
+            run_jar("%s/flink-jobs/target" % repo.get_absolute_path(),
+                    "flink-jobs-*.jar",
+                    args=[self.dop, self.out_path, self.size_gb],
+                    clazz="com.github.projectflink.generators.Text")
 
-        master(fun)
+        master(code)
 
     def shutdown(self):
         pass
@@ -55,18 +56,13 @@ class ALS(Experiment):
         repo.checkout("master")
         repo.maven("clean install")
 
-        fun = lambda: run_jar("%s/flink-jobs/target" % repo.get_absolute_path(),
-                              "flink-jobs-*.jar",
-                              args = [40000000, 5000000, 8, 2, 700, 300, self.out_path],
-                              clazz = "com.github.projectflink.als.ALSDataGeneration")
+        def code():
+            run_jar("%s/flink-jobs/target" % repo.get_absolute_path(),
+                    "flink-jobs-*.jar",
+                    args=[40000000, 5000000, 8, 2, 700, 300, self.out_path],
+                    clazz="com.github.projectflink.als.ALSDataGeneration")
 
-        master(fun)
+        master(code)
 
     def shutdown(self):
         pass
-
-
-systems = [Flink(flink_config)]
-
-text_generator = Benchmark('text_generator', systems, Text())
-als_generator = Benchmark('als_generator', systems, ALS())
