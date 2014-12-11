@@ -165,20 +165,28 @@ class ClusterSuite(Experiment):
                 system.stop()
         self.cluster.shutdown()
 
-    def execute(self, shutDownOnFailure=True):
-        try:
-            logger.info("Setting up cluster")
-            self.setup()
-            logger.info("Running benchmarks")
-            self.run()
-            failure = False
-        except:
-            logger.exception("Exception trying to run suite %s" % self.id)
-            failure = True
-        finally:
-            if not failure or shutDownOnFailure:
-                logger.info("Shutting down cluster")
-                self.shutdown()
+    def execute(self, retry_setup=0, shutdown_on_success=True, shutdown_on_failure=True):
+        for run_id in range(1, retry_setup+2):
+            try:
+                logger.info("Setting up cluster")
+                self.setup()
+                setup_failure = False
+                break
+            except:
+                logger.exception("Failed to set up cluster for the %d/%d time." % (run_id, retry_setup+1))
+                setup_failure = True
+        if not setup_failure:
+            try:
+                logger.info("Running benchmarks")
+                self.run()
+                run_failure = False
+            except:
+                logger.exception("Exception trying to run suite %s" % self.id)
+                run_failure = True
+            finally:
+                if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
+                    logger.info("Shutting down cluster")
+                    self.shutdown()
 
     def __str__(self):
         return self.id
