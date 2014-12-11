@@ -93,6 +93,7 @@ def create_instances():
         "--scopes 'https://www.googleapis.com/auth/devstorage.read_only'",
         "--image '%s'" % conf['disk_image'],
         "--boot-disk-type 'pd-standard'",
+        "--boot-disk-size %s" % conf['disk_space_gb'],
         "-q"
     ).execute()
     Configuration.delete()

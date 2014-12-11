@@ -46,6 +46,7 @@ compute_engine_config = {
     'machine_type' : "n1-standard-2",
     'disk_image' : "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/backports-debian-7-wheezy-v20141108",
     'prefix' : "benchmark-",
+    'disk_space_gb' : 50,
 }
 
 """
