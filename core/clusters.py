@@ -8,6 +8,8 @@ class ComputeEngine(Cluster):
 
     def setup(self):
         gcloud.conf = self.config
+        execute(gcloud.init)
+        execute(gcloud.configure_ssh)
         execute(gcloud.create_instances)
         execute(maintenance.update_package_cache)
         #execute(maintenance.upgrade)

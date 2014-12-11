@@ -4,7 +4,7 @@ import json
 import pickle
 import os
 
-from fabric.api import env
+from fabric.api import env, local
 from configs import compute_engine_config as conf
 
 
@@ -65,7 +65,6 @@ class Configuration(object):
         os.remove(gcloud_file)
 
 
-
 @task
 @runs_once
 def install_gcloud():
@@ -76,6 +75,11 @@ def install_gcloud():
 def authenticate():
     local("gcloud config set project %s" % conf['project_name'])
     local("gcloud auth login")
+
+@task
+@runs_once
+def configure_ssh():
+    local("gcloud compute config-ssh --project %s" % conf['project_name'])
 
 @task
 @runs_once
@@ -118,6 +122,7 @@ def delete_instances():
 def create_config():
     output = LocalCommand(
         "gcloud compute instances list",
+        "--project %s" % conf['project_name'],
         "--regexp '%s.*'" % conf['prefix'],
         "--format json"
     ).execute(capture=True)
@@ -168,5 +173,3 @@ def init():
         env.key_filename = "~/.ssh/google_compute_engine"
         env.ids = ids
         env.keepalive = 60
-
-init()
