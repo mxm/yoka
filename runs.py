@@ -1,6 +1,4 @@
-import sys
-
-from core.lib import Benchmark, ClusterSuite
+from core.lib import Benchmark, Generator, ClusterSuite
 
 # import cluster and systems classes
 from core.clusters import ComputeEngine
@@ -31,23 +29,23 @@ custom_flink = Flink(custom_flink_config)
 
 benchmarks = [
     # Normal benchmark
-    # Benchmark(
-    #     id = "WordCount1000",
-    #     systems = [flink],
-    #     experiment = WordCount({
-    #         'num_lines' : 1000
-    #     }),
-    #     times = 5
-    # ),
+    Benchmark(
+        id = "WordCount1000",
+        systems = [flink],
+        experiment = WordCount({
+            'num_lines' : 1000
+        }),
+        times = 5
+    ),
     # Custom Flink version benchmark
-    # Benchmark(
-    #     id = "WordCount1000-custom",
-    #     systems = [custom_flink],
-    #     experiment = WordCount({
-    #         'num_lines' : 1000
-    #     }),
-    #     times = 3
-    # ),
+    Benchmark(
+        id = "WordCount1000-custom",
+        systems = [custom_flink],
+        experiment = WordCount({
+            'num_lines' : 1000
+        }),
+        times = 3
+    ),
     Benchmark(
         id = "Grep",
         systems = [flink],
@@ -64,7 +62,16 @@ benchmarks = [
 ]
 
 
-generators = [generators.text_generator]
+generators = [
+    Generator(
+        id = "TextGenerator",
+        systems = [flink],
+        experiment = generators.Text(
+            size_gb = 1024,
+            dop = compute_engine_config['num_workers']
+        )
+    )
+]
 
 suite = ClusterSuite("DefaultSuite", cluster, systems, generators, benchmarks)
 
