@@ -62,4 +62,4 @@ def set_key():
 @parallel
 @roles('slaves')
 def pull_from_master(path, dest="~"):
-    run("rsync -aP %s:%s %s || true" % (env.master, path, dest), quiet=False)
+    run("rsync -aP %s:%s %s > /dev/null || true" % (env.master, path, dest), quiet=False)
