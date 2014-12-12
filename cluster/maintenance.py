@@ -7,6 +7,14 @@ import logging
 
 @task
 @parallel
+def mount_disk():
+    sudo('echo -e "o\nn\np\n1\n\n\n\n\n\nw" | fdisk /dev/sdb1')
+    sudo('mkfs -t ext4 /dev/sdb1')
+    run("mkdir -p mnt")
+    sudo("mount -t ext4 /dev/sdb1 mnt")
+
+@task
+@parallel
 def update_package_cache():
     sudo("apt-get update > /dev/null")
 
