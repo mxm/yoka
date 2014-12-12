@@ -8,7 +8,7 @@ import logging
 @task
 @parallel
 def update_package_cache():
-    sudo("apt-get update")
+    sudo("apt-get update > /dev/null")
 
 @task
 @parallel
