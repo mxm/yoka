@@ -1,6 +1,9 @@
 from fabric.decorators import task, roles, parallel, runs_once
 from fabric.api import sudo, run, execute, env
 
+from time import sleep
+
+import logging
 
 @task
 @parallel
@@ -59,7 +62,14 @@ def set_key():
 
 
 @task
-@parallel
+# this fails if too many hosts pull at once
+@parallel(pool_size=10)
 @roles('slaves')
 def pull_from_master(path, dest="~"):
-    run("rsync -aP %s:%s %s > /dev/null || true" % (env.master, path, dest), quiet=False)
+    for i in range(0, 5):
+        try:
+            run("rsync -aP %s:%s %s > /dev/null" % (env.master, path, dest))
+            break
+        except:
+            logging.warn("Failed to execute rsync for host %s" % env.host_string)
+            sleep(5)
