@@ -31,7 +31,7 @@ class Configuration(object):
     def get_slaves_ips(self):
         return self.slaves.values()
 
-    def get_slaves_names(self):
+    def get_slave_names(self):
         return self.slaves.keys()
 
     def get_ips(self):
@@ -40,9 +40,23 @@ class Configuration(object):
         return ips
 
     def get_hostnames(self):
-        names = self.get_slaves_names()
+        names = self.get_slave_names()
         names.append(self.get_master_name())
         return names
+
+    def get_host_dict(self):
+        # map ips to host names
+        host_dict = {ip: name for name, ip in self.slaves.iteritems()}
+        host_dict[self.get_master_ip()] = self.get_master_name()
+        return host_dict
+
+    def get_id_dict(self):
+        # dictionary which gives each slave an id
+        ids = {}
+        ids[self.get_master_ip()] = 0
+        for (slave_id, slave) in enumerate(self.get_slaves_ips()):
+            ids[slave] = slave_id+1
+        return ids
 
     def save(self):
         with open(gcloud_file, 'wb') as output:
@@ -157,19 +171,15 @@ def init():
         config = create_config()
     ips = config.get_ips()
     hostnames = config.get_hostnames()
-    master = config.get_master_ip()
-    slaves = config.get_slaves_ips()
-    # dictionary which gives each slave an id
-    ids = {}
-    ids[master] = 0
-    for (slave_id, slave) in enumerate(slaves):
-        ids[slave] = slave_id+1
-    if ips and hostnames and master and slaves:
+    master_ip = config.get_master_ip()
+    slave_ips = config.get_slave_ips()
+    if ips and hostnames:
         env.hosts = ips
         env.master = config.get_master_name()
-        env.slaves = config.get_slaves_names()
+        env.slaves = config.get_slave_names()
         env.hostnames = hostnames
-        env.roledefs = {'slaves' : slaves, 'master' : [master]}
+        env.host_dict = config.get_host_dict()
+        env.roledefs = {'slaves' : slave_ips, 'master' : [master_ip]}
         env.key_filename = "~/.ssh/google_compute_engine"
-        env.ids = ids
+        env.ids = config.get_id_dict()
         env.keepalive = 60
