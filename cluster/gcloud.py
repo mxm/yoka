@@ -1,4 +1,4 @@
-from fabric.decorators import task, roles, runs_once
+from fabric.decorators import task, parallel, runs_once
 from utils import LocalCommand
 import json
 import pickle
@@ -101,6 +101,7 @@ def create_instances():
     if env.hostnames:
         print "Old instancecs exist. Not creating new instances."
         return
+    print "Creating machines."
     LocalCommand(
         "gcloud compute --project %s" % conf['project_name'],
         "instances create %s" % ' '.join(get_hostnames()),
@@ -110,12 +111,31 @@ def create_instances():
         "--maintenance-policy 'MIGRATE'",
         "--scopes 'https://www.googleapis.com/auth/devstorage.read_only'",
         "--image '%s'" % conf['disk_image'],
-        "--boot-disk-type 'pd-standard'",
-        "--boot-disk-size %s" % conf['disk_space_gb'],
+        "--boot-disk-type %s", conf['disk_type'],
+        "-q"
+    ).execute()
+    print "Creating disks."
+    LocalCommand(
+        "gcloud compute --project %s" % conf['project_name'],
+        "disks create %s" % ' '.join(get_disknames()),
+        "--zone %s" % conf['zone'],
+        "--size %s" % conf['disk_space_gb'],
+        "--type %s" % conf['disk_type'],
         "-q"
     ).execute()
     Configuration.delete()
     init()
+
+@task
+@parallel
+def attach_disk():
+    host_name = env.host_dict[env.host_string]
+    LocalCommand(
+        "gcloud compute --project %s" % conf['project_name'],
+        "instances attach-disk %s" % host_name,
+        "--disk %s-disk" % host_name,
+        "-q"
+    ).execute()
 
 @task
 @runs_once
@@ -161,6 +181,9 @@ def get_hostnames():
     workers = [conf['prefix'] + "worker" + str(x) for x in xrange(0, conf['num_workers'])]
     workers.append(get_master_hostname())
     return workers
+
+def get_disknames():
+    return [name + "disk" for name in get_hostnames()]
 
 def init():
     env.hostnames = []

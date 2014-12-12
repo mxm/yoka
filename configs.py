@@ -47,6 +47,7 @@ compute_engine_config = {
     'disk_image' : "https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/backports-debian-7-wheezy-v20141108",
     'prefix' : "benchmark-",
     'disk_space_gb' : 50,
+    'disk_type' : 'pd-standard', # change to pd-ssd for ssd
 }
 
 """
