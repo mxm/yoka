@@ -12,7 +12,7 @@ class ComputeEngine(Cluster):
         execute(gcloud.configure_ssh)
         execute(gcloud.create_instances)
         execute(gcloud.attach_disk)
-        execute(maintenance.mount_disk)
+        execute(gcloud.mount_disk)
         execute(maintenance.update_package_cache)
         #execute(maintenance.upgrade)
         execute(maintenance.install_dependencies)

@@ -1,10 +1,10 @@
 from fabric.decorators import task, parallel, runs_once
-from utils import LocalCommand
+from utils import LocalCommand, RemoteCommand
 import json
 import pickle
 import os
 
-from fabric.api import env, local
+from fabric.api import env, local, run, sudo
 from configs import compute_engine_config as conf
 
 
@@ -136,6 +136,17 @@ def attach_disk():
         "--disk %s-disk" % host_name,
         "-q"
     ).execute()
+
+@task
+@parallel
+def mount_disk():
+    # create partition table and partition
+    sudo('echo -e "o\nn\np\n1\n\n\n\n\n\nw" | fdisk /dev/sdb')
+    # format partition
+    sudo('mkfs -t ext4 /dev/sdb1')
+    run("mkdir -p %s" % conf['disk_mount_path'])
+    # mount
+    sudo("mount -t ext4 /dev/sdb1 %s" % conf['disk_mount_path'])
 
 @task
 @runs_once
