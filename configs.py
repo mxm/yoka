@@ -29,9 +29,7 @@ Standard Hadoop config
 hadoop_config = {
     'source' : "http://mirror.arcor-online.net/www.apache.org/hadoop/common/hadoop-2.5.2/hadoop-2.5.2.tar.gz",
     'path' : "/home/%s/hadoop" % USER,
-    'config_path' : "etc/hadoop",
-    'namenode_path' : "/home/%s/hdfs-namenode" % USER,
-    'datanode_path' : "/home/%s/hdfs-datanode" % USER,
+    'data_path' : "/home/%s/mnt" % USER,
     'replication_factor' : 3,
 }
 

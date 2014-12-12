@@ -5,6 +5,9 @@ from utils import process_template
 
 from configs import hadoop_config as conf
 
+namenode_dir = "hdfs-namenode"
+datanode_dir = "hdfs-datanode"
+
 @task
 @roles('master')
 def install():
@@ -14,23 +17,25 @@ def install():
 
 @roles('master')
 def format_hdfs_master():
-    run("rm -rf '%s'" % conf['namenode_path'])
-    run("mkdir %s" % conf['namenode_path'])
+    run("rm -rf %s/%s" % (conf['data_path'], namenode_dir))
+    run("mkdir %s/%s" % (conf['data_path'], namenode_dir))
     run("%s/bin/hdfs namenode -format" % conf['path'])
 
 @task
 @roles('slaves')
 def delete_data_slaves():
-    sudo("rm -rf '%s'" % conf['datanode_path'])
+    sudo("rm -rf %s/%s" % (conf['data_path'], datanode_dir))
 
 @task
 @roles('master')
 def configure():
-    set_java_home("%s/%s/hadoop-env.sh" % (conf['path'], conf['config_path']))
+    set_java_home("%s/etc/hadoop/hadoop-env.sh" % conf['path'])
     # configure hdfs
-    context =  conf.copy()
+    context = conf.copy()
     context['master'] = env.master
-    destination = conf['path'] + "/" + conf['config_path']
+    context['namenode_path'] = "%s/%s" % (conf['data_path'], namenode_dir)
+    context['datanode_path'] = "%s/%s" % (conf['data_path'], datanode_dir)
+    destination = conf['path'] + "/etc/hadoop/"
     process_template("hadoop", "hdfs-site.xml.mustache", context, destination)
     slaves = '\n'.join(env.slaves)
     context['slaves'] = slaves
@@ -51,16 +56,16 @@ def pull():
 @task
 @roles('master')
 def master(action="start"):
-    sudo("%s/sbin/hadoop-daemon.sh --config %s/%s --script hdfs %s namenode" % (conf['path'], conf['path'], conf['config_path'], action))
-    sudo("%s/sbin/yarn-daemon.sh --config %s/%s %s resourcemanager" % (conf['path'], conf['path'], conf['config_path'], action))
-    sudo("%s/sbin/mr-jobhistory-daemon.sh --config %s/%s %s historyserver" % (conf['path'], conf['path'], conf['config_path'], action))
+    sudo("%s/sbin/hadoop-daemon.sh --config %s/etc/hadoop/ --script hdfs %s namenode" % (conf['path'], conf['path'], action))
+    sudo("%s/sbin/yarn-daemon.sh --config %s/etc/hadoop/ %s resourcemanager" % (conf['path'], conf['path'], action))
+    sudo("%s/sbin/mr-jobhistory-daemon.sh --config %s/etc/hadoop/ %s historyserver" % (conf['path'], conf['path'], action))
 
 @task
 @roles('slaves')
 @parallel
 def slaves(action="start"):
-    sudo("%s/sbin/hadoop-daemon.sh --config %s/%s --script hdfs %s datanode" % (conf['path'], conf['path'], conf['config_path'], action))
-    sudo("%s/sbin/yarn-daemon.sh --config %s/%s %s nodemanager" % (conf['path'], conf['path'], conf['config_path'], action))
+    sudo("%s/sbin/hadoop-daemon.sh --config %s/etc/hadoop/ --script hdfs %s datanode" % (conf['path'], conf['path'], action))
+    sudo("%s/sbin/yarn-daemon.sh --config %s/etc/hadoop/ %s nodemanager" % (conf['path'], conf['path'], action))
 
 def mkdir_hdfs(dir):
     run("%s/bin/hdfs dfs -mkdir -p 'hdfs://%s:50040/%s'"
