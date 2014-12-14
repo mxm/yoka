@@ -90,13 +90,18 @@ def install_gcloud():
 @task
 @runs_once
 def authenticate():
-    local("gcloud config set project %s" % conf['project_name'])
-    local("gcloud auth login")
+    LocalCommand(
+        "gcloud auth login",
+        "--project %s" % conf['project_name']
+    ).execute()
 
 @task
 @runs_once
 def configure_ssh():
-    local("gcloud compute config-ssh --project %s" % conf['project_name'])
+    LocalCommand(
+        "gcloud compute config-ssh",
+        "--project %s" % conf['project_name']
+    ).execute()
 
 @task
 @runs_once
