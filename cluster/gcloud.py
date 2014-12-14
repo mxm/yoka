@@ -1,5 +1,6 @@
 from fabric.decorators import task, parallel, runs_once
 from utils import LocalCommand, RemoteCommand
+from getpass import getuser
 import json
 import pickle
 import os
@@ -28,21 +29,23 @@ class Configuration(object):
         except:
             return None
 
-    def get_slaves_ips(self):
+    def get_slave_ips(self):
         return self.slaves.values()
 
     def get_slave_names(self):
         return self.slaves.keys()
 
     def get_ips(self):
-        ips = self.get_slaves_ips()
-        ips.append(self.get_master_ip())
-        return ips
+        master_ip = self.get_master_ip()
+        ips = self.get_slave_ips()
+        ips.append(master_ip)
+        return ips if master_ip else None
 
     def get_hostnames(self):
+        master_name = self.get_master_name()
         names = self.get_slave_names()
-        names.append(self.get_master_name())
-        return names
+        names.append(master_name)
+        return names if master_name else None
 
     def get_host_dict(self):
         # map ips to host names
@@ -54,7 +57,7 @@ class Configuration(object):
         # dictionary which gives each slave an id
         ids = {}
         ids[self.get_master_ip()] = 0
-        for (slave_id, slave) in enumerate(self.get_slaves_ips()):
+        for (slave_id, slave) in enumerate(self.get_slave_ips()):
             ids[slave] = slave_id+1
         return ids
 
@@ -111,7 +114,7 @@ def create_instances():
         "--maintenance-policy 'MIGRATE'",
         "--scopes 'https://www.googleapis.com/auth/devstorage.read_only'",
         "--image '%s'" % conf['disk_image'],
-        "--boot-disk-type %s", conf['disk_type'],
+        "--boot-disk-type %s" % conf['disk_type'],
         "-q"
     ).execute()
     print "Creating disks."
@@ -133,6 +136,7 @@ def attach_disk():
     LocalCommand(
         "gcloud compute --project %s" % conf['project_name'],
         "instances attach-disk %s" % host_name,
+        "--zone %s" % conf['zone'],
         "--disk %s-disk" % host_name,
         "-q"
     ).execute()
@@ -147,6 +151,8 @@ def mount_disk():
     run("mkdir -p %s" % conf['disk_mount_path'])
     # mount
     sudo("mount -t ext4 /dev/sdb1 %s" % conf['disk_mount_path'])
+    user = getuser()
+    sudo("chown %s:%s %s" % (user, user, conf['disk_mount_path']))
 
 @task
 @runs_once
@@ -157,6 +163,12 @@ def delete_instances():
     LocalCommand(
         "gcloud compute --project %s" % conf['project_name'],
         "instances delete %s" % ' '.join(env.hostnames),
+        "--zone %s" % conf['zone'],
+        "-q"
+    ).execute()
+    LocalCommand(
+        "gcloud compute --project %s" % conf['project_name'],
+        "disks delete %s" % ' '.join(env.disknames),
         "--zone %s" % conf['zone'],
         "-q"
     ).execute()
@@ -194,7 +206,7 @@ def get_hostnames():
     return workers
 
 def get_disknames():
-    return [name + "disk" for name in get_hostnames()]
+    return [name + "-disk" for name in get_hostnames()]
 
 def init():
     env.hostnames = []
@@ -212,6 +224,7 @@ def init():
         env.master = config.get_master_name()
         env.slaves = config.get_slave_names()
         env.hostnames = hostnames
+        env.disknames = [name + "-disk" for name in hostnames]
         env.host_dict = config.get_host_dict()
         env.roledefs = {'slaves' : slave_ips, 'master' : [master_ip]}
         env.key_filename = "~/.ssh/google_compute_engine"
