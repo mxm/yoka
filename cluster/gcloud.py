@@ -130,7 +130,8 @@ def create_instances():
     init()
 
 @task
-@parallel
+# this fails if too many hosts pull at once
+@parallel(pool_size=10)
 def attach_disk():
     host_name = env.host_dict[env.host_string]
     LocalCommand(
@@ -142,7 +143,8 @@ def attach_disk():
     ).execute()
 
 @task
-@parallel
+# this fails if too many hosts pull at once
+@parallel(pool_size=10)
 def mount_disk():
     # create partition table and partition
     sudo('echo -e "o\nn\np\n1\n\n\n\n\n\nw" | fdisk /dev/sdb')
