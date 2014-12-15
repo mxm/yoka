@@ -52,8 +52,8 @@ generators = [
         id = "TextGenerator",
         systems = [flink],
         experiment = generators.Text(
-            size_gb = 1024, # 1 tB of data
-            dop = compute_engine_config['num_workers']
+            size_gb = 512, # 512 gB of data
+            dop = compute_engine_config['num_workers'] * 2
         )
     )
 ]
