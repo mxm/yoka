@@ -60,3 +60,17 @@ tez_config = {
         'path' : "/home/%s/tez" % USER,
         'path_client' : "/home/%s/tez_client/" % USER,
     }
+
+"""
+Standard Spark config
+
+"""
+spark_config = {
+    'path' : "/home/%s/spark" % USER,
+    'git_repository' : "git://github.com/apache/spark.git",
+    'git_commit' : "master",
+    'spark_env_variables' : [
+        {'variable' : "#HADOOP_CONF_DIR=/home/hadoop/etc"},
+        {'variable' : "#SPARK_CLASSPATH=."},
+    ]
+}

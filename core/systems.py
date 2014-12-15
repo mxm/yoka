@@ -1,6 +1,6 @@
 from core.lib import System
 
-from cluster import hadoop, flink, tez
+from cluster import hadoop, flink, tez, spark
 from fabric.api import execute
 
 class Hadoop(System):
@@ -38,6 +38,7 @@ class Hadoop(System):
         execute(hadoop.master, 'stop')
 
     def save_log(self, log_name):
+        # TODO
         pass
 
     def __str__(self):
@@ -110,3 +111,40 @@ class Flink(System):
 
     def __str__(self):
         return "flink"
+
+
+class Spark(System):
+
+    module = spark
+    once_per_suite = False
+
+    def __init__(self, config):
+        self.config = config
+
+    def install(self):
+        if 'install' not in self.skip_targets:
+            execute(spark.install)
+
+    def configure(self):
+        if 'configure' not in self.skip_targets:
+            execute(spark.configure)
+        execute(spark.pull)
+
+    def reset(self):
+        pass
+
+    def start(self):
+        execute(spark.master)
+        execute(spark.slaves)
+
+    def stop(self):
+        execute(spark.slaves, 'stop')
+        execute(spark.master, 'stop')
+
+    def save_log(self, unique_full_path):
+        # TODO
+        pass
+
+    def __str__(self):
+        return "spark"
+
