@@ -3,6 +3,7 @@ from fabric.decorators import task, roles, parallel
 from fabric.api import env, local, run, cd, put, sudo
 from maintenance import pull_from_master, find_java_home
 from utils import process_template, copy_log, get_slave_id
+from gcloud import get_degree_of_parallelism
 
 from configs import flink_config as conf
 
@@ -55,7 +56,7 @@ def slaves(action="start"):
 
 @task
 @roles('master')
-def run_jar(path, jar_name, args, clazz=None, upload=False):
+def run_jar(path, jar_name, args, dop=None, clazz=None, upload=False):
     print "running %s with args: %s" % (jar_name, args)
     args = [str(a) for a in args]
     job_args = ' '.join(args)
@@ -64,8 +65,9 @@ def run_jar(path, jar_name, args, clazz=None, upload=False):
         path = conf['path']
     with cd(get_flink_dist_path()):
         class_loader = "-c '%s'" % clazz if clazz else ""
-        run("bin/flink run -v %s %s/%s %s"
-            % (class_loader, path, jar_name, job_args))
+        dop = dop if dop else get_degree_of_parallelism()
+        run("bin/flink run -v -p %d %s %s/%s %s"
+            % (dop, class_loader, path, jar_name, job_args))
 
 @task
 @roles('master')

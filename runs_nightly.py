@@ -20,6 +20,8 @@ compute_engine_config['project_name'] = "astral-sorter-757"
 compute_engine_config['prefix'] = "max-benchmark-"
 # 2 cores 7.5GB RAM
 compute_engine_config['machine_type'] = "n1-standard-2"
+# num cores to use
+compute_engine_config['num_cores'] = 2
 # 16 workers + 1 master
 compute_engine_config['num_workers'] = 16
 compute_engine_config['disk_space_gb'] = 200
@@ -53,7 +55,7 @@ generators = [
         systems = [flink],
         experiment = generators.Text(
             size_gb = 512, # 512 gB of data
-            dop = compute_engine_config['num_workers'] * 2
+            dop = compute_engine_config['num_workers'] * compute_engine_config['num_cores']
         )
     )
 ]
@@ -62,4 +64,4 @@ suite = ClusterSuite("DefaultSuite", cluster, systems, generators, benchmarks)
 
 # retry 1 time if cluster setup fails
 # do not shutdown the cluster on failures
-suite.execute(retry_setup=1, shutdown_on_failure=False)
+suite.execute(retry_setup=0, shutdown_on_failure=False)

@@ -42,6 +42,7 @@ compute_engine_config = {
     'project_name' : "braided-keel-768",
     'zone' : "europe-west1-c",
     'machine_type' : "n1-standard-2",
+    'num_cores' : 2,
     'disk_image' : "debian-7-backports",
     'prefix' : "benchmark-",
     'disk_space_gb' : 50,

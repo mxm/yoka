@@ -237,3 +237,7 @@ def init():
         env.key_filename = "~/.ssh/google_compute_engine"
         env.ids = config.get_id_dict()
         env.keepalive = 60
+
+
+def get_degree_of_parallelism():
+    return conf['num_workers'] * conf['num_cores']
