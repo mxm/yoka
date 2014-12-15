@@ -124,7 +124,7 @@ class ClusterSuite(Experiment):
                 system.configure()
                 system.start()
 
-    def run(self):
+    def run(self, ignore_failures=False):
         # generate data
         for generator in self.generators:
             generator.setup()
@@ -157,6 +157,8 @@ class ClusterSuite(Experiment):
                 # save result
                 result = Result(self, benchmark, log_paths)
                 result.save(failed)
+                if not ignore_failures:
+                    raise Exception("Exception raised in %s run %d" (benchmark, run_id))
 
 
     def shutdown(self):
@@ -165,7 +167,7 @@ class ClusterSuite(Experiment):
                 system.stop()
         self.cluster.shutdown()
 
-    def execute(self, retry_setup=0, shutdown_on_success=True, shutdown_on_failure=True):
+    def execute(self, retry_setup=0, ignore_failures=True, shutdown_on_success=True, shutdown_on_failure=True):
         for run_id in range(1, retry_setup+2):
             try:
                 logger.info("Setting up cluster")
@@ -178,7 +180,7 @@ class ClusterSuite(Experiment):
         if not setup_failure:
             try:
                 logger.info("Running benchmarks")
-                self.run()
+                self.run(ignore_failures)
                 run_failure = False
             except:
                 logger.exception("Exception trying to run suite %s" % self.id)
