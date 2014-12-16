@@ -50,10 +50,14 @@ Run
 
 To run py-bench, execute
 
-    ./pybench.sh runs/<runfile>
+    ./pybench.sh <run_name>
 
-Run files are located in the /runs directory. You can use any of the
+Run files are located in the runs directory. You can use any of the
 supplied run files as a base to write your own.
+
+For example, to run runs/example.py execute the following:
+
+    ./pybench.sh example
 
 
 Evaluation

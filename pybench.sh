@@ -30,16 +30,38 @@ rotateLogFile() {
     fi
 }
 
-source env/bin/activate
+printUsage(){
+    echo "usage: ./pybench.sh <run_name>"
+}
+
+printRunNames(){
+    echo "Run names found:"
+    for path in `ls runs/*.py` ; do
+        name=`basename $path .py`
+        echo "    $name"
+    done
+}
+
+runFile="runs/$1.py"
 
 if [ "$#" -ne 1 ]; then
-    echo "usage: ./pybench.sh <run_file>"
+    printUsage
+    echo
+    printRunNames
+    exit 1
+elif [ -e $runFile ] ; then
+    source env/bin/activate
+
+    logFile="runs/$1.stdout.log"
+    rotateLogFile "$logFile"
+
+    export PYTHONPATH="$PYTHONPATH:./"
+    python "$runFile" 2>&1 | tee "$logFile"
+else
+    printUsage
+    echo
+    echo "$1 is not a valid run name."
+    echo
+    printRunNames
     exit 1
 fi
-
-logFile="$1.stdout.log"
-rotateLogFile "$logFile"
-
-export PYTHONPATH="$PYTHONPATH:./"
-
-python "$1" 2>&1 | tee "$logFile"
