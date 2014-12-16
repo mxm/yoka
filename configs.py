@@ -45,7 +45,7 @@ compute_engine_config = {
     'num_cores' : 2,
     'disk_image' : "debian-7-backports",
     'prefix' : "benchmark-",
-    'disk_space_gb' : 50,
+    'disk_space_gb' : 20,
     'disk_type' : 'pd-standard', # change to pd-ssd for ssd,
     'disk_mount_path' : "/home/%s/mnt" % USER,
 }
