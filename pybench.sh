@@ -37,7 +37,9 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-logFile="$1.output.log"
+logFile="$1.stdout.log"
 rotateLogFile "$logFile"
+
+export PYTHONPATH="$PYTHONPATH:./"
 
 python "$1" 2>&1 | tee "$logFile"
