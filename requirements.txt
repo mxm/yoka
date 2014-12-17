@@ -1,3 +1,2 @@
 fabric
 pystache
-matplotlib

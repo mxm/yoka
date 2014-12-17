@@ -27,6 +27,16 @@ Then run:
 
 The installation script will install the dependencies listed in requirements.txt.
 
+### Plotting
+
+Optionally, if you want to generate plots, install:
+
+    sudo apt-get install libfreetype6-dev libpng12-dev
+
+Then execute:
+
+    ./install.sh with_plotting
+
 ### Google Compute Engine
 
 For using Google Compute Engine, please install the gcloud tool, i.e. using
