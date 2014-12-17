@@ -1,5 +1,10 @@
 import sqlite3
 
+
+import matplotlib.pyplot as plt
+import datetime
+
+
 DB_FILE = 'results.db'
 
 class DB(object):
@@ -69,3 +74,37 @@ class Result(object):
                 VALUES
                   (?,?,?)
                 """, log_data)
+
+
+def gen_plot(suite_id=None):
+    with DB() as db:
+        # default figure
+        plt.figure(1)
+        plt.subplots_adjust(hspace=.5)
+        c = db.cursor()
+        if suite_id:
+            c.execute("select distinct bench_id from results where suite_id = ?", (suite_id,))
+            filename = suite_id + ".png"
+        else:
+            c.execute("select distinct bench_id from results")
+            filename = "all_results.png"
+        bench_ids = c.fetchall()
+        for (i, (bench_id,)) in enumerate(bench_ids):
+            print bench_id
+            # subfigure
+            plt.subplot(len(bench_ids), 1, i+1)
+            c.execute("select start_time, duration from results where bench_id=? order by start_time asc", (bench_id,))
+            results = c.fetchall()
+            timestamps, y = zip(*results)
+            labels = [datetime.datetime.fromtimestamp(int(timestamp)).strftime("%d.%m.") for timestamp in timestamps]
+            x = range(1, len(results)+1)
+            y = map(lambda val: val / 60 if val else 0, y)
+            #labels = x
+            plt.bar(x, y, align="center", width=0.5)
+            plt.xticks(x, labels)
+            plt.xlabel('date')
+            plt.ylabel('run time (minutes)')
+            plt.title(bench_id)
+        plt.savefig(filename)
+        return filename
+
