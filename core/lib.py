@@ -50,7 +50,10 @@ class Benchmark(Experiment):
         self.executed += 1
 
     def shutdown(self):
-        self.experiment.shutdown()
+        try:
+            self.experiment.shutdown()
+        except:
+            logger.exception("Shutting down benchmark %s failed." % self.id)
         for system in reversed(self.systems):
             system.stop()
             system.reset()

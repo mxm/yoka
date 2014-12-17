@@ -3,6 +3,8 @@ from fabric.api import env, run, sudo, put, cd
 from maintenance import pull_from_master, set_java_home
 from utils import process_template
 
+from time import sleep
+
 from configs import hadoop_config as conf
 
 namenode_dir = "hdfs-namenode"
@@ -59,6 +61,7 @@ def master(action="start"):
     sudo("%s/sbin/hadoop-daemon.sh --config %s/etc/hadoop/ --script hdfs %s namenode" % (conf['path'], conf['path'], action))
     sudo("%s/sbin/yarn-daemon.sh --config %s/etc/hadoop/ %s resourcemanager" % (conf['path'], conf['path'], action))
     sudo("%s/sbin/mr-jobhistory-daemon.sh --config %s/etc/hadoop/ %s historyserver" % (conf['path'], conf['path'], action))
+    sleep(1)
 
 @task
 @roles('slaves')

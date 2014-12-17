@@ -5,6 +5,8 @@ from maintenance import pull_from_master, find_java_home
 from utils import process_template, copy_log, get_slave_id
 from gcloud import get_degree_of_parallelism
 
+from time import sleep
+
 from configs import flink_config as conf
 
 @task
@@ -23,7 +25,7 @@ def get_flink_dist_path():
 def configure():
     with cd(conf['path']):
         run("git checkout %s" % conf['git_commit'])
-        run("mvn install -DskipTests")
+        run("mvn clean install -DskipTests")
     context = conf.copy()
     context['java_home'] = find_java_home()
     context['master'] = env.master
@@ -45,6 +47,7 @@ def master(action="start"):
     path = get_flink_dist_path()
     with cd(path):
         run('nohup bash bin/jobmanager.sh %s cluster' % action)
+    sleep(1)
 
 @task
 @roles('slaves')
