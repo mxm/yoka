@@ -94,10 +94,12 @@ class TestResults(unittest.TestCase):
                 """, data)
                 self.assertEquals(c.fetchall().__len__(), b.times)
 
+    def test_email_plot(self):
+        filename = results.gen_plot()
+        results.send_email(filename)
+
     def tearDown(self):
         pass
-
-#class TestGCloud(unittest.TestCase):
 
 
 unittest.main()

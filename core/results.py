@@ -108,7 +108,7 @@ def send_email(filename):
     server.login(conf['smtp_account'], conf['smtp_password'])
     server.sendmail(FROM, TO, msg.as_string())
     server.close()
-    print 'successfully sent the mail'
+    print 'Mail sent successfully.'
 
 
 def gen_plot(suite_id=None):
