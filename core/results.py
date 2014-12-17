@@ -1,9 +1,17 @@
 import sqlite3
 
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import Encoders
+
+from configs import email_config as conf
 
 import matplotlib.pyplot as plt
 import datetime
 
+from os.path import basename
 
 DB_FILE = 'results.db'
 
@@ -74,6 +82,33 @@ class Result(object):
                 VALUES
                   (?,?,?)
                 """, log_data)
+
+
+
+def send_email(filename):
+    FROM = conf['smtp_account']
+    TO = conf['email_addresses']
+
+    msg = MIMEMultipart()
+    msg['From'] = FROM
+    msg['To'] = ', '.join(TO)
+    msg['Subject'] = conf['subject']
+
+    msg.attach(MIMEText(conf['text']))
+
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload(open(filename, 'rb').read())
+    Encoders.encode_base64(part)
+    part.add_header('Content-Disposition', 'attachment; filename="%s"' % basename(filename))
+    msg.attach(part)
+
+    server = smtplib.SMTP(conf['smtp_server'], conf['smtp_port'])
+    server.ehlo()
+    server.starttls()
+    server.login(conf['smtp_account'], conf['smtp_password'])
+    server.sendmail(FROM, TO, msg.as_string())
+    server.close()
+    print 'successfully sent the mail'
 
 
 def gen_plot(suite_id=None):

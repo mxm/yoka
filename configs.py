@@ -59,4 +59,19 @@ tez_config = {
         'git_commit' : 'master',
         'path' : "/home/%s/tez" % USER,
         'path_client' : "/home/%s/tez_client/" % USER,
-    }
+}
+
+
+"""
+eMail config
+
+"""
+email_config = {
+    'smtp_server' : "smtp.gmail.com",
+    'smtp_port' : 587,
+    'smtp_account' : "iamthemailer@gmail.com",
+    'smtp_password' : '',
+    'email_addresses' : ["max@data-artisans.com"],
+    'subject' : "Performance test results",
+    'text' : "Here are the results."
+}
