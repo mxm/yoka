@@ -81,7 +81,7 @@ def copy_to_hdfs(src, dest):
     )
 
 def delete_from_hdfs(path):
-     run("%s/bin/hdfs dfs -rm 'hdfs://%s:50040/%s'"
+     run("%s/bin/hdfs dfs -rm -r 'hdfs://%s:50040/%s'"
         % (conf['path'], env.master, path)
      )
 
