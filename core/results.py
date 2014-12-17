@@ -87,7 +87,7 @@ class Result(object):
 
 def send_email(filename):
     FROM = conf['smtp_account']
-    TO = conf['email_addresses']
+    TO = conf['addresses']
 
     msg = MIMEMultipart()
     msg['From'] = FROM

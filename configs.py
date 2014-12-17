@@ -3,6 +3,24 @@ import getpass
 USER = getpass.getuser()
 
 """
+Standard Google Compute Engine config
+
+"""
+compute_engine_config = {
+    'num_workers' : 2,
+    'project_name' : "braided-keel-768",
+    'zone' : "europe-west1-c",
+    'machine_type' : "n1-standard-2",
+    'num_cores' : 2,
+    'disk_image' : "debian-7-backports",
+    'prefix' : "benchmark-",
+    'disk_space_gb' : 20,
+    'disk_type' : 'pd-standard', # change to pd-ssd for ssd,
+    'disk_mount_path' : "/home/%s/mnt" % USER,
+}
+
+
+"""
 Standard Flink config
 
 """
@@ -22,6 +40,7 @@ flink_config = {
     ]
 }
 
+
 """
 Standard Hadoop config
 
@@ -33,22 +52,6 @@ hadoop_config = {
     'replication_factor' : 3,
 }
 
-"""
-Standard Google Compute Engine config
-
-"""
-compute_engine_config = {
-    'num_workers' : 2,
-    'project_name' : "braided-keel-768",
-    'zone' : "europe-west1-c",
-    'machine_type' : "n1-standard-2",
-    'num_cores' : 2,
-    'disk_image' : "debian-7-backports",
-    'prefix' : "benchmark-",
-    'disk_space_gb' : 20,
-    'disk_type' : 'pd-standard', # change to pd-ssd for ssd,
-    'disk_mount_path' : "/home/%s/mnt" % USER,
-}
 
 """
 Standard Tez config
@@ -71,7 +74,7 @@ email_config = {
     'smtp_port' : 587,
     'smtp_account' : "iamthemailer@gmail.com",
     'smtp_password' : '',
-    'email_addresses' : ["max@data-artisans.com"],
+    'addresses' : ["max@data-artisans.com"],
     'subject' : "Performance test results",
     'text' : "Here are the results."
 }
