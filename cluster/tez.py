@@ -34,7 +34,7 @@ def get_tez_tarball_path(file):
 def configure():
     # build tez
     with cd(conf['path']):
-        run("mvn clean package -DskipTests=true -Dmaven.javadoc.skip=true")
+        run("mvn clean package -DskipTests=true -Dmaven.javadoc.skip=true > /dev/null")
     # copy to HDFS
     mkdir_hdfs("/tez")
     hdfs_path = "/tez/tarball.tar.gz"

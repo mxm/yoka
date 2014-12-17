@@ -25,7 +25,7 @@ def get_flink_dist_path():
 def configure():
     with cd(conf['path']):
         run("git checkout %s" % conf['git_commit'])
-        run("mvn clean install -DskipTests")
+        run("mvn clean install -DskipTests > /dev/null")
     context = conf.copy()
     context['java_home'] = find_java_home()
     context['master'] = env.master

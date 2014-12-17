@@ -13,7 +13,7 @@ class GitRepository(object):
         master("cd %s && git checkout %s" % (self.path, branch))
 
     def maven(self, target):
-        master("cd %s && mvn %s" % (self.path, target))
+        master("cd %s && mvn %s > /dev/null" % (self.path, target))
 
     def get_absolute_path(self):
         return "~/" + self.path
