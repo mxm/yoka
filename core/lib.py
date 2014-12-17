@@ -1,5 +1,7 @@
 from time import time
 
+import results
+
 import log
 
 logger = log.get_logger(__name__)
@@ -167,7 +169,9 @@ class ClusterSuite(Experiment):
                 system.stop()
         self.cluster.shutdown()
 
-    def execute(self, retry_setup=0, ignore_failures=True, shutdown_on_success=True, shutdown_on_failure=True):
+    def execute(self, retry_setup=0, ignore_failures=True,
+                shutdown_on_success=True, shutdown_on_failure=True,
+                email_results=False):
         for run_id in range(1, retry_setup+2):
             try:
                 logger.info("Setting up cluster")
@@ -189,6 +193,12 @@ class ClusterSuite(Experiment):
                 if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
                     logger.info("Shutting down cluster")
                     self.shutdown()
+            if email_results and not run_failure:
+                try:
+                    filename = results.gen_plot(self.id)
+                    results.send_email(filename)
+                except:
+                    logger.exception("Failed to send results.")
 
     def __str__(self):
         return self.id

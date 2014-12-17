@@ -62,6 +62,6 @@ generators = [
 
 suite = ClusterSuite("DefaultSuite", cluster, systems, generators, benchmarks)
 
-# retry 1 time if cluster setup fails
-# do not shutdown the cluster on failures
-suite.execute(retry_setup=0, shutdown_on_failure=False)
+suite.execute(retry_setup=0,
+              shutdown_on_failure=False,
+              email_results=True)
