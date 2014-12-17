@@ -157,8 +157,8 @@ class ClusterSuite(Experiment):
                 # save result
                 result = Result(self, benchmark, log_paths)
                 result.save(failed)
-                if not ignore_failures:
-                    raise Exception("Exception raised in %s run %d" (benchmark, run_id))
+                if failed and not ignore_failures:
+                    raise Exception("Exception raised in %s run %d (see logs)." % (benchmark, run_id))
 
 
     def shutdown(self):
