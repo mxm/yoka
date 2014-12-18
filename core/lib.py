@@ -1,4 +1,5 @@
 from time import time
+from pprint import pformat
 
 import results
 
@@ -199,7 +200,8 @@ class ClusterSuite(Experiment):
             if email_results and not run_failure:
                 try:
                     filename = results.gen_plot(self.id)
-                    results.send_email(filename)
+                    text = "Cluster config:\n%s" % (pformat(self.cluster.config))
+                    results.send_email(filename, additional_text=text)
                 except:
                     logger.exception("Failed to send results.")
 

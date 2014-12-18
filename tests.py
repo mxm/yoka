@@ -95,8 +95,10 @@ class TestResults(unittest.TestCase):
                 self.assertEquals(c.fetchall().__len__(), b.times)
 
     def test_email_plot(self):
-        filename = results.gen_plot()
-        results.send_email(filename)
+        from pprint import pformat
+        filename = results.gen_plot("TestSuiteId")
+        text = "Cluster config:\n%s" % (pformat(compute_engine_config))
+        results.send_email(filename, additional_text=text)
 
     def tearDown(self):
         pass

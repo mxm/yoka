@@ -85,7 +85,7 @@ class Result(object):
 
 
 
-def send_email(filename):
+def send_email(filename, additional_text=""):
     FROM = conf['smtp_account']
     TO = conf['addresses']
 
@@ -94,7 +94,8 @@ def send_email(filename):
     msg['To'] = ', '.join(TO)
     msg['Subject'] = conf['subject']
 
-    msg.attach(MIMEText(conf['text']))
+    TEXT = "%s\n\n%s" % (conf['text'], additional_text)
+    msg.attach(MIMEText(TEXT))
 
     part = MIMEBase('application', 'octet-stream')
     part.set_payload(open(filename, 'rb').read())
