@@ -13,7 +13,8 @@ gcloud_file = "gcloud_conf.data"
 
 class Configuration(object):
 
-    def __init__(self, master, slaves):
+    def __init__(self, config, master, slaves):
+        self.config = config
         self.master = master
         self.slaves = slaves
 
@@ -200,7 +201,7 @@ def create_config():
             master = (name, ip)
         else:
             slaves[name] = ip
-    config = Configuration(master, slaves)
+    config = Configuration(conf, master, slaves)
     config.save()
     return Configuration.load()
 
@@ -227,6 +228,8 @@ def init():
     master_ip = config.get_master_ip()
     slave_ips = config.get_slave_ips()
     if ips and hostnames:
+        global conf
+        conf = config.config
         env.hosts = ips
         env.master = config.get_master_name()
         env.slaves = config.get_slave_names()
