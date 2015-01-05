@@ -199,8 +199,10 @@ class ClusterSuite(Experiment):
                     self.shutdown()
             if email_results and not run_failure:
                 try:
-                    filename = results.gen_plot(self.id)
                     text = "Cluster config:\n%s" % (pformat(self.cluster.config))
+                    filename = results.gen_plot(self.id)
+                    if not filename:
+                        text += "Plot could not be generated. See log for more details.\n"
                     results.send_email(filename, additional_text=text)
                 except:
                     logger.exception("Failed to send results.")

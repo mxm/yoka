@@ -8,8 +8,19 @@ from email import Encoders
 
 from configs import email_config as conf
 
-import matplotlib.pyplot as plt
-import datetime
+import log
+
+logger = log.get_logger(__name__)
+
+# these are optional
+try:
+    import matplotlib.pyplot as plt
+    import datetime
+    plotting_support = True
+except:
+    plotting_support = False
+    logger.warn("Matplotlib could not be loaded, you will not be able to generate plots!")
+
 
 from os.path import basename
 
@@ -113,6 +124,9 @@ def send_email(filename, additional_text=""):
 
 
 def gen_plot(suite_id=None):
+    if not plotting_support:
+        logger.error("Plotting was attempted but matplotlib could not be loaded previously!")
+        return None
     with DB() as db:
         # default figure
         plt.figure(1)
