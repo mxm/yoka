@@ -3,6 +3,26 @@ import getpass
 USER = getpass.getuser()
 
 """
+Standard Local Cluster config
+
+"""
+local_cluster_config = {
+    # the address of the master machine
+    'master' : "master.example.com",
+    # addresses of the slave machines
+    'slaves' : [
+        # list of machines, e.g.
+        "85.13.152.91",
+        "host2.example.com",
+        "host3.example.com",
+    ],
+    # user name for ssh login
+    'user' : USER,
+    # absolute path to the local ssh key file for authentication
+    'ssh_key' : "/home/%s/.ssh/id_rsa" % USER,
+}
+
+"""
 Standard Google Compute Engine config
 
 """

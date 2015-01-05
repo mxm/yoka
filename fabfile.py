@@ -44,6 +44,13 @@
 #     tez.get_tez_tarball_path
 #     tez.install
 
-from cluster import gcloud, maintenance, hadoop, flink, tez, utils
+from cluster import gcloud, local, maintenance, hadoop, flink, tez, utils
 
-gcloud.init()
+# the default execution mode
+# either gcloud for GCE or local for local cluster
+default_mode = "gcloud"
+
+if default_mode == "gcloud":
+    gcloud.init()
+elif default_mode == "local":
+    local.init()

@@ -20,7 +20,7 @@ def install():
 @roles('master')
 def format_hdfs_master():
     run("rm -rf %s/%s" % (conf['data_path'], namenode_dir))
-    run("mkdir %s/%s" % (conf['data_path'], namenode_dir))
+    run("mkdir -p %s/%s" % (conf['data_path'], namenode_dir))
     run("%s/bin/hdfs namenode -format" % conf['path'])
 
 @task
