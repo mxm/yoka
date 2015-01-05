@@ -34,17 +34,17 @@ def find_java_home():
 
 @task
 @parallel
-def set_java_home(file="~/.bashrc"):
+def set_java_home(file="~/.bashrc", has_root=True):
     java_home = find_java_home()
     run("echo 'export JAVA_HOME=%s' >> %s" % (java_home, file))
-    sudo("echo 'export JAVA_HOME=%s' >> %s" % (java_home, "/root/.bashrc"))
+    if has_root:
+        sudo("echo 'export JAVA_HOME=%s' >> %s" % (java_home, "/root/.bashrc"))
 
 @task
 @roles('master')
 @runs_once
 def generate_key():
     run("yes | ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''")
-    print run("echo aha > access_log")
     return (run("cat ~/.ssh/id_rsa.pub", quiet=False), run("cat ~/.ssh/id_rsa", quiet=True))
 
 @task
