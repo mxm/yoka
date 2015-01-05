@@ -5,11 +5,11 @@ import json
 import pickle
 import os
 
-from fabric.api import env, local, run, sudo
+from fabric.api import env, run, sudo
 from configs import compute_engine_config as conf
 
 
-gcloud_file = "gcloud_conf.data"
+config_file = "gcloud_conf.data"
 
 class Configuration(object):
 
@@ -63,7 +63,7 @@ class Configuration(object):
         return ids
 
     def save(self):
-        with open(gcloud_file, 'wb') as output:
+        with open(config_file, 'wb') as output:
             pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
 
     def __str__(self):
@@ -72,7 +72,7 @@ class Configuration(object):
     @staticmethod
     def load():
         try:
-            with open(gcloud_file, 'rb') as input:
+            with open(config_file, 'rb') as input:
                 config = pickle.load(input)
                 return config
         except:
@@ -80,7 +80,7 @@ class Configuration(object):
 
     @staticmethod
     def delete():
-        os.remove(gcloud_file)
+        os.remove(config_file)
 
 
 @task
