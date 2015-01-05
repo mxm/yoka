@@ -27,7 +27,7 @@ Then run:
 
 The installation script will install the dependencies listed in requirements.txt.
 
-### Plotting
+#### Plotting
 
 Optionally, if you want to generate plots, install:
 
@@ -80,10 +80,13 @@ system logs which are available in the /logs directory.
 Development
 -----------
 
-To trigger certain actions on the cluster, you can use the fab command.
+To trigger certain actions on the cluster, you can use Fabric's fab command.
 
+    # activate virtual environment
     source env/bin/activate
+    # list all available actions
     fab -l
+    # execute some actions, e.g.
     # start flink
     fab flink.master
     fab flink.slaves
