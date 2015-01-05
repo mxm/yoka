@@ -1,14 +1,14 @@
 Yoka
 ====
 
-Yoka is a framework for running performance tests on PaaS
-services. Currently, only Google Compute Engine is supported but Yoka can be
+Yoka is a framework for running performance tests on clusters. Existing clusters
+as well as dynamic clusters created by PaaS services are supported. Currently,
+only Google Compute Engine is supported as a PaaS service but Yoka can be
 extended to support other PaaS providers.
 
 With Yoka, you can define cluster suites which performance test a set of
 experiments. Experiments depend on systems which can be started along with the
-experiments. Right now, Yoka supports HDFS and Flink as configurable
-systems.
+experiments. Right now, Yoka supports HDFS and Flink as configurable systems.
 
 Install
 -------
