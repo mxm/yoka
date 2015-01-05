@@ -31,7 +31,7 @@ rotateLogFile() {
 }
 
 printUsage(){
-    echo "usage: ./pybench.sh <run_name>"
+    echo "usage: ./yoka.sh <run_name>"
 }
 
 printRunNames(){

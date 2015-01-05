@@ -1,19 +1,19 @@
-py-bench
-========
+Yoka
+====
 
-py-bench is a framework for running performance tests on PaaS
-services. Currently, only Google Compute Engine is supported but py-bench can be
+Yoka is a framework for running performance tests on PaaS
+services. Currently, only Google Compute Engine is supported but Yoka can be
 extended to support other PaaS providers.
 
-With py-bench, you can define cluster suites which performance test a set of
+With Yoka, you can define cluster suites which performance test a set of
 experiments. Experiments depend on systems which can be started along with the
-experiments. Right now, py-bench supports HDFS and Flink as configurable
+experiments. Right now, Yoka supports HDFS and Flink as configurable
 systems.
 
 Install
 -------
 
-### py-bench
+### Yoka
 
 Install Python 2.7, Virtualenv for Python, and the Python development files. In Debian, this command does the trick:
 
@@ -58,16 +58,16 @@ configs can be modified for a performance test.
 Run
 ---
 
-To run py-bench, execute
+To run Yoka, execute
 
-    ./pybench.sh <run_name>
+    ./yoka.sh <run_name>
 
 Run files are located in the runs directory. You can use any of the
 supplied run files as a base to write your own.
 
 For example, to run runs/example.py execute the following:
 
-    ./pybench.sh example
+    ./yoka.sh example
 
 
 Evaluation
