@@ -77,7 +77,8 @@ def run_jar(path, jar_name, args, dop=None, clazz=None, upload=False):
 def copy_log_master(dest_path):
     local("mkdir -p '%s'" % dest_path)
     path = get_flink_dist_path() + "/log"
-    log_file = "flink-*-jobmanager-*"
+    # flink bug FLINK-1361: either jobmanager or jobManager
+    log_file = "flink-*-job[Mm]anager-*"
     for extension in ["log", "out"]:
         copy_log("%s/%s.%s" % (path, log_file, extension),
                  "%s/flink_jobmanager.%s" % (dest_path, extension)
