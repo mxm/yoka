@@ -1,5 +1,5 @@
 from fabric.decorators import task, roles, parallel
-from fabric.api import env, run, sudo, put, cd
+from fabric.api import env, run, sudo, put, cd, execute
 from maintenance import pull_from_master, set_java_home
 from utils import process_template
 
@@ -42,7 +42,9 @@ def configure():
     slaves = '\n'.join(env.slaves)
     context['slaves'] = slaves
     process_template("hadoop", "slaves.mustache", context, destination)
-    format_hdfs_master()
+    # delete all data and ensure consistent state
+    execute(format_hdfs_master)
+    execute(delete_data_slaves)
     # configure YARN
     process_template("hadoop", "core-site.xml.mustache", context, destination)
     process_template("hadoop", "yarn-site.xml.mustache", context, destination)

@@ -25,8 +25,7 @@ class Hadoop(System):
         execute(hadoop.pull)
 
     def reset(self):
-        #execute(hadoop.delete_data_slaves)
-        pass
+        execute(hadoop.delete_data_slaves)
 
     def start(self):
         if 'start' not in self.skip_targets:
