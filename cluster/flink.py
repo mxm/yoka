@@ -12,7 +12,7 @@ from configs import flink_config as conf
 @task
 @roles('master')
 def install():
-    sudo("rm -rf '%s'" % conf['path'])
+    run("rm -rf '%s'" % conf['path'])
     run("git clone %s %s" % (conf['git_repository'], conf['path']))
 
 @task

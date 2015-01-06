@@ -46,7 +46,7 @@ def configure():
                      context={'hdfs_path' : hdfs_path},
                      destination=destination)
     # configure client
-    sudo("rm -rf '%s'" % conf['path_client'])
+    run("rm -rf '%s'" % conf['path_client'])
     tarball_location = get_tez_tarball_path("tez*-minimal.tar.gz")
     run("mkdir -p %s" % conf['path_client'])
     run("tar -xzf %s -C %s" % (tarball_location, conf['path_client']))
