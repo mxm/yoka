@@ -1,7 +1,7 @@
 import logging
 import sys
 
-root = logging.getLogger('pybench')
+root = logging.getLogger('yoka')
 root.setLevel(logging.DEBUG)
 
 fh = logging.FileHandler('logs/run.log')
