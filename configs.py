@@ -7,14 +7,18 @@ Standard Local Cluster config
 
 """
 local_cluster_config = {
+    # address format: (internal_address, external_address)
+    # the internal addresses are used for internal cluster communication
+    # the external addresses are necessary when controlling from outside
+    # in case, this is started from a machine from inside the cluster, internal and external addresses can be identical
+
     # the address of the master machine
-    'master' : "master.example.com",
+    'master' : ("instance-1", "146.148.117.108"),
     # addresses of the slave machines
     'slaves' : [
         # list of machines, e.g.
-        "85.13.152.91",
-        "host2.example.com",
-        "host3.example.com",
+        ("instance-2", "104.155.15.202"),
+        ("instance-3", "104.142.23.199"),
     ],
     # user name for ssh login
     'user' : USER,

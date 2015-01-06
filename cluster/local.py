@@ -8,11 +8,11 @@ import os
 from fabric.api import env, run, sudo
 from configs import local_cluster_config as conf
 
-def get_slave_id_dict():
+def get_slave_id_dict(master, slaves):
     # dictionary which gives each slave an id
     ids = {}
-    ids[conf['master']] = 0
-    for (slave_id, slave) in enumerate(conf['slaves']):
+    ids[master] = 0
+    for (slave_id, slave) in enumerate(slaves):
         ids[slave] = slave_id+1
     return ids
 
@@ -25,13 +25,20 @@ def init():
     if master and slaves:
         #global conf
         #conf = config.config
-        env.hosts = slaves + [master]
-        env.master = master
-        env.slaves = slaves
-        env.hostnames = env.hosts
+        # extract internal and external addresses
+        master_internal, master_external = master
+        slaves_internal, slaves_external = [list(addresses) for addresses in zip(*slaves)]
+        # external addresses
+        env.hosts = slaves_external + [master_external]
+        # internal address
+        env.master = master_internal
+        # internal addresses
+        env.slaves = slaves_internal
+        # not needed for local mode
+        #env.hostnames = env.hosts
         #env.disknames = [name + "-disk" for name in hostnames]
         #env.host_dict = get_host_dict()
-        env.roledefs = {'slaves' : slaves, 'master' : [master]}
+        env.roledefs = {'slaves' : slaves_external, 'master' : [master_external]}
         env.key_filename = conf['ssh_key']
-        env.ids = get_slave_id_dict()
+        env.ids = get_slave_id_dict(master_external, slaves_external)
         env.keepalive = 60
