@@ -9,6 +9,9 @@ from fabric.api import env, run, sudo
 from configs import compute_engine_config as conf
 
 
+class ExistingInstancesException(Exception):
+    pass
+
 config_file = "gcloud_conf.data"
 
 class Configuration(object):
@@ -109,7 +112,7 @@ def configure_ssh():
 def create_instances():
     if env.hostnames:
         print "Old instancecs exist. Not creating new instances."
-        return
+        raise ExistingInstancesException("Old instances exist.")
     print "Creating machines."
     LocalCommand(
         "gcloud compute --project %s" % conf['project_name'],

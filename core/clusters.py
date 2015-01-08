@@ -16,9 +16,12 @@ class ComputeEngine(Cluster):
         gcloud.conf = self.config
         execute(gcloud.init)
         execute(gcloud.configure_ssh)
-        execute(gcloud.create_instances)
-        execute(gcloud.attach_disk)
-        execute(gcloud.mount_disk)
+        try:
+            execute(gcloud.create_instances)
+            execute(gcloud.attach_disk)
+            execute(gcloud.mount_disk)
+        except gcloud.ExistingInstancesException:
+            pass
         execute(maintenance.update_package_cache)
         #execute(maintenance.upgrade)
         execute(maintenance.install_dependencies)
