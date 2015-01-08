@@ -60,14 +60,14 @@ Run
 
 To run Yoka, execute
 
-    ./yoka.sh <run_name>
+    ./yoka.sh run <run_name>
 
 Run files are located in the runs directory. You can use any of the
 supplied run files as a base to write your own.
 
 For example, to run runs/example.py execute the following:
 
-    ./yoka.sh example
+    ./yoka.sh run example
 
 
 Evaluation

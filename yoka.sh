@@ -31,7 +31,7 @@ rotateLogFile() {
 }
 
 printUsage(){
-    echo "usage: ./yoka.sh <run_name>"
+    echo "usage: ./yoka.sh [run <run_name> | shutdown]"
 }
 
 printRunNames(){
@@ -42,25 +42,32 @@ printRunNames(){
     done
 }
 
-runFile="runs/$1.py"
 
-if [ "$#" -ne 1 ]; then
-    printUsage
-    echo
-    printRunNames
-    exit 1
-elif [ -e $runFile ] ; then
+if [ "$1" == "shutdown" ] ; then
     source env/bin/activate
+    fab gcloud.delete_instances
+elif [ "$1" == "run" ] ; then
+    runFile="runs/$2.py"
+    if  [ -e $runFile ] ; then
+        source env/bin/activate
 
-    logFile="runs/$1.stdout.log"
-    rotateLogFile "$logFile"
+        logFile="runs/$2.stdout.log"
+        rotateLogFile "$logFile"
 
-    export PYTHONPATH="$PYTHONPATH:./"
-    python "$runFile" 2>&1 | tee "$logFile"
+        export PYTHONPATH="$PYTHONPATH:./"
+        python "$runFile" 2>&1 | tee "$logFile"
+    else
+        printUsage
+        if [ "$2" != "" ] ; then
+            echo
+            echo "$2 is not a valid run name."
+        fi
+        echo
+        printRunNames
+        exit 1
+    fi
 else
     printUsage
-    echo
-    echo "$1 is not a valid run name."
     echo
     printRunNames
     exit 1
