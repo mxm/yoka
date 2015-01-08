@@ -3,7 +3,9 @@ from fabric.api import sudo, run, execute, env
 
 from time import sleep
 
-import logging
+import core.log
+
+logger = core.log.get_logger()
 
 
 @task
@@ -72,5 +74,5 @@ def pull_from_master(path, dest="~"):
             run("rsync -aP %s:%s %s > /dev/null" % (env.master, path, dest))
             break
         except:
-            logging.warn("Failed to execute rsync for host %s" % env.host_string)
+            logger.warn("Failed to execute rsync for host %s" % env.host_string)
             sleep(5)
