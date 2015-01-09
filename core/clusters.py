@@ -4,6 +4,9 @@ from cluster import gcloud, local, maintenance
 
 from fabric.api import execute
 
+import log
+logger = log.get_logger()
+
 class ComputeEngine(Cluster):
     """
     Google Compute Engine execution mode

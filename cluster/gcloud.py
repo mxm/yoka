@@ -8,6 +8,8 @@ import os
 from fabric.api import env, run, sudo
 from configs import compute_engine_config as conf
 
+import core.log
+logger = core.log.get_logger()
 
 class ExistingInstancesException(Exception):
     pass
@@ -113,7 +115,7 @@ def create_instances():
     if env.hostnames:
         print "Old instancecs exist. Not creating new instances."
         raise ExistingInstancesException("Old instances exist.")
-    print "Creating machines."
+    logger.info("Creating machines.")
     LocalCommand(
         "gcloud compute --project %s" % conf['project_name'],
         "instances create %s" % ' '.join(get_hostnames()),
@@ -126,7 +128,7 @@ def create_instances():
         "--boot-disk-type %s" % conf['disk_type'],
         "-q"
     ).execute()
-    print "Creating disks."
+    logger.info("Creating disks.")
     LocalCommand(
         "gcloud compute --project %s" % conf['project_name'],
         "disks create %s" % ' '.join(get_disknames()),
