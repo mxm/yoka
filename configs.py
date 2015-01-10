@@ -36,6 +36,7 @@ compute_engine_config = {
     'zone' : "europe-west1-c",
     'machine_type' : "n1-standard-2",
     'num_cores' : 2,
+    'size_mem' : 7500,
     'disk_image' : "debian-7-backports",
     'prefix' : "benchmark-",
     'disk_space_gb' : 20,
@@ -50,7 +51,7 @@ Standard Flink config
 """
 flink_config = {
     'path' : "/home/%s/flink" % USER,
-    'git_repository' : "https://github.com/apache/incubator-flink",
+    'git_repository' : "https://github.com/apache/flink",
     'git_commit' : "master",
     'num_task_slots' : 8,
     'parallelization' : 1,
