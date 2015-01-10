@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from core.lib import System, Experiment, Benchmark, ClusterSuite
+from core.lib import Cluster, System, Experiment, Benchmark, ClusterSuite
 from core.clusters import ComputeEngine
 #from systems import Hadoop, Flink
 from configs import compute_engine_config, hadoop_config, flink_config
@@ -10,13 +10,21 @@ import core.results as results
 
 results.DB_FILE = 'test.db'
 
-cluster = ComputeEngine(compute_engine_config)
 #hadoop = Hadoop(hadoop_config)
 #flink = Flink(flink_config)
+
+class StupidCluster(Cluster):
+    
+    def setup(self):
+        pass
+
+    def shutdown(self):
+        pass
 
 class StupidSystem(System):
 
     def __init__(self, name):
+        self.config = {'this': 'is_a_config', 'value': 42}
         self.name = name
     def set_config(self):
         pass
@@ -68,6 +76,9 @@ benchmarks = [
 ]
 
 
+cluster = StupidCluster({})
+name = "TestResults"
+
 class TestResults(unittest.TestCase):
 
     def setup(self):
@@ -77,9 +88,9 @@ class TestResults(unittest.TestCase):
             pass
 
     def test_save(self):
-        suite = ClusterSuite("SuiteTest", cluster, systems, [], benchmarks)
-        # skip setup and shutdown, just run the tests
-        suite.run()
+        suite = ClusterSuite(name, cluster, systems, [], benchmarks)
+        # run suite
+        suite.execute()
         #check corresponding db entries
         suite_id = suite.id
         suite_uid = suite.uid
@@ -94,11 +105,13 @@ class TestResults(unittest.TestCase):
                 """, data)
                 self.assertEquals(c.fetchall().__len__(), b.times)
 
+    def gen_plot(self):
+        results.gen_plot(name)
+
     def test_email_plot(self):
-        from pprint import pformat
-        filename = results.gen_plot("TestSuiteId")
-        text = "Cluster config:\n%s" % (pformat(compute_engine_config))
-        results.send_email(filename, additional_text=text)
+        suite = ClusterSuite(name, cluster, systems, [], benchmarks)
+        suite.execute(email_results=True)
+        #results.gen_plot(name)
 
     def tearDown(self):
         pass
