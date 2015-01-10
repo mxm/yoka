@@ -199,7 +199,12 @@ class ClusterSuite(Experiment):
                     self.shutdown()
             if email_results and not run_failure:
                 try:
-                    text = "Cluster config:\n%s" % (pformat(self.cluster.config))
+                    text = "Cluster config:\n%s\n\n" % (pformat(self.cluster.config))
+                    for benchmark in self.benchmarks:
+                        text += "%s:\n" % benchmark.id
+                        for system in benchmark.systems:
+                            text += "%s config:\n%s\n" % (system, system.config)
+                        text += "\n"
                     filename = results.gen_plot(self.id)
                     if not filename:
                         text += "Plot could not be generated. See log for more details.\n"
