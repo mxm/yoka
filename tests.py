@@ -28,11 +28,13 @@ class StupidSystem(System):
     def __init__(self, name):
         self.config = {'this': 'is_a_config', 'value': 42}
         self.name = name
+        self.configured = 0
     def set_config(self):
         pass
     def install(self):
         pass
     def configure(self):
+        self.configured += 1
         pass
     def reset(self):
         pass
@@ -106,6 +108,14 @@ class TestResults(unittest.TestCase):
                 bench_id = ?
                 """, data)
                 self.assertEquals(c.fetchall().__len__(), b.times)
+    
+    def test_configure_once_per_benchmark(self):
+        tmp = core.lib.sleep_time
+        core.lib.sleep_time = 0
+        suite = ClusterSuite(name, cluster, systems, [], benchmarks)
+        suite.execute()
+        self.assertEquals(suite.benchmarks[0].systems[0].configured, 1)
+        core.lib.sleep_time = tmp
 
     def test_gen_plot(self):
         suite = ClusterSuite(name, cluster, systems, [], benchmarks)
