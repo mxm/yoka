@@ -1,6 +1,7 @@
 import unittest
 import os
 
+import core.lib
 from core.lib import Cluster, System, Experiment, Benchmark, ClusterSuite
 from core.clusters import ComputeEngine
 #from systems import Hadoop, Flink
@@ -9,6 +10,7 @@ from configs import compute_engine_config, hadoop_config, flink_config
 import core.results as results
 
 results.DB_FILE = 'test.db'
+core.lib.sleep_time = 0
 
 #hadoop = Hadoop(hadoop_config)
 #flink = Flink(flink_config)
@@ -81,7 +83,7 @@ name = "TestResults"
 
 class TestResults(unittest.TestCase):
 
-    def setup(self):
+    def setUp(self):
         try:
             os.remove(results.DB_FILE)
         except:
@@ -105,7 +107,7 @@ class TestResults(unittest.TestCase):
                 """, data)
                 self.assertEquals(c.fetchall().__len__(), b.times)
 
-    def gen_plot(self):
+    def test_gen_plot(self):
         results.gen_plot(name)
 
     def test_email_plot(self):

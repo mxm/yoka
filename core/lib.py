@@ -9,6 +9,8 @@ logger = log.get_logger(__name__)
 
 from results import Result
 
+sleep_time = 10
+
 class Experiment(object):
 
     def setup(self):
@@ -42,7 +44,7 @@ class Benchmark(Experiment):
             if not self.executed:
                 system.configure()
             system.start()
-            sleep(10)
+            sleep(sleep_time)
         self.experiment.setup()
 
     def run(self):
@@ -130,7 +132,7 @@ class ClusterSuite(Experiment):
             if system.once_per_suite:
                 system.configure()
                 system.start()
-                sleep(10)
+                sleep(sleep_time)
 
     def run(self, ignore_failures=False):
         # generate data
