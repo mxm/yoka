@@ -1,4 +1,4 @@
-from time import time
+from time import sleep, time
 from pprint import pformat
 
 import results
@@ -42,6 +42,7 @@ class Benchmark(Experiment):
             if not self.executed:
                 system.configure()
             system.start()
+            sleep(10)
         self.experiment.setup()
 
     def run(self):
@@ -129,6 +130,7 @@ class ClusterSuite(Experiment):
             if system.once_per_suite:
                 system.configure()
                 system.start()
+                sleep(10)
 
     def run(self, ignore_failures=False):
         # generate data
