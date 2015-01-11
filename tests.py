@@ -108,12 +108,13 @@ class TestResults(unittest.TestCase):
                 self.assertEquals(c.fetchall().__len__(), b.times)
 
     def test_gen_plot(self):
+        suite = ClusterSuite(name, cluster, systems, [], benchmarks)
+        suite.execute()
         results.gen_plot(name)
 
     def test_email_plot(self):
         suite = ClusterSuite(name, cluster, systems, [], benchmarks)
         suite.execute(email_results=True)
-        #results.gen_plot(name)
 
     def tearDown(self):
         pass
