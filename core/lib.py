@@ -1,6 +1,8 @@
 from time import sleep, time
 from pprint import pformat
 
+import datetime
+
 from utils import Timer
 
 import results
@@ -30,31 +32,33 @@ class Experiment(object):
 class Benchmark(Experiment):
 
     id = None
-    start_time = None
-    duration = None
-    executed = 0
-
+    # timings for run phases
+    run_times = {}
+    # all timings, set by cluster suite
+    runs = []
+    
     def __init__(self, id, systems, experiment, times = 1):
         self.id = id
         self.systems = systems
         self.experiment = experiment
         self.times = times
 
+    @Timer(run_times, "Setup")
     def setup(self):
         for system in self.systems:
             system.set_config()
-            if not self.executed:
+            # if benchmark has not run yet, configure
+            if not self.runs:
                 system.configure()
             system.start()
             sleep(sleep_time)
         self.experiment.setup()
 
+    @Timer(run_times, "Benchmark")
     def run(self):
-        self.start_time = time()
         self.experiment.run()
-        self.duration = time() - self.start_time
-        self.executed += 1
 
+    @Timer(run_times, "Shutdown")
     def shutdown(self):
         try:
             self.experiment.shutdown()
@@ -65,7 +69,15 @@ class Benchmark(Experiment):
             system.reset()
 
     def __str__(self):
-        return str(self.id)
+        s = "%s:\n\n" % self.id
+        for system in self.systems:
+            s += "%s config:\n%s\n\n" % (system, pformat(system.config))
+        s += "\n"
+        for run_time in self.runs:
+            s += Timer.format_run_times(run_time)
+            s += "\n"
+        s += "\n"
+        return s
 
 # reuse the same logic the Benchmark class
 class Generator(Benchmark):
@@ -119,8 +131,7 @@ class Cluster(object):
 
 class ClusterSuite(Experiment):
 
-    run_times_suite = {}
-    run_times_benchmarks = {}
+    run_times = {}
 
     def __init__(self, id, cluster, systems, generators, benchmarks):
         self.id = id
@@ -130,7 +141,7 @@ class ClusterSuite(Experiment):
         self.generators = generators
         self.benchmarks = benchmarks
 
-    @Timer(run_times_suite, "Setup")
+    @Timer(run_times, "Setup")
     def setup(self):
         self.cluster.setup()
         for system in self.systems:
@@ -140,7 +151,7 @@ class ClusterSuite(Experiment):
                 system.start()
                 sleep(sleep_time)
 
-    @Timer(run_times_suite, "Data generation")
+    @Timer(run_times, "Data generation")
     def generate(self):
         # generate data
         for generator in self.generators:
@@ -148,7 +159,7 @@ class ClusterSuite(Experiment):
             generator.run()
             generator.shutdown()
 
-    @Timer(run_times_suite, "Benchmark")
+    @Timer(run_times, "Benchmark")
     def run(self, ignore_failures=False):
         # execute benchmarks
         for benchmark in self.benchmarks:
@@ -175,12 +186,13 @@ class ClusterSuite(Experiment):
                     system.save_log(unique_full_path)
                     log_paths[system] = unique_full_path
                 # save result
+                benchmark.runs.append(benchmark.run_times)
                 result = Result(self, benchmark, log_paths)
                 result.save(failed)
                 if failed and not ignore_failures:
                     raise Exception("Exception raised in %s run %d (see logs)." % (benchmark, run_id))
 
-    @Timer(run_times_suite, "Shutdown")
+    @Timer(run_times, "Shutdown")
     def shutdown(self):
         for system in self.systems:
             if system.once_per_suite:
@@ -230,19 +242,14 @@ class ClusterSuite(Experiment):
     def __str__(self):
         # print run times
         s = "Cluster suite %s\n\n" % self.id
-        for fun_name, (description, run_time) in self.run_times_suite.iteritems():
-            seconds = int(run_time)
-            s += "%s\n%s hours, %s minutes, %s seconds\n\n" \
-                 % (description, seconds // 3600, seconds // 60 % 60, seconds % 60)
+        s += Timer.format_run_times(self.run_times)
         s += "\n"
-        # print configs
+        # print system configs
         s += "Cluster %s config\n%s\n\n" % (self.cluster.__class__.__name__, pformat(self.cluster.config))
         for system in self.systems:
             s += "%s config:\n%s\n\n" % (system, pformat(system.config))
         s += "\n"
+        # print benchmark times and system configs
         for benchmark in self.benchmarks:
-            s += "%s:\n\n" % benchmark.id
-            for system in benchmark.systems:
-                s += "%s config:\n%s\n\n" % (system, pformat(system.config))
-            s += "\n"
+            s += "%s\n\n" % benchmark
         return s

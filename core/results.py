@@ -70,11 +70,15 @@ class Result(object):
     def save(self, failed=False):
         with DB() as db:
             c = db.cursor()
+            try:
+                _description, start_time, duration = self.benchmark.run_times[self.benchmark.run.__name__]
+            except:
+                start_time = 0
+                duration = 0
             data = (self.suite.uid, self.suite.id,
                     self.benchmark.id,
-                    # set precision to seconds
-                    int(self.benchmark.start_time),
-                    self.benchmark.duration,
+                    start_time,
+                    duration,
                     failed
             )
             c.execute("""
