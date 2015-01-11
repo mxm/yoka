@@ -203,13 +203,8 @@ class ClusterSuite(Experiment):
                     self.shutdown()
             if email_results and not run_failure:
                 try:
-                    text = "Cluster config:\n%s\n\n" % (pformat(self.cluster.config))
-                    for benchmark in self.benchmarks:
-                        text += "%s:\n" % benchmark.id
-                        for system in benchmark.systems:
-                            text += "%s config:\n%s\n" % (system, system.config)
-                        text += "\n"
                     filename = results.gen_plot(self.id)
+                    text = "%s" % self
                     if not filename:
                         text += "Plot could not be generated. See log for more details.\n"
                     results.send_email(filename, additional_text=text)
@@ -217,4 +212,14 @@ class ClusterSuite(Experiment):
                     logger.exception("Failed to send results.")
 
     def __str__(self):
-        return self.id
+        s = "Cluster suite %s\n\n" % self.id
+        s += "Cluster config:\n%s\n" % pformat(self.cluster.config)
+        for system in self.systems:
+            s += "%s config:\n%s\n" % (system, pformat(system.config))
+        s += "\n"
+        for benchmark in self.benchmarks:
+            s += "%s:\n" % benchmark.id
+            for system in benchmark.systems:
+                s += "%s config:\n%s\n" % (system, pformat(system.config))
+            s += "\n"
+        return s
