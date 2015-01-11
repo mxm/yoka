@@ -1,6 +1,8 @@
 from time import sleep, time
 from pprint import pformat
 
+from utils import Timer
+
 import results
 
 import log
@@ -117,6 +119,9 @@ class Cluster(object):
 
 class ClusterSuite(Experiment):
 
+    run_times_suite = {}
+    run_times_benchmarks = {}
+
     def __init__(self, id, cluster, systems, generators, benchmarks):
         self.id = id
         self.uid = "%s_%d" % (id, int(time()))
@@ -125,6 +130,7 @@ class ClusterSuite(Experiment):
         self.generators = generators
         self.benchmarks = benchmarks
 
+    @Timer(run_times_suite, "Setup")
     def setup(self):
         self.cluster.setup()
         for system in self.systems:
@@ -134,12 +140,16 @@ class ClusterSuite(Experiment):
                 system.start()
                 sleep(sleep_time)
 
-    def run(self, ignore_failures=False):
+    @Timer(run_times_suite, "Data generation")
+    def generate(self):
         # generate data
         for generator in self.generators:
             generator.setup()
             generator.run()
             generator.shutdown()
+
+    @Timer(run_times_suite, "Benchmark")
+    def run(self, ignore_failures=False):
         # execute benchmarks
         for benchmark in self.benchmarks:
             for run_id in range(0, benchmark.times):
@@ -170,16 +180,18 @@ class ClusterSuite(Experiment):
                 if failed and not ignore_failures:
                     raise Exception("Exception raised in %s run %d (see logs)." % (benchmark, run_id))
 
-
+    @Timer(run_times_suite, "Shutdown")
     def shutdown(self):
         for system in self.systems:
             if system.once_per_suite:
                 system.stop()
         self.cluster.shutdown()
 
+
     def execute(self, retry_setup=0, ignore_failures=True,
                 shutdown_on_success=True, shutdown_on_failure=True,
                 email_results=False):
+        # setup cluster
         for run_id in range(1, retry_setup+2):
             try:
                 logger.info("Setting up cluster")
@@ -191,6 +203,9 @@ class ClusterSuite(Experiment):
                 setup_failure = True
         if not setup_failure:
             try:
+                # generate data
+                self.generate()
+                # run benchmarks
                 logger.info("Running benchmarks")
                 self.run(ignore_failures)
                 run_failure = False
@@ -198,6 +213,7 @@ class ClusterSuite(Experiment):
                 logger.exception("Exception trying to run suite %s" % self.id)
                 run_failure = True
             finally:
+                # shutdown
                 if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
                     logger.info("Shutting down cluster")
                     self.shutdown()
@@ -212,14 +228,21 @@ class ClusterSuite(Experiment):
                     logger.exception("Failed to send results.")
 
     def __str__(self):
+        # print run times
         s = "Cluster suite %s\n\n" % self.id
-        s += "Cluster config:\n%s\n" % pformat(self.cluster.config)
+        for fun_name, (description, run_time) in self.run_times_suite.iteritems():
+            seconds = int(run_time)
+            s += "%s\n%s hours, %s minutes, %s seconds\n\n" \
+                 % (description, seconds // 3600, seconds // 60 % 60, seconds % 60)
+        s += "\n"
+        # print configs
+        s += "Cluster %s config\n%s\n\n" % (self.cluster.__class__.__name__, pformat(self.cluster.config))
         for system in self.systems:
-            s += "%s config:\n%s\n" % (system, pformat(system.config))
+            s += "%s config:\n%s\n\n" % (system, pformat(system.config))
         s += "\n"
         for benchmark in self.benchmarks:
-            s += "%s:\n" % benchmark.id
+            s += "%s:\n\n" % benchmark.id
             for system in benchmark.systems:
-                s += "%s config:\n%s\n" % (system, pformat(system.config))
+                s += "%s config:\n%s\n\n" % (system, pformat(system.config))
             s += "\n"
         return s
