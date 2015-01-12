@@ -56,7 +56,7 @@ class Timer(object):
         s = ""
         for fun_name, (description, start_time, run_time) in run_times.iteritems():
             timestamp = int(start_time)
-            time = datetime.datetime.fromtimestamp(start_time).strftime("%d.%m. %Y %H:%M:%S")
+            time = datetime.datetime.fromtimestamp(start_time).strftime("%d.%m.%Y %H:%M:%S")
             seconds = int(run_time)
             s += "%s\n%s\n%s hours, %s minutes, %s seconds\n\n" \
                  % (description, time, seconds // 3600, seconds // 60 % 60, seconds % 60)

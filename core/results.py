@@ -71,6 +71,9 @@ class Result(object):
         with DB() as db:
             c = db.cursor()
             try:
+                # safely get the main method's run time
+                # if an exception occurred in the setup, it will not be available
+                # if an exception occurred in the main method, it will be available
                 _description, start_time, duration = self.benchmark.run_times[self.benchmark.run.__name__]
             except:
                 start_time = 0

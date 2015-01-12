@@ -185,8 +185,11 @@ class ClusterSuite(Experiment):
                                                              system)
                     system.save_log(unique_full_path)
                     log_paths[system] = unique_full_path
-                # save result
+                # keep list of results
                 benchmark.runs.append(benchmark.run_times)
+                # TODO this could be re-initialized somewhere else
+                benchmark.run_times = {}
+                # save current result immediately
                 result = Result(self, benchmark, log_paths)
                 result.save(failed)
                 if failed and not ignore_failures:
