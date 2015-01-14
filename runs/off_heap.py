@@ -22,14 +22,14 @@ compute_engine_config['machine_type'] = "n1-standard-2"
 # num cores to use
 compute_engine_config['num_cores'] = 2
 # 16 workers + 1 master
-compute_engine_config['num_workers'] = 16
-compute_engine_config['disk_space_gb'] = 200
+compute_engine_config['num_workers'] = 10
+compute_engine_config['disk_space_gb'] = 100
 
 cluster = ComputeEngine(compute_engine_config)
 hadoop = Hadoop(hadoop_config)
 
 flink_config['git_repository'] = "https://github.com/mxm/flink.git"
-flink_config['git_commit'] = "d9cb5b71043d5fc863efed7610e87408ed00cb8f"
+flink_config['git_commit'] = "aba76171fef41e2c987913c32fefafc55ef635f6"
 flink = Flink(flink_config)
 
 flink_config_custom = flink_config.copy()
@@ -62,7 +62,7 @@ generators = [
         id = "TextGenerator",
         systems = [flink],
         experiment = generators.Text(
-            size_gb = 512, # 512 gB of data
+            size_gb = 150, # 512 gB of data
             dop = compute_engine_config['num_workers'] * compute_engine_config['num_cores']
         )
     )
