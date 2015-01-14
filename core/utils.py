@@ -32,7 +32,7 @@ class Timer(object):
 
     def __init__(self, timings, description):
         if not isinstance(timings, types.DictType):
-            raise Exception("Only dicts and lists are supported!")
+            raise Exception("Only dicts are supported!")
         self.timings = timings
         self.description = description
 
@@ -41,12 +41,12 @@ class Timer(object):
         # this decorator preserves the original function attributes (e.g. name)
         @wraps(method)
         def timing(*args, **kwargs):
-            start_time = int(time())
+            start_time = time()
             try:
                 return method(*args, **kwargs)
             finally:
                 run_time = time() - start_time
-                value = (self.description, start_time, run_time)
+                value = (self.description, int(start_time), run_time)
                 self.timings[method.__name__] = value
 
         return timing

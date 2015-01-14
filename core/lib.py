@@ -29,19 +29,23 @@ class Experiment(object):
     def __str__(self):
         return self.__class__.__name__
 
+
 class Benchmark(Experiment):
 
-    id = None
-    # timings for run phases
+    # timings for each execution's phases
     run_times = {}
-    # all timings, set by cluster suite
-    runs = []
-    
-    def __init__(self, id, systems, experiment, times = 1):
+
+    def __init__(self, id, systems, experiment, times=1):
+        # unique name of this benchmark
         self.id = id
         self.systems = systems
         self.experiment = experiment
+        # number of executions
         self.times = times
+        # all timings, set by cluster suite
+        self.runs = []
+        # clear the dict (if this class gets reused)
+        self.run_times.clear()
 
     @Timer(run_times, "Setup")
     def setup(self):
@@ -135,11 +139,14 @@ class ClusterSuite(Experiment):
 
     def __init__(self, id, cluster, systems, generators, benchmarks):
         self.id = id
+        # generate unique cluster id
         self.uid = "%s_%d" % (id, int(time()))
         self.cluster = cluster
         self.systems = systems
         self.generators = generators
         self.benchmarks = benchmarks
+        # clear the dict (if this class gets reused)
+        self.run_times.clear()
 
     @Timer(run_times, "Setup")
     def setup(self):
@@ -163,6 +170,8 @@ class ClusterSuite(Experiment):
     def run(self, ignore_failures=False):
         # execute benchmarks
         for benchmark in self.benchmarks:
+            # in case this class got reused
+            benchmark.runs = []
             for run_id in range(0, benchmark.times):
                 failed = False
                 try:
@@ -185,13 +194,16 @@ class ClusterSuite(Experiment):
                                                              system)
                     system.save_log(unique_full_path)
                     log_paths[system] = unique_full_path
-                # keep list of results
-                benchmark.runs.append(benchmark.run_times)
-                # TODO this could be re-initialized somewhere else
-                benchmark.run_times = {}
+                # keep list of results (make copy!)
+                benchmark.runs.append(benchmark.run_times.copy())
                 # save current result immediately
                 result = Result(self, benchmark, log_paths)
                 result.save(failed)
+                # TODO this could be re-initialized somewhere else
+                # CAUTION: run_times holds the same pointer as the decorator Timer
+                #          if run_times gets reassigned, this pointer is lost
+                benchmark.run_times.clear()
+                # raise exception if desired
                 if failed and not ignore_failures:
                     raise Exception("Exception raised in %s run %d (see logs)." % (benchmark, run_id))
 
