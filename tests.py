@@ -1,5 +1,7 @@
 import unittest
 import os
+import random
+from time import sleep
 
 import core.lib
 from core.lib import Cluster, System, Experiment, Benchmark, ClusterSuite
@@ -16,7 +18,7 @@ core.lib.sleep_time = 0
 #flink = Flink(flink_config)
 
 class StupidCluster(Cluster):
-    
+
     def setup(self):
         pass
 
@@ -57,6 +59,7 @@ class TestExperiment(Experiment):
 
     def run(self):
         print "running experiment"
+        sleep(random.randint(1, 3))
 
     def shutdown(self):
         pass
@@ -70,7 +73,7 @@ benchmarks = [
     Benchmark("Test2",
               systems=systems,
               experiment = TestExperiment(),
-              times = 10
+              times = 5
               ),
     Benchmark("Test3",
               systems=systems,
@@ -110,12 +113,15 @@ class TestResults(unittest.TestCase):
                 self.assertEquals(c.fetchall().__len__(), b.times)
     
     def test_configure_once_per_benchmark(self):
-        tmp = core.lib.sleep_time
-        core.lib.sleep_time = 0
         suite = ClusterSuite(name, cluster, systems, [], benchmarks)
         suite.execute()
-        self.assertEquals(suite.benchmarks[0].systems[0].configured, 1)
-        core.lib.sleep_time = tmp
+        # test if each system was only configured the necessary amount of times
+        for system in systems:
+            expected = 0
+            for benchmark in benchmarks:
+                if system in benchmark.systems:
+                    expected += 1
+            self.assertEquals(suite.benchmarks[0].systems[0].configured, expected)
 
     def test_gen_plot(self):
         suite = ClusterSuite(name, cluster, systems, [], benchmarks)
