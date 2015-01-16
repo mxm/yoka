@@ -66,7 +66,9 @@ def set_key():
 
 @task
 # this fails if too many hosts pull at once
-@parallel(pool_size=10)
+#@parallel(pool_size=10)
+# now set globally through environment dictionary fabric.env
+@parallel
 @roles('slaves')
 def pull_from_master(path, dest="~"):
     for i in range(0, 5):

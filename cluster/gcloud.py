@@ -141,8 +141,7 @@ def create_instances():
     init()
 
 @task
-# this fails if too many hosts pull at once
-@parallel(pool_size=10)
+@parallel
 def attach_disk():
     host_name = env.host_dict[env.host_string]
     LocalCommand(
@@ -154,8 +153,7 @@ def attach_disk():
     ).execute()
 
 @task
-# this fails if too many hosts pull at once
-@parallel(pool_size=10)
+@parallel
 def mount_disk():
     # create partition table and partition
     sudo('echo -e "o\nn\np\n1\n\n\n\n\n\nw" | fdisk /dev/sdb')
@@ -245,6 +243,8 @@ def init():
         env.key_filename = "~/.ssh/google_compute_engine"
         env.ids = config.get_id_dict()
         env.keepalive = 60
+        # at most 10 parallel executions, otherwise this can lead to failures
+        env.pool_size = 10
 
 
 def get_degree_of_parallelism():

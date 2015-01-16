@@ -42,3 +42,5 @@ def init():
         env.key_filename = conf['ssh_key']
         env.ids = get_slave_id_dict(master_external, slaves_external)
         env.keepalive = 60
+        # at most 10 parallel executions
+        env.pool_size = 10
