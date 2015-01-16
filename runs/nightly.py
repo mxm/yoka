@@ -10,6 +10,7 @@ from configs import compute_engine_config, hadoop_config, flink_config
 # import experiment's main class
 from experiments.wordcount_new import WordCountNew
 from experiments.grep import Grep
+from experiments.als import ALS
 
 # import data generators for benchmarks
 from experiments import generators
@@ -34,9 +35,13 @@ flink_config['taskmanager_heap'] = 5120 #5gb
 flink_config['jobmanager_heap'] = 5120
 flink_config['parallelization'] = dop
 
+flink_als_config = flink_config.copy()
+flink_als_config['extra_config_entries'] = [{'entry' : "taskmanager.memory.fraction: 0.3"}]
+
 cluster = ComputeEngine(compute_engine_config)
 hadoop = Hadoop(hadoop_config)
 flink = Flink(flink_config)
+flink_als = Flink(flink_als_config)
 
 systems = [hadoop, flink]
 
@@ -58,7 +63,13 @@ benchmarks = [
 
     # KMeans
     # PageRank
-    # ALS
+
+    Benchmark(
+        id = "ALS",
+        systems = [flink_als],
+        experiment = ALS(),
+        times = 3
+    )
 
 ]
 
@@ -70,6 +81,16 @@ generators = [
         experiment = generators.Text(
             size_gb = 150, # 5gb * 10 nodes * 3
             dop = dop
+        )
+    ),
+    
+    Generator(
+        id = "ALSGenerator",
+        systems = [flink_als],
+        experiment = generators.ALS(
+            num_rows = 400000, num_cols = 50000,
+            mean_entry = 20, variance_entry = 4,
+            mean_num_row_entries = 200, variance_num_row_entries = 50
         )
     )
 ]
