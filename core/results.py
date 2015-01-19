@@ -150,7 +150,10 @@ def gen_plot(suite_id=None):
             print bench_id
             # subfigure
             plt.subplot(len(bench_ids), 1, i+1)
-            c.execute("select start_time, duration from results where bench_id=? order by start_time asc", (bench_id,))
+            if suite_id:
+                c.execute("select start_time, duration from results where bench_id=? and suite_id=? order by start_time asc", (bench_id, suite_id))
+            else:
+                c.execute("select start_time, duration from results where bench_id=? order by start_time asc", (bench_id,))
             results = c.fetchall()
             timestamps, y = zip(*results)
             labels = [datetime.datetime.fromtimestamp(int(timestamp)).strftime("%d.%m.") for timestamp in timestamps]
