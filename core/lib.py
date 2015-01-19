@@ -48,11 +48,13 @@ class Benchmark(Experiment):
         self.run_times.clear()
 
     @Timer(run_times, "Setup")
-    def setup(self):
+    def setup(self, previous=[]):
+        # TODO use previous benchmark configurations to avoid configuration more than once
         for system in self.systems:
             system.set_config()
-            # if benchmark has not run yet, configure
+            # if benchmark has not run yet, install & configure
             if not self.runs:
+                system.install()
                 system.configure()
             system.start()
             sleep(sleep_time)
@@ -89,8 +91,11 @@ class Generator(Benchmark):
 
 class System(object):
 
+    # the module for the execution functions and config
     module = None
+    # if True, this system is only set up once per suite
     once_per_suite = False
+    # skip functions with names in this list
     skip_targets = []
 
     def __init__(self, config):
@@ -152,8 +157,8 @@ class ClusterSuite(Experiment):
     def setup(self):
         self.cluster.setup()
         for system in self.systems:
-            system.install()
             if system.once_per_suite:
+                system.install()
                 system.configure()
                 system.start()
                 sleep(sleep_time)
@@ -175,7 +180,8 @@ class ClusterSuite(Experiment):
             for run_id in range(0, benchmark.times):
                 failed = False
                 try:
-                    benchmark.setup()
+                    # pass list of previous benchmarks (for optimizing configuration time)
+                    benchmark.setup(previous=self.benchmarks[0:run_id])
                     benchmark.run()
                 except:
                     logger.exception("Exception in %s run %d" % (benchmark, run_id))
