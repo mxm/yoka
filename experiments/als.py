@@ -9,9 +9,7 @@ from cluster.hadoop import get_hdfs_address
 import generators
 
 class ALS(Experiment):
-    u"""
-
-    Um dann ALS auszuführen:
+    """
 
     flink run -v -c \
     com.github.projectflink.als.ALSJoinBlocking -p 320 \

@@ -49,7 +49,7 @@ class Text(FlinkPerf):
 
 class ALS(FlinkPerf):
 
-    u"""
+    """
     
     Data generation:
     
