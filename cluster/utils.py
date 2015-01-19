@@ -29,18 +29,29 @@ class RemoteCommand(Command):
         run(self.command)
 
 def exec_on(command, master_or_slaves):
+    """
+    :param command: function or shell string to be executed
+    :param master_or_slaves (optional): either 'master' or 'slaves'
+    :return:
+    """
     if isinstance(command, types.FunctionType):
         execute(command, role=master_or_slaves)
     else:
         execute(lambda: run(command), role=master_or_slaves)
 
-""" Execute command on master """
 def master(command):
+    """ Execute command on master """
     exec_on(command, 'master')
 
-""" Execute command on slaves """
 def slaves(command):
+    """ Execute command on slaves """
     exec_on(command, 'slaves')
+
+def master_slaves(command):
+    """ Execute command on master and slaves """
+    master(command)
+    slaves(command)
+
 
 def exec_bash(script):
     return run("cd /tmp && cat <<'EOF' | bash \n%s \nEOF" % script)

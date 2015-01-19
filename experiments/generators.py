@@ -1,4 +1,4 @@
-from cluster.utils import master, slaves
+from cluster.utils import master, slaves, master_slaves
 from cluster.flink import run_jar
 from cluster.hadoop import get_hdfs_address
 from cluster.maintenance import install
@@ -86,8 +86,7 @@ class ALS(FlinkPerf):
         self.variance_num_row_entries = variance_num_row_entries
 
     def setup(self):
-        master(lambda: install("libgfortran3"))
-        slaves(lambda: install("libgfortran3"))
+        master_slaves(lambda: install("libgfortran3"))
         self.out_path = get_hdfs_address() + "/als-benchmark"
 
     def run(self):
