@@ -88,9 +88,9 @@ generators = [
         id = "ALSGenerator",
         systems = [flink_als],
         experiment = generators.ALS(
-            num_rows = 400000, num_cols = 50000,
+            num_rows = 800000, num_cols = 100000,
             mean_entry = 20, variance_entry = 4,
-            mean_num_row_entries = 200, variance_num_row_entries = 50
+            mean_num_row_entries = 400, variance_num_row_entries = 50
         )
     )
 ]

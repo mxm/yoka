@@ -46,7 +46,7 @@ class ALS(Experiment):
 
     def run(self):
         # TODO get from generator directly
-        als_in = "%s/als-benchmark400000-50000-200" % get_hdfs_address()
+        als_in = "%s/als-benchmark800000-100000-400" % get_hdfs_address()
         als_out = "%s/tmp/als_out_%d" % (get_hdfs_address(), int(time()))
 
         def code():
