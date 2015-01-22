@@ -46,22 +46,29 @@ def set_java_home(file="~/.bashrc", has_root=True):
 @roles('master')
 @runs_once
 def generate_key():
-    run("yes | ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''")
-    return (run("cat ~/.ssh/id_rsa.pub", quiet=False), run("cat ~/.ssh/id_rsa", quiet=True))
+    run("yes | ssh-keygen -q -t rsa -f ~/.ssh/yoka -N ''")
+    return (run("cat ~/.ssh/yoka.pub", quiet=False), run("cat ~/.ssh/yoka", quiet=True))
 
 @task
 # calls runs_once method, not safe to be parallel
 #@parallel
 def set_key():
     (publickey, privatekey) = execute(generate_key).values()[0]
-    run("echo '%s' > ~/.ssh/id_rsa.pub" % publickey, quiet=False)
-    run("echo '%s' > ~/.ssh/id_rsa" % privatekey, quiet=True)
-    run("chmod 700 ~/.ssh/id_rsa")
+    run("echo '%s' > ~/.ssh/yoka.pub" % publickey, quiet=False)
+    run("echo '%s' > ~/.ssh/yoka" % privatekey, quiet=True)
+    run("chmod 700 ~/.ssh/yoka")
     run("echo '%s' >> ~/.ssh/authorized_keys" % publickey, quiet=True)
-    ssh_config = """Host *
-    StrictHostKeyChecking no
-    UserKnownHostsFile=/dev/null"""
-    run("echo '%s' > ~/.ssh/config" % ssh_config)
+    ssh_config = ""
+    for host in env.hostnames:
+        ssh_config += """
+            Host %s
+            HostName %s
+            IdentityFile ~/.ssh/yoka
+            UserKnownHostsFile=/dev/null
+            CheckHostIP=no
+            StrictHostKeyChecking=no
+        """ % (host, host)
+    run("echo '%s' >> ~/.ssh/config" % ssh_config)
 
 
 @task
