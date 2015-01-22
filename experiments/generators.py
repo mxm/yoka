@@ -33,7 +33,7 @@ class Text(FlinkPerf):
     def run(self):
         self.repo.clone()
         self.repo.checkout("5f5477bebc772de17d574e93fb1d5dafd4416bdc")
-        self.repo.maven("clean install")
+        self.repo.maven("clean package")
 
         def code():
             run_jar("%s/flink-jobs/target" % self.repo.get_absolute_path(),
