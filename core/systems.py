@@ -16,23 +16,28 @@ class Hadoop(System):
         self.config = config
 
     def install(self):
+        self.set_config()
         if 'install' not in self.skip_targets:
             execute(hadoop.install)
 
     def configure(self):
+        self.set_config()
         if 'configure' not in self.skip_targets:
             execute(hadoop.configure)
         execute(hadoop.pull)
 
     def reset(self):
+        self.set_config()
         execute(hadoop.delete_data_slaves)
 
     def start(self):
+        self.set_config()
         if 'start' not in self.skip_targets:
             execute(hadoop.master)
             execute(hadoop.slaves)
 
     def stop(self):
+        self.set_config()
         execute(hadoop.slaves, 'stop')
         execute(hadoop.master, 'stop')
 
@@ -52,10 +57,12 @@ class Tez(System):
         self.config = config
 
     def install(self):
+        self.set_config()
         if 'install' not in self.skip_targets:
             execute(tez.install)
 
     def configure(self):
+        self.set_config()
         if 'configure' not in self.skip_targets:
             execute(tez.configure)
 
@@ -84,10 +91,12 @@ class Flink(System):
         self.config = config
 
     def install(self):
+        self.set_config()
         if 'install' not in self.skip_targets:
             execute(flink.install)
 
     def configure(self):
+        self.set_config()
         if 'configure' not in self.skip_targets:
             execute(flink.configure)
         execute(flink.pull)
@@ -96,14 +105,17 @@ class Flink(System):
         pass
 
     def start(self):
+        self.set_config()
         execute(flink.master)
         execute(flink.slaves)
 
     def stop(self):
+        self.set_config()
         execute(flink.slaves, 'stop')
         execute(flink.master, 'stop')
 
     def save_log(self, unique_full_path):
+        self.set_config()
         execute(flink.copy_log_master, unique_full_path)
         execute(flink.copy_log_slaves, unique_full_path)
 

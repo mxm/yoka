@@ -70,6 +70,9 @@ def set_key():
         """ % (host, host)
     run("echo '%s' >> ~/.ssh/config" % ssh_config)
 
+@task
+def set_up_dir(dir):
+    run("mkdir -p '%s'" % dir)
 
 @task
 # this fails if too many hosts pull at once

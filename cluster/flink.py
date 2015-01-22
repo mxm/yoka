@@ -9,21 +9,24 @@ from time import sleep
 
 from configs import flink_config as conf
 
+# defaults to home but is set by actual system class
+PATH = "~"
+
 @task
 @roles('master')
 def install():
-    run("rm -rf '%s'" % conf['path'])
-    run("git clone %s %s" % (conf['git_repository'], conf['path']))
+    run("rm -rf '%s'" % PATH)
+    run("git clone %s %s" % (conf['git_repository'], PATH))
 
 @task
 @roles('master')
 def get_flink_dist_path():
-    return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % conf['path'])
+    return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % PATH)
 
 @task
 @roles('master')
 def configure():
-    with cd(conf['path']):
+    with cd(PATH):
         run("git checkout %s" % conf['git_commit'])
         run("mvn clean package -DskipTests > /dev/null")
     context = conf.copy()
@@ -39,7 +42,7 @@ def configure():
 @roles('slaves')
 @parallel
 def pull():
-    pull_from_master(conf['path'])
+    pull_from_master(PATH, PATH)
 
 @task
 @roles('master')
@@ -64,8 +67,8 @@ def run_jar(path, jar_name, args, dop=None, clazz=None, upload=False):
     args = [str(a) for a in args]
     job_args = ' '.join(args)
     if upload:
-        put("%s/%s" % (path, jar_name), conf['path'])
-        path = conf['path']
+        put("%s/%s" % (path, jar_name), PATH)
+        path = PATH
     with cd(get_flink_dist_path()):
         class_loader = "-c '%s'" % clazz if clazz else ""
         dop = dop if dop else get_degree_of_parallelism()

@@ -24,6 +24,7 @@ local_cluster_config = {
     'user' : USER,
     # absolute path to the local ssh key file for authentication
     'ssh_key' : "/home/%s/.ssh/id_rsa" % USER,
+    'working_dir' : "/home/%s/yoka" % USER,
 }
 
 """
@@ -42,6 +43,8 @@ compute_engine_config = {
     'disk_space_gb' : 20,
     'disk_type' : 'pd-standard', # change to pd-ssd for ssd,
     'disk_mount_path' : "/home/%s/mnt" % USER,
+    # path where system are set up
+    'working_dir' : "/home/%s/yoka" % USER,
 }
 
 

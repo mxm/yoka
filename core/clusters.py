@@ -17,6 +17,7 @@ class ComputeEngine(Cluster):
     
     def setup(self):
         gcloud.conf = self.config
+        self.working_dir = self.config['working_dir']
         execute(gcloud.init)
         execute(gcloud.configure_ssh)
         try:
@@ -30,6 +31,7 @@ class ComputeEngine(Cluster):
         execute(maintenance.install_dependencies)
         execute(maintenance.set_java_home)
         execute(maintenance.set_key)
+        execute(maintenance.set_up_dir, self.working_dir)
 
     def shutdown(self):
         execute(gcloud.delete_instances)
@@ -45,9 +47,11 @@ class Local(Cluster):
     
     def setup(self):
         local.conf = self.config
+        self.working_dir = self.config['working_dir']
         execute(local.init)
         execute(maintenance.set_java_home, has_root=False)
         execute(maintenance.set_key)
+        execute(maintenance.set_up_dir, self.working_dir)
     
     def shutdown(self):
         # TODO do some cleanup here

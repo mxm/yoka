@@ -48,14 +48,8 @@ class Benchmark(Experiment):
         self.run_times.clear()
 
     @Timer(run_times, "Setup")
-    def setup(self, previous=[]):
-        # TODO use previous benchmark configurations to avoid configuration more than once
+    def setup(self):
         for system in self.systems:
-            system.set_config()
-            # if benchmark has not run yet, install & configure
-            if not self.runs:
-                system.install()
-                system.configure()
             system.start()
             sleep(sleep_time)
         self.experiment.setup()
@@ -97,12 +91,15 @@ class System(object):
     once_per_suite = False
     # skip functions with names in this list
     skip_targets = []
+    # path to install directory (set by cluster suite)
+    path = None
 
     def __init__(self, config):
         self.config = config
 
     def set_config(self):
         self.module.conf = self.config
+        self.module.PATH = self.path
 
     def install(self):
         raise NotImplementedError()
@@ -127,6 +124,9 @@ class System(object):
 
 
 class Cluster(object):
+
+    # working dir for all files
+    working_dir = None
 
     def __init__(self, config):
         self.config = config
@@ -155,13 +155,28 @@ class ClusterSuite(Experiment):
 
     @Timer(run_times, "Setup")
     def setup(self):
+        # first set up cluster
         self.cluster.setup()
+        # aggregate all unique systems
+        all_systems = set()
+        # systems of cluster suite
         for system in self.systems:
+            all_systems.add(system)
+        # systems of benchmarks
+        for benchmark in self.benchmarks:
+            for system in benchmark.systems:
+                all_systems.add(system)
+        # install & configure unique systems
+        for i, system in enumerate(all_systems):
+            # install path
+            system.path = "%s/%s-%d" % (self.cluster.working_dir, system, i)
+            system.install()
+            system.configure()
+        # start systems that run once per cluster suite
+        for system in all_systems:
             if system.once_per_suite:
-                system.install()
-                system.configure()
                 system.start()
-                sleep(sleep_time)
+        sleep(sleep_time)
 
     @Timer(run_times, "Data generation")
     def generate(self):
@@ -180,8 +195,7 @@ class ClusterSuite(Experiment):
             for run_id in range(0, benchmark.times):
                 failed = False
                 try:
-                    # pass list of previous benchmarks (for optimizing configuration time)
-                    benchmark.setup(previous=self.benchmarks[0:run_id])
+                    benchmark.setup()
                     benchmark.run()
                 except:
                     logger.exception("Exception in %s run %d" % (benchmark, run_id))
