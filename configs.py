@@ -60,8 +60,9 @@ flink_config = {
     'taskmanager_num_buffers' : 2048,
     'jvm_opts' : "",
     'extra_config_entries' : [
-        { 'entry' : "#this: wontdoanything" },
-        { 'entry' : "#another: entry" },
+        # additional entries can be added like this:
+        # { 'entry' : "taskmanager.memory.size: 1024" },
+        # { 'entry' : "another.entry: value" },
     ]
 }
 
