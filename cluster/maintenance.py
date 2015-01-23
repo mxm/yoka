@@ -81,9 +81,14 @@ def set_up_dir(dir):
 @parallel
 @roles('slaves')
 def pull_from_master(path, dest="~"):
+    """
+    :param path: dir to be copied
+    :param dest: destination of the dir
+    :return:
+    """
     for i in range(0, 5):
         try:
-            run("rsync -aP %s:%s %s > /dev/null" % (env.master, path, dest))
+            run("rsync -aP %s:%s/ %s > /dev/null" % (env.master, path, dest))
             break
         except:
             logger.warn("Failed to execute rsync for host %s" % env.host_string)
