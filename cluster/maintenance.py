@@ -36,11 +36,9 @@ def find_java_home():
 
 @task
 @parallel
-def set_java_home(file="~/.bashrc", has_root=True):
+def set_java_home(file="~/.bashrc"):
     java_home = find_java_home()
     run("echo 'export JAVA_HOME=%s' >> %s" % (java_home, file))
-    if has_root:
-        sudo("echo 'export JAVA_HOME=%s' >> %s" % (java_home, "/root/.bashrc"))
 
 @task
 @roles('master')

@@ -49,7 +49,7 @@ class Local(Cluster):
         local.conf = self.config
         self.working_dir = self.config['working_dir']
         execute(local.init)
-        execute(maintenance.set_java_home, has_root=False)
+        execute(maintenance.set_java_home)
         execute(maintenance.set_key)
         execute(maintenance.set_up_dir, self.working_dir)
     
