@@ -2,3 +2,4 @@
 /logs
 *.log
 *.log.[0-9]
+/env
