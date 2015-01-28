@@ -1,5 +1,5 @@
 from fabric.decorators import task, roles, parallel, runs_once
-from fabric.api import sudo, run, execute, env
+from fabric.api import sudo, run, execute, env, settings
 
 from time import sleep
 
@@ -70,7 +70,21 @@ def set_key():
 
 @task
 def set_up_dir(dir):
-    run("mkdir -p '%s'" % dir)
+    # for safety, check if this directory does not exist
+    # or delete, if it contains a yoka lock file
+    with settings(warn_only=True):
+        if run("[ -d '%s' ]" % dir).failed:
+            logger.info("Creating working directory %s" % dir)
+            run("mkdir -p '%s'" % dir)
+            run("touch '%s/yoka.dir.lock'" % dir)
+        elif run("[ -f '%s/yoka.dir.lock' ]" % dir).succeeded:
+            logger.info("Removing working directory %s" % dir)
+            run("rm -rf '%s'" % dir)
+            set_up_dir(dir)
+        else:
+            logger.error("Working directory exists but has not been used as a Yoka directory before.\n \
+            Deleting it would be unsafe. Please delete manually! Exiting.\nDirectory: %s" % dir)
+            raise Exception("Could not create working dir: %s" % dir)
 
 @task
 # this fails if too many hosts pull at once
