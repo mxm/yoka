@@ -16,9 +16,9 @@ datanode_dir = "hdfs-datanode"
 @roles('master')
 def install():
     run("rm -rf '%s'" % PATH)
-    # TODO this is not safe in local execution mode
-    run("curl %s | tar xz" % conf['source'])
-    run("mv hadoop* %s" % PATH)
+    run("mkdir -p '%s'" % PATH)
+    run("curl %s | tar xz -C %s" % (conf['source'], PATH))
+    run("mv %s/hadoop*/* %s" % (PATH, PATH))
 
 @roles('master')
 def format_hdfs_master():
