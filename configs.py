@@ -3,6 +3,16 @@ import getpass
 USER = getpass.getuser()
 
 """
+General config
+"""
+config = {
+    # path where system are set up
+    'working_dir' : "/tmp/yoka-dir/",
+    # path where additional storage is mounted (e.g. for hdfs)
+    'storage_path' : "/home/%s/mnt" % USER,
+}
+
+"""
 Standard Local Cluster config
 
 """
@@ -23,8 +33,8 @@ local_cluster_config = {
     # user name for ssh login
     'user' : USER,
     # absolute path to the local ssh key file for authentication
-    'ssh_key' : "/home/%s/.ssh/id_rsa" % USER,
-    'working_dir' : "/home/%s/yoka" % USER,
+    'ssh_key' : "~/.ssh/id_rsa",
+    'working_dir' : config['working_dir'],
 }
 
 """
@@ -42,9 +52,8 @@ compute_engine_config = {
     'prefix' : "benchmark-",
     'disk_space_gb' : 20,
     'disk_type' : 'pd-standard', # change to pd-ssd for ssd,
-    'disk_mount_path' : "/home/%s/mnt" % USER,
-    # path where system are set up
-    'working_dir' : "/home/%s/yoka" % USER,
+    'disk_mount_path' : config['storage_path'],
+    'working_dir' : config['working_dir'],
 }
 
 
@@ -53,7 +62,6 @@ Standard Flink config
 
 """
 flink_config = {
-    'path' : "/home/%s/flink" % USER,
     'git_repository' : "https://github.com/apache/flink",
     'git_commit' : "master",
     'num_task_slots' : 8,
@@ -76,8 +84,7 @@ Standard Hadoop config
 """
 hadoop_config = {
     'source' : "http://mirror.arcor-online.net/www.apache.org/hadoop/common/hadoop-2.5.2/hadoop-2.5.2.tar.gz",
-    'path' : "/home/%s/hadoop" % USER,
-    'data_path' : "/home/%s/mnt" % USER,
+    'data_path' : config['storage_path'],
     'replication_factor' : 3,
 }
 
