@@ -31,7 +31,7 @@ rotateLogFile() {
 }
 
 printUsage(){
-    echo "usage: ./yoka.sh [run <run_name> | shutdown]"
+    echo "usage: yoka [run <run_name> | shutdown]"
 }
 
 printRunNames(){

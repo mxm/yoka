@@ -23,7 +23,7 @@ Then run:
 
     git clone https://github.com/mxm/flink-perf-new
     cd flink-perf-new
-    ./install.sh
+    ./install
 
 The installation script will install the dependencies listed in requirements.txt.
 
@@ -35,7 +35,7 @@ Optionally, if you want to generate plots, install:
 
 Then execute:
 
-    ./install.sh with_plotting
+    ./install with_plotting
 
 ### Google Compute Engine
 
@@ -60,14 +60,14 @@ Run
 
 To run Yoka, execute
 
-    ./yoka.sh run <run_name>
+    ./yoka run <run_name>
 
 Run files are located in the runs directory. You can use any of the
 supplied run files as a base to write your own.
 
 For example, to run runs/example.py execute the following:
 
-    ./yoka.sh run example
+    ./yoka run example
 
 
 Evaluation
