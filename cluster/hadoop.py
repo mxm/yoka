@@ -55,6 +55,16 @@ def configure():
     process_template("hadoop", "mapred-site.xml.mustache", context, destination)
 
 @task
+@parallel
+def set_environment_variables(file="~/.bashrc"):
+    run("echo export HADOOP_HOME='%s' >> %s" % (PATH, file))
+    run("echo export HADOOP_COMMON_HOME='%s' >> %s" % (PATH, file))
+    run("echo export HADOOP_CONF_DIR='%s/etc/hadoop' >> %s" % (PATH, file))
+    run("echo export HADOOP_HDFS_HOME='%s' >> %s" % (PATH, file))
+    run("echo export HADOOP_MAPRED_HOME='%s' >> %s" % (PATH, file))
+    run("echo export HADOOP_YARN_HOME='%s' >> %s" % (PATH, file))
+
+@task
 @roles('slaves')
 @parallel
 def pull():

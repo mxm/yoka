@@ -91,4 +91,6 @@ taskmanager.network.numberOfBuffers: {{taskmanager_num_buffers}}
 # You can also directly specify the paths to hdfs-default.xml and hdfs-site.xml
 # via keys 'fs.hdfs.hdfsdefault' and 'fs.hdfs.hdfssite'.
 #
-# fs.hdfs.hadoopconf: /path/to/hadoop/conf/
+{{#hadoop_conf_path}}
+fs.hdfs.hadoopconf: {{hadoop_conf_path}}
+{{/hadoop_conf_path}}

@@ -25,6 +25,7 @@ class Hadoop(System):
         if 'configure' not in self.skip_targets:
             execute(hadoop.configure)
         execute(hadoop.pull)
+        execute(hadoop.set_environment_variables)
 
     def reset(self):
         self.set_config()

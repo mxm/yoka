@@ -32,6 +32,8 @@ def configure():
     context = conf.copy()
     context['java_home'] = find_java_home()
     context['master'] = env.master
+    # get hadoop conf environment variable
+    context['hadoop_conf_path'] = run("echo $HADOOP_CONF_DIR")
     destination = get_flink_dist_path() + "/conf"
     process_template("flink", "flink-conf.yaml.mustache", context, destination)
     slaves = '\n'.join(env.slaves)
