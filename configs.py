@@ -10,6 +10,8 @@ config = {
     'working_dir' : "/tmp/yoka-dir/",
     # path where additional storage is mounted (e.g. for hdfs)
     'storage_path' : "/home/%s/mnt" % USER,
+    'size_mem' : 7500,
+    'num_cores' : 2,
 }
 
 """
@@ -23,18 +25,19 @@ local_cluster_config = {
     # in case, this is started from a machine from inside the cluster, internal and external addresses can be identical
 
     # the address of the master machine
-    'master' : ("instance-1", "146.148.117.108"),
+    'master' : ("locahost", "localhost"),
     # addresses of the slave machines
     'slaves' : [
         # list of machines, e.g.
-        ("instance-2", "104.155.15.202"),
-        ("instance-3", "104.142.23.199"),
+        ("localhost", "localhost"),
     ],
     # user name for ssh login
     'user' : USER,
     # absolute path to the local ssh key file for authentication
     'ssh_key' : "~/.ssh/id_rsa",
     'working_dir' : config['working_dir'],
+    'num_cores' : config['num_cores'],
+    'size_mem' : config['size_mem'],
 }
 
 """
@@ -46,8 +49,8 @@ compute_engine_config = {
     'project_name' : "braided-keel-768",
     'zone' : "europe-west1-c",
     'machine_type' : "n1-standard-2",
-    'num_cores' : 2,
-    'size_mem' : 7500,
+    'num_cores' : config['num_cores'],
+    'size_mem' : config['size_mem'],
     'disk_image' : "debian-7-backports",
     'prefix' : "benchmark-",
     'disk_space_gb' : 20,
@@ -86,6 +89,13 @@ hadoop_config = {
     'source' : "http://mirror.arcor-online.net/www.apache.org/hadoop/common/hadoop-2.5.2/hadoop-2.5.2.tar.gz",
     'data_path' : config['storage_path'],
     'replication_factor' : 3,
+    # memory in mb
+    'scheduler_min_mem' : 128,
+    'scheduler_max_mem' : int(config['size_mem'] * 0.8),
+    'scheduler_min_vcores' : 1,
+    'scheduler_max_vcores' : config['num_cores'],
+    'nodemanager_max_mem' : int(config['size_mem'] * 0.8),
+    'nodemanager_max_vcores' : config['num_cores'],
 }
 
 
