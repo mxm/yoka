@@ -35,7 +35,7 @@ def init():
         # internal addresses
         env.slaves = slaves_internal
         # not needed for local mode
-        #env.hostnames = env.hosts
+        env.hostnames = env.hosts
         #env.disknames = [name + "-disk" for name in hostnames]
         #env.host_dict = get_host_dict()
         env.roledefs = {'slaves' : slaves_external, 'master' : [master_external]}
