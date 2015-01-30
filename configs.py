@@ -96,6 +96,9 @@ hadoop_config = {
     'scheduler_max_vcores' : config['num_cores'],
     'nodemanager_max_mem' : int(config['size_mem'] * 0.8),
     'nodemanager_max_vcores' : config['num_cores'],
+    # secure mode (kerberos) true or false
+    'secure' : True,
+    'realm' : "data-artisans.com",
 }
 
 

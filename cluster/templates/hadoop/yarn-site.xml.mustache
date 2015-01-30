@@ -55,4 +55,30 @@
         <value>{{nodemanager_max_vcores}}</value>
         <description>Number of CPU cores that can be allocated for containers.</description>
     </property>
+    
+{{#secure}}
+    <!-- resource manager -->
+    <property>
+        <name>yarn.resourcemanager.keytab</name>
+        <value>/etc/rm.keytab</value>
+    </property>
+    <property>
+        <name>yarn.resourcemanager.principal</name>
+        <value>rm/kerberos.{{realm}}@{{realm}}</value>
+    </property>
+    <!-- node manager -->
+    <property>
+        <name>yarn.nodemanager.keytab</name>
+        <value>/etc/nm.keytab</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.principal</name>
+        <value>nm/kerberos.{{realm}}@{{realm}}</value>
+    </property>
+    <!-- linux container execution
+    yarn.nodemanager.container-executor.class 	org.apache.hadoop.yarn.server.nodemanager.LinuxContainerExecutor 	Use LinuxContainerExecutor.
+    yarn.nodemanager.linux-container-executor.group 	hadoop 	Unix group of the NodeManager.
+    yarn.nodemanager.linux-container-executor.path 	/path/to/bin/container-executor 	The path to the executable of Linux container executor.
+    -->
+{{/secure}}
 </configuration>

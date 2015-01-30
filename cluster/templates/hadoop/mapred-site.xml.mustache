@@ -11,4 +11,14 @@
         <name>mapreduce.jobhistory.webapp.address</name>
         <value>{{master}}:19888</value>
     </property>
+{{#secure}}
+    <property>
+        <name>mapreduce.jobhistory.keytab</name>
+        <value>/etc/jhs.keytab</value>
+    </property>
+    <property>
+        <name>mapreduce.jobhistory.principal</name>
+        <value>jhs/kerberos.{{real}}@{{realm}}</value>
+    </property>
+{{/secure}}
 </configuration>

@@ -23,4 +23,71 @@
      <name>dfs.permissions.enabled</name>
      <value>false</value>
    </property>
+{{#secure}}
+    <!-- name node -->
+
+    <property>
+        <name>dfs.block.access.token.enable</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>dfs.http.policy</name>
+        <value>HTTP_AND_HTTPS</value>
+    </property>
+    <property>
+        <name>dfs.namenode.https-address</name>
+        <value>{{master}}:50470</value>
+    </property>
+    <property>
+        <name>dfs.https.port</name>
+        <value>50470</value>
+    </property>
+    <property>
+        <name>dfs.namenode.keytab.file</name>
+        <value>/etc/nn.keytab</value>
+    </property>
+    <property>
+        <name>dfs.namenode.kerberos.principal</name>
+        <value>nn/kerberos.{{realm}}@{{realm}}</value>
+    </property>
+    <!--<property>
+        <name>dfs.namenode.kerberos.internal.spnego.principal</name>
+        <value>false</value>
+    </property> -->
+    
+    <!-- data node -->
+    <!--<property>
+        <name>dfs.datanode.data.dir.perm</name>
+        <value>700</value>
+    </property>-->
+    <property><!-- data node must be started using jscv -->
+        <name>dfs.datanode.address</name>
+        <value>0.0.0.0:1004</value>
+    </property>
+    <property>
+        <name>dfs.datanode.http.address</name>
+        <value>0.0.0.0:1006</value>
+    </property>
+    <property>
+        <name>dfs.datanode.https.address</name>
+        <value>0.0.0.0:50470</value>
+    </property>
+    <property>
+        <name>dfs.datanode.keytab.file</name>
+        <value>/etc/dn.keytab</value>
+    </property>
+    <property>
+        <name>dfs.namenode.kerberos.principal</name>
+        <value>dn/kerberosclient.{{realm}}@{{realm}}</value>
+    </property>
+    <property>
+        <name>dfs.encrypt.data.transfer</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>dfs.data.transfer.protection</name>
+        <value>authentication</value>
+    </property>
+
+{{/secure}}
 </configuration> 
