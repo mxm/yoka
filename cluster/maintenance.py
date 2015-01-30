@@ -41,7 +41,9 @@ def set_java_home(file="~/.bashrc"):
     run("echo 'export JAVA_HOME=%s' >> %s" % (java_home, file))
     with settings(warn_only=True):
         sudo("echo 'export JAVA_HOME=%s' >> %s" % (java_home, file))
-
+        sudo("echo 'export HADOOP_SECURE_DN_USER=max' >> %s" % file)
+        sudo("echo 'export JSVC_HOME=/usr/bin' >> %s" % file)
+        
 @task
 @roles('master')
 @runs_once
@@ -81,6 +83,7 @@ def set_up_dir(dir):
             run("touch '%s/yoka.dir.lock'" % dir)
         elif run("[ -f '%s/yoka.dir.lock' ]" % dir).succeeded:
             logger.info("Removing working directory %s" % dir)
+            sudo("rm -rf '%s'" % dir)
             run("rm -rf '%s'" % dir)
             set_up_dir(dir)
         else:

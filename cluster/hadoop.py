@@ -84,7 +84,7 @@ def master(action="start"):
 def slaves(action="start"):
     if conf['secure']:
         # required for kerberos
-        sudo("apt-get install jsvc")
+        sudo("apt-get -y install jsvc")
         sudo("%s/sbin/hadoop-daemon.sh --config %s/etc/hadoop/ --script hdfs %s datanode" % (PATH, PATH, action))
     else:
         run("%s/sbin/hadoop-daemon.sh --config %s/etc/hadoop/ --script hdfs %s datanode" % (PATH, PATH, action))
