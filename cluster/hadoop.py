@@ -82,7 +82,12 @@ def master(action="start"):
 @roles('slaves')
 @parallel
 def slaves(action="start"):
-    run("%s/sbin/hadoop-daemon.sh --config %s/etc/hadoop/ --script hdfs %s datanode" % (PATH, PATH, action))
+    if conf['secure']:
+        # required for kerberos
+        sudo("apt-get install jsvc")
+        sudo("%s/sbin/hadoop-daemon.sh --config %s/etc/hadoop/ --script hdfs %s datanode" % (PATH, PATH, action))
+    else:
+        run("%s/sbin/hadoop-daemon.sh --config %s/etc/hadoop/ --script hdfs %s datanode" % (PATH, PATH, action))
     run("%s/sbin/yarn-daemon.sh --config %s/etc/hadoop/ %s nodemanager" % (PATH, PATH, action))
 
 def mkdir_hdfs(dir):

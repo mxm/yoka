@@ -39,6 +39,8 @@ def find_java_home():
 def set_java_home(file="~/.bashrc"):
     java_home = find_java_home()
     run("echo 'export JAVA_HOME=%s' >> %s" % (java_home, file))
+    with settings(warn_only=True):
+        sudo("echo 'export JAVA_HOME=%s' >> %s" % (java_home, file))
 
 @task
 @roles('master')
