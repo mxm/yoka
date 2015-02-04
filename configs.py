@@ -65,7 +65,7 @@ Standard Flink config
 
 """
 flink_config = {
-    'git_repository' : "https://github.com/apache/flink",
+    'git_repository' : "git://git.apache.org/flink.git",
     'git_commit' : "master",
     'num_task_slots' : 8,
     'parallelization' : 1,
@@ -86,7 +86,7 @@ Standard Hadoop config
 
 """
 hadoop_config = {
-    'source' : "http://mirror.arcor-online.net/www.apache.org/hadoop/common/hadoop-2.5.2/hadoop-2.5.2.tar.gz",
+    'source' : "file://hadoop-2.6.0.tar.gz",
     'data_path' : config['storage_path'],
     'replication_factor' : 3,
     # memory in mb
