@@ -130,41 +130,54 @@ def send_email(filename, additional_text=""):
     print 'Mail sent successfully.'
 
 
-def gen_plot(suite_id=None):
+def gen_plot(suite_id):
     if not plotting_support:
         logger.error("Plotting was attempted but matplotlib could not be loaded previously!")
         return None
     with DB() as db:
-        # default figure
-        plt.figure(1)
-        plt.subplots_adjust(hspace=.5)
+        filename = suite_id + ".png"
         c = db.cursor()
-        if suite_id:
-            c.execute("select distinct bench_id from results where suite_id = ?", (suite_id,))
-            filename = suite_id + ".png"
-        else:
-            c.execute("select distinct bench_id from results")
-            filename = "all_results.png"
-        bench_ids = c.fetchall()
-        for (i, (bench_id,)) in enumerate(bench_ids):
-            print bench_id
-            # subfigure
-            plt.subplot(len(bench_ids), 1, i+1)
-            if suite_id:
-                c.execute("select start_time, duration from results where bench_id=? and suite_id=? order by start_time asc", (bench_id, suite_id))
-            else:
-                c.execute("select start_time, duration from results where bench_id=? order by start_time asc", (bench_id,))
-            results = c.fetchall()
-            timestamps, y = zip(*results)
-            labels = [datetime.datetime.fromtimestamp(int(timestamp)).strftime("%d.%m.") for timestamp in timestamps]
-            x = range(1, len(results)+1)
-            y = map(lambda val: val / 60 if val else 0, y)
-            #labels = x
-            plt.bar(x, y, align="center", width=0.5)
-            plt.xticks(x, labels)
-            plt.xlabel('date')
-            plt.ylabel('run time (minutes)')
-            plt.title(bench_id)
+        # collect all benchmarks of the suite to determine number of plots
+        c.execute("select distinct bench_id from results where suite_id = ? order by bench_id ASC", (suite_id,))
+        bench_ids = [bid for (bid,) in c.fetchall()]
+        num_benchmarks = len(bench_ids)
+        # collect all suite executions
+        c.execute("select distinct suite_uid from results where suite_id = ?", (suite_id,))
+        suite_uids = [uid for (uid,) in c.fetchall()]
+        num_suits = len(suite_uids)
+        # plot all benchmarks in one plot, share both axes
+        figure, axes = plt.subplots(num_benchmarks, sharex=True, sharey=True, figsize=(2*num_suits,2*num_benchmarks))
+        for i, bench_id in enumerate(bench_ids):
+            axes[i].autoscale_view()
+            axes[i].set_title(bench_id)
+            axes[i].set_xlabel('date')
+            axes[i].set_ylabel('run time (minutes)')
+        # plot each benchmark (if it exists) for each suite execution
+        x = 0
+        for (i, suite_uid) in enumerate(suite_uids):
+            # select all run times for each suite execution
+            for (bindex, bench_id) in enumerate(bench_ids):
+                # select data for this suite id and bench id
+                c.execute("select duration, failed from results where bench_id=? and suite_uid=?", (bench_id, suite_uid))
+                results = c.fetchall()
+                if not results:
+                    continue
+                maxwidth = 0.8
+                width = maxwidth/len(results)
+                for (ind, (time, failed)) in enumerate(results):
+                    pos = x - (float(ind)/len(results)) + width
+                    if failed:
+                        axes[bindex].text(pos, 1, "failed", color="red", rotation=90, verticalalignment="bottom")
+                    else:
+                        time /= 60
+                        axes[bindex].bar(pos, time, width=width, alpha=0.8, color="green")
+            x += 2
+        # construct labels, convert suite_uid to timestamp
+        labels = [datetime.datetime.fromtimestamp(int(s.split("_")[-1])).strftime("%d.%m.%Y") for s in suite_uids]
+        plt.setp(axes, xticks=range(0, len(labels)*2, 2), xticklabels=labels)
+        # rest
+        figure.autofmt_xdate()
+        figure.tight_layout()
         plt.savefig(filename)
         return filename
 
