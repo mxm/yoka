@@ -20,8 +20,11 @@ def install():
 
 @task
 @roles('master')
-def get_flink_dist_path():
-    return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % PATH)
+def get_flink_dist_path(yarn=False):
+    if yarn:
+        return run("cd %s/flink-dist/target/flink*/flink-yarn*/;pwd" % PATH)
+    else:
+        return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % PATH)
 
 @task
 @roles('master')
@@ -48,19 +51,29 @@ def pull():
 
 @task
 @roles('master')
-def master(action="start"):
-    path = get_flink_dist_path()
+def master(action="start", yarn=False):
+    path = get_flink_dist_path(yarn=yarn)
     with cd(path):
-        run('nohup bash bin/jobmanager.sh %s cluster' % action)
-    sleep(1)
+        if not yarn:
+            run('nohup bash bin/jobmanager.sh %s cluster' % action)
+        else:
+            if action == 'start':
+                # the sleep is necessaray
+                # see https://github.com/fabric/fabric/issues/1158
+                run("nohup bin/yarn-session.sh -n %d & sleep 1" % conf['num_task_slots'])
+            elif action == 'stop':
+                run("kill -s SIGINT `jps | grep FlinkYarn | cut -d' ' -f1`")
+    sleep(10)
 
 @task
 @roles('slaves')
 @parallel
-def slaves(action="start"):
-    path = get_flink_dist_path()
+def slaves(action="start", yarn=False):
+    path = get_flink_dist_path(yarn=yarn)
     with cd(path):
-        run('nohup bash bin/taskmanager.sh %s' % action)
+        if not yarn:
+            run('nohup bash bin/taskmanager.sh %s' % action)
+    sleep(1)
 
 @task
 @roles('master')
@@ -71,7 +84,13 @@ def run_jar(path, jar_name, args, dop=None, clazz=None, upload=False):
     if upload:
         put("%s/%s" % (path, jar_name), PATH)
         path = PATH
-    with cd(get_flink_dist_path()):
+    # figure out if we're running Flink on YARN
+    with settings(warn_only=True):
+        if run("jps | grep Yarn").failed:
+            yarn = False
+        else:
+            yarn = True
+    with cd(get_flink_dist_path(yarn)):
         class_loader = "-c '%s'" % clazz if clazz else ""
         dop = dop if dop else get_degree_of_parallelism()
         run("bin/flink run -v -p %d %s %s/%s %s"
@@ -79,9 +98,9 @@ def run_jar(path, jar_name, args, dop=None, clazz=None, upload=False):
 
 @task
 @roles('master')
-def copy_log_master(dest_path):
+def copy_log_master(dest_path, yarn=False):
     local("mkdir -p '%s'" % dest_path)
-    path = get_flink_dist_path() + "/log"
+    path = get_flink_dist_path(yarn) + "/log"
     # flink bug FLINK-1361: either jobmanager or jobManager
     log_file = "flink-*-job[Mm]anager-*"
     for extension in ["log", "out"]:
@@ -91,9 +110,9 @@ def copy_log_master(dest_path):
 
 @task
 @roles('slaves')
-def copy_log_slaves(dest_path):
+def copy_log_slaves(dest_path, yarn=False):
     local("mkdir -p '%s'" % dest_path)
-    path = get_flink_dist_path() + "/log"
+    path = get_flink_dist_path(yarn) + "/log"
     log_file = "flink-*-taskmanager-*"
     for extension in ["log", "out"]:
         copy_log("%s/%s.%s" % (path, log_file, extension),

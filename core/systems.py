@@ -122,3 +122,20 @@ class Flink(System):
 
     def __str__(self):
         return "flink"
+
+
+class FlinkYarn(Flink):
+
+    def start(self):
+        self.set_config()
+        execute(flink.master, yarn=True)
+
+    def stop(self):
+        execute(flink.master, 'stop', yarn=True)
+
+    def save_log(self, unique_full_path):
+        execute(flink.copy_log_master, unique_full_path, yarn=True)
+        execute(flink.copy_log_slaves, unique_full_path, yarn=True)
+
+    def __str__(self):
+        return "flink-yarn"
