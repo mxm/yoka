@@ -36,7 +36,7 @@ def find_java_home():
 
 @task
 @parallel
-def set_java_home(file="~/.bashrc"):
+def set_java_home(file="~/.profile"):
     java_home = find_java_home()
     run("echo 'export JAVA_HOME=%s' >> %s" % (java_home, file))
 

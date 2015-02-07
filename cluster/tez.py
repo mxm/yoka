@@ -53,5 +53,5 @@ def configure():
     tarball_location = get_tez_tarball_path("tez*-minimal.tar.gz")
     run("mkdir -p %s" % conf['path_client'])
     run("tar -xzf %s -C %s" % (tarball_location, conf['path_client']))
-    run("echo 'export TEZ_CONF_DIR=%s' >> ~/.bashrc" % path)
-    run("echo 'export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:${TEZ_CONF_DIR}:${TEZ_JARS}/*:${TEZ_JARS}/lib/*' >> ~/.bashrc")
+    run("echo 'export TEZ_CONF_DIR=%s' >> ~/.profile" % path)
+    run("echo 'export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:${TEZ_CONF_DIR}:${TEZ_JARS}/*:${TEZ_JARS}/lib/*' >> ~/.profile")
