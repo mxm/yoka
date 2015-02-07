@@ -245,7 +245,3 @@ def init():
         env.keepalive = 60
         # at most 10 parallel executions, otherwise this can lead to failures
         env.pool_size = 10
-
-
-def get_degree_of_parallelism():
-    return conf['num_workers'] * conf['num_cores']

@@ -1,9 +1,8 @@
 from __future__ import with_statement
 from fabric.decorators import task, roles, parallel
-from fabric.api import env, local, run, cd, put, sudo
+from fabric.api import env, local, run, cd, put, settings
 from maintenance import pull_from_master, find_java_home
 from utils import process_template, copy_log, get_slave_id
-from gcloud import get_degree_of_parallelism
 
 from time import sleep
 
@@ -118,3 +117,7 @@ def copy_log_slaves(dest_path, yarn=False):
         copy_log("%s/%s.%s" % (path, log_file, extension),
                  "%s/flink_taskmanager_%s.%s" % (dest_path, get_slave_id(env.host_string), extension)
         )
+
+def get_degree_of_parallelism():
+    #return conf['num_workers'] * conf['num_cores']
+    return conf['parallelization']
