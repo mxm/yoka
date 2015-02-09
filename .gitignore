@@ -1,5 +1,6 @@
 *.pyc
 /logs
-*.log
-*.log.[0-9]
 /env
+runs/*.log
+runs/*.log.[0-9]
+/results

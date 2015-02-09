@@ -22,14 +22,21 @@ except:
     logger.warn("Matplotlib could not be loaded, you will not be able to generate plots!")
 
 
-from os.path import basename
+from os import mkdir
+from os.path import basename, exists
 
-DB_FILE = 'results.db'
+RESULTS_DIR = "results"
+DB_FILE = "results.db"
+
+# create results dir if it does not exist
+if not exists(RESULTS_DIR):
+    mkdir(RESULTS_DIR)
+
 
 class DB(object):
 
     def __enter__(self):
-        self.conn = sqlite3.connect(DB_FILE)
+        self.conn = sqlite3.connect("%s/%s" % (RESULTS_DIR, DB_FILE))
         return self.conn
 
     def __exit__(self, type, value, traceback):
@@ -135,7 +142,7 @@ def gen_plot(suite_id):
         logger.error("Plotting was attempted but matplotlib could not be loaded previously!")
         return None
     with DB() as db:
-        filename = suite_id + ".png"
+        filename = "%s/%s.png" % (RESULTS_DIR, suite_id)
         c = db.cursor()
         # collect all benchmarks of the suite to determine number of plots
         c.execute("select distinct bench_id from results where suite_id = ? order by bench_id ASC", (suite_id,))
