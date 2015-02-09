@@ -36,6 +36,11 @@ class CustomHandler(SimpleHTTPRequestHandler):
             self.wfile.write("Sorry, not authorized.")
             sleep(1)
 
+CustomHandler.extensions_map.update({'.log': 'text/plain',
+                                     '.out': 'text/plain',
+})
+for key in range(1, 10):
+    CustomHandler.extensions_map["."+str(key)] = 'text/plain'
 
 httpd = SocketServer.TCPServer(("", PORT), CustomHandler)
 
