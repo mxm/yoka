@@ -9,13 +9,11 @@ import sys
 import base64
 from time import sleep
 
-if len(sys.argv) != 4:
-    print "Please supply the required parameters"    
-    sys.exit(1)
+from configs import web_config
 
 try:
-    PORT = int(sys.argv[1])
-    PASSWORD = base64.b64encode("%s:%s" % (sys.argv[2], sys.argv[3]))
+    PORT = int(web_config['port'])
+    PASSWORD = base64.b64encode("%s:%s" % (web_config['user'], web_config['password']))
 except ValueError:
     print "Please supply a correct port number"
     sys.exit(1)

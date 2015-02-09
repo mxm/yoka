@@ -31,7 +31,7 @@ rotateLogFile() {
 }
 
 printUsage(){
-    echo "usage: yoka [run <run_name> | shutdown | serve <port> <user> <password> ]"
+    echo "usage: yoka [run <run_name> | shutdown | serve ]"
     echo "    run - runs a run file with performance tests"
     echo "    shutdown - shuts down a cloud experiment (if still running)"
     echo "    serve - opens a http server to serve the results directory"
@@ -83,8 +83,9 @@ elif [ "$1" == "run" ] ; then
     fi
 elif [ "$1" == "serve" ] ; then
     source env/bin/activate
+    export PYTHONPATH="$PYTHONPATH:`pwd`"
     cd results
-    python "../core/web.py" "$2" "$3" "$4"
+    python "../core/web.py"
 else
     printUsage
     echo

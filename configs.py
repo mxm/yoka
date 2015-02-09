@@ -124,3 +124,10 @@ email_config = {
     'subject' : "Performance test results",
     'text' : "Here are the results."
 }
+
+
+web_config = {
+    'port' : 9999,
+    'user' : "admin",
+    'password' : "password"
+}
