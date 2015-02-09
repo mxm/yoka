@@ -3,15 +3,12 @@ from cluster.flink import run_jar
 from cluster.hadoop import get_hdfs_address
 from cluster.maintenance import install
 
-from core.systems import Flink
-from configs import flink_config
-
-from core.lib import Experiment, Generator
+from core.lib import Generator
 from core.utils import GitRepository
 
 flink_perf_repo = "https://github.com/project-flink/flink-perf"
 
-class FlinkPerf(Experiment):
+class FlinkPerf(Generator):
     repo = GitRepository(flink_perf_repo, "flink-perf")
 
 
@@ -28,12 +25,12 @@ class Text(FlinkPerf):
 
     def setup(self):
         self.out_path = get_hdfs_address() + "/text"
-        pass
+
+        self.repo.clone()
+        self.repo.checkout("master")
+        self.repo.maven("clean package")
 
     def run(self):
-        self.repo.clone()
-        self.repo.checkout("5f5477bebc772de17d574e93fb1d5dafd4416bdc")
-        self.repo.maven("clean package")
 
         def code():
             run_jar("%s/flink-jobs/target" % self.repo.get_absolute_path(),
@@ -89,10 +86,11 @@ class ALS(FlinkPerf):
         master_slaves(lambda: install("libgfortran3"))
         self.out_path = get_hdfs_address() + "/als-benchmark"
 
-    def run(self):
         self.repo.clone()
         self.repo.checkout("master")
         self.repo.maven("clean package")
+
+    def run(self):
 
         def code():
             run_jar("%s/flink-jobs/target" % self.repo.get_absolute_path(),
