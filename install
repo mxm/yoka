@@ -3,8 +3,6 @@
 # fail on errors
 set -e
 
-mkdir -p logs
-
 virtualenv -p /usr/bin/python2.7 env
 source env/bin/activate
 

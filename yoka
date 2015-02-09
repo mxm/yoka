@@ -42,20 +42,32 @@ printRunNames(){
     done
 }
 
+# change into yoka directory (if called from outside)
+cd "`dirname "$0"`"
+
+# create log dir
+LOG_DIR="results/logs"
+mkdir -p "$LOG_DIR"
 
 if [ "$1" == "shutdown" ] ; then
     source env/bin/activate
     fab gcloud.delete_instances
 elif [ "$1" == "run" ] ; then
-    runFile="runs/$2.py"
-    if  [ -e $runFile ] ; then
+    RUN_FILE="runs/$2.py"
+    if  [ -e $RUN_FILE ] ; then
+
+        LOG_FILE="$LOG_DIR/$2.stdout.log"
+        # rotate log file in case another one exists
+        rotateLogFile "$LOG_FILE"
+
+        echo "$2 run file:" > "$LOG_FILE"
+        echo "----------------------------" >> "$LOG_FILE"
+        cat "$RUN_FILE" >> "$LOG_FILE"
+        echo "----------------------------" >> "$LOG_FILE"
+
         source env/bin/activate
-
-        logFile="runs/$2.stdout.log"
-        rotateLogFile "$logFile"
-
-        export PYTHONPATH="$PYTHONPATH:./"
-        python "$runFile" 2>&1 | tee "$logFile"
+        export PYTHONPATH="$PYTHONPATH:`pwd`"
+        python "$RUN_FILE" 2>&1 | tee -a "$LOG_FILE"
     else
         printUsage
         if [ "$2" != "" ] ; then
