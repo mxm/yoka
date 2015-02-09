@@ -116,12 +116,11 @@ class TestResults(unittest.TestCase):
         suite = ClusterSuite(name, cluster, systems, [], benchmarks)
         suite.execute()
         # test if each system was only configured the necessary amount of times
-        for system in systems:
-            expected = 0
-            for benchmark in benchmarks:
-                if system in benchmark.systems:
-                    expected += 1
-            self.assertEquals(suite.benchmarks[0].systems[0].configured, expected)
+        for system in suite.systems:
+            self.assertEquals(system.configured, 1)
+        for benchmark in suite.benchmarks:
+            for system in benchmark.systems:
+                self.assertEquals(system.configured, 1)
 
     def test_gen_plot(self):
         suite = ClusterSuite(name, cluster, systems, [], benchmarks)
