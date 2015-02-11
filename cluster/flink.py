@@ -30,6 +30,8 @@ def get_flink_dist_path(yarn=False):
 def configure():
     with cd(PATH):
         run("git checkout %s" % conf['git_commit'])
+        run("echo commit: ")
+        run("git rev-parse HEAD")
         run("mvn clean install -DskipTests > build.log")
     context = conf.copy()
     context['java_home'] = find_java_home()
