@@ -208,10 +208,11 @@ class ClusterSuite(Experiment):
                 # get system logs
                 log_paths = {}
                 for system in self.systems:
-                    unique_full_path = "logs/%s/%s/%d/%s" % (self.uid,
-                                                             benchmark.id,
-                                                             run_id+1,
-                                                             system)
+                    unique_full_path = "results/logs/%s/%s/%d/%s" % (
+                                        self.uid,
+                                        benchmark.id,
+                                        run_id+1,
+                                        system)
                     system.save_log(unique_full_path)
                     log_paths[system] = unique_full_path
                 # keep list of results (make copy!)
