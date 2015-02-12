@@ -45,6 +45,29 @@ flink_als = Flink(flink_als_config)
 
 systems = [hadoop, flink]
 
+
+generators = [
+    Generator(
+        id = "TextGenerator",
+        systems = [flink],
+        experiment = generators.Text(
+            size_gb = 150, # 5gb * 10 nodes * 3
+            dop = dop
+        )
+    ),
+
+    Generator(
+        id = "ALSGenerator",
+        systems = [flink_als],
+        experiment = generators.ALS(
+            num_rows = 800000, num_cols = 100000,
+            mean_entry = 20, variance_entry = 4,
+            mean_num_row_entries = 400, variance_num_row_entries = 50
+        )
+    ),
+
+]
+
 benchmarks = [
 
     Benchmark(
@@ -69,30 +92,8 @@ benchmarks = [
         systems = [flink_als],
         experiment = ALS(),
         times = 3
-    )
-
-]
-
-
-generators = [
-    Generator(
-        id = "TextGenerator",
-        systems = [flink],
-        experiment = generators.Text(
-            size_gb = 150, # 5gb * 10 nodes * 3
-            dop = dop
-        )
     ),
-    
-    Generator(
-        id = "ALSGenerator",
-        systems = [flink_als],
-        experiment = generators.ALS(
-            num_rows = 800000, num_cols = 100000,
-            mean_entry = 20, variance_entry = 4,
-            mean_num_row_entries = 400, variance_num_row_entries = 50
-        )
-    )
+
 ]
 
 suite = ClusterSuite("NightlySuite", cluster, systems, generators, benchmarks)
