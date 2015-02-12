@@ -29,6 +29,11 @@ class Experiment(object):
     def __str__(self):
         return self.__class__.__name__
 
+class ExperimentWithGenerator(Experiment):
+
+    def __init__(self, generator):
+        self.generator = generator
+
 
 class Benchmark(Experiment):
 

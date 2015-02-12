@@ -107,3 +107,40 @@ class ALS(FlinkPerf):
 
     def shutdown(self):
         pass
+
+
+class Avro(FlinkPerf):
+    """
+    - Run Generate Lineitems: ./flink run -v -p 152 -c com.github.projectflink.avro.GenerateLineitems ../../testjob/flink-jobs/target/flink-jobs-0.1-SNAPSHOT.jar -p 152 -o hdfs:///user/robert/datasets/tpch1/
+    """
+
+    def __init__(self, parallelism, scale_gb=1.0):
+        self.scale_gb = scale_gb
+        self.parallelism = parallelism
+
+    def setup(self):
+
+        self.repo.clone()
+        self.repo.checkout("master")
+        self.repo.maven("clean package")
+
+    def run(self):
+        self.out = get_hdfs_address() + "/avro-benchmark/tpch1/" # + lineitems.csv
+
+        def code():
+            run_jar("%s/flink-jobs/target" % self.repo.get_absolute_path(),
+                    "flink-jobs-*.jar",
+                    args=[
+                        "-s", self.scale_gb,
+                        "-p", self.parallelism,
+                        "-o", self.out,
+                        ],
+                    clazz="com.github.projectflink.avro.GenerateLineitems"
+            )
+
+        master(code)
+        # update path for benchmark
+        self.out += "lineitems.csv"
+
+    def shutdown(self):
+        pass

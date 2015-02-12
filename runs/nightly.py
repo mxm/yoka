@@ -11,6 +11,7 @@ from configs import compute_engine_config, hadoop_config, flink_config
 from experiments.wordcount_new import WordCountNew
 from experiments.grep import Grep
 from experiments.als import ALS
+from experiments.avro import Avro
 
 # import data generators for benchmarks
 from experiments import generators
@@ -45,28 +46,40 @@ flink_als = Flink(flink_als_config)
 
 systems = [hadoop, flink]
 
+generators = {
 
-generators = [
-    Generator(
-        id = "TextGenerator",
-        systems = [flink],
-        experiment = generators.Text(
-            size_gb = 150, # 5gb * 10 nodes * 3
-            dop = dop
+    'text':
+        Generator(
+            id = "TextGenerator",
+            systems = [flink],
+            experiment = generators.Text(
+                size_gb = 150, # 5gb * 10 nodes * 3
+                dop = dop
+            )
+        ),
+
+    'als':
+        Generator(
+            id = "ALSGenerator",
+            systems = [flink_als],
+            experiment = generators.ALS(
+                num_rows = 800000, num_cols = 100000,
+                mean_entry = 20, variance_entry = 4,
+                mean_num_row_entries = 400, variance_num_row_entries = 50
+            )
+        ),
+
+    'avro':
+        Generator(
+            id = "AvroGenerator",
+            systems = [flink],
+            experiment = generators.Avro(
+                parallelism = dop,
+                scale_gb = 1.0
+            )
         )
-    ),
 
-    Generator(
-        id = "ALSGenerator",
-        systems = [flink_als],
-        experiment = generators.ALS(
-            num_rows = 800000, num_cols = 100000,
-            mean_entry = 20, variance_entry = 4,
-            mean_num_row_entries = 400, variance_num_row_entries = 50
-        )
-    ),
-
-]
+}
 
 benchmarks = [
 
@@ -94,9 +107,16 @@ benchmarks = [
         times = 3
     ),
 
+    Benchmark(
+        id = "Avro",
+        systems = [flink],
+        experiment = Avro(generators['avro']),
+        times = 3
+    )
+
 ]
 
-suite = ClusterSuite("NightlySuite", cluster, systems, generators, benchmarks)
+suite = ClusterSuite("NightlySuite", cluster, systems, generators.values(), benchmarks)
 
 suite.execute(retry_setup=0,
               shutdown_on_failure=True,
