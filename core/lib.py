@@ -162,6 +162,10 @@ class ClusterSuite(Experiment):
         # systems of cluster suite
         for system in self.systems:
             all_systems.add(system)
+        # systems for generators
+        for generator in self.generators:
+            for system in generator.systems:
+                all_systems.add(system)
         # systems of benchmarks
         for benchmark in self.benchmarks:
             for system in benchmark.systems:
