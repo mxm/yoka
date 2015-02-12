@@ -9,15 +9,26 @@ class GitRepository(object):
     def __init__(self, repo_url, path):
         self.url = repo_url
         self.path = path
+        self.commit = None
+        self.cloned = False
+        self.built_using = None
 
     def clone(self):
-        master("git clone %s %s || true" % (self.url, self.path))
+        if not self.cloned:
+            master("git clone %s %s" % (self.url, self.path))
+            self.cloned = True
 
-    def checkout(self, branch):
-        master("cd %s && git checkout %s" % (self.path, branch))
+    def checkout(self, commit):
+        if commit != self.commit:
+            master("cd %s && git checkout %s" % (self.path, commit))
+            self.commit = commit
+            self.built_using = None
 
     def maven(self, target):
-        master("cd %s && mvn %s > /dev/null" % (self.path, target))
+        # avoid building multiple times
+        if target != self.built_using:
+            master("cd %s && mvn %s > /dev/null" % (self.path, target))
+            self.built_using = target
 
     def get_absolute_path(self):
         return "~/" + self.path
