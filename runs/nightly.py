@@ -37,7 +37,9 @@ flink_config['jobmanager_heap'] = 5120
 flink_config['parallelization'] = dop
 
 flink_als_config = flink_config.copy()
-flink_als_config['extra_config_entries'] = [{'entry' : "taskmanager.memory.fraction: 0.3"}]
+flink_als_config['extra_config_entries'] = [
+    {'entry' : "taskmanager.memory.fraction: 0.3"},
+]
 
 cluster = ComputeEngine(compute_engine_config)
 hadoop = Hadoop(hadoop_config)

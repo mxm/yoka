@@ -86,19 +86,25 @@ def slaves(action="start"):
     run("%s/sbin/yarn-daemon.sh --config %s/etc/hadoop/ %s nodemanager" % (PATH, PATH, action))
 
 def mkdir_hdfs(dir):
-    run("%s/bin/hdfs dfs -mkdir -p 'hdfs://%s:50040/%s'"
-        % (PATH, env.master, dir)
+    dir = dir if is_hdfs_address(dir) else "%s/%s" % (get_hdfs_address(), dir)
+    run("%s/bin/hdfs dfs -mkdir -p '%s'"
+        % (PATH, dir)
     )
 
 def copy_to_hdfs(src, dest):
-    run("%s/bin/hdfs dfs -put -f -p '%s' 'hdfs://%s:50040/%s'"
-        % (PATH, src, env.master, dest)
+    dest = dest if is_hdfs_address(dest) else "%s/%s" % (get_hdfs_address(), dest)
+    run("%s/bin/hdfs dfs -put -f -p '%s' '%s'"
+        % (PATH, src, dest)
     )
 
 def delete_from_hdfs(path):
-     run("%s/bin/hdfs dfs -rm -r 'hdfs://%s:50040/%s'"
-        % (PATH, env.master, path)
-     )
+    path = path if is_hdfs_address(path) else "%s/%s" % (get_hdfs_address(), path)
+    run("%s/bin/hdfs dfs -rm -r '%s'"
+    % (PATH, path)
+    )
+
+def is_hdfs_address(address):
+    return address.startswith("hdfs://")
 
 def get_hdfs_address():
     return "hdfs://%s:50040/" % env.master

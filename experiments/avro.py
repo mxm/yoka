@@ -1,9 +1,8 @@
-from time import time
 from core.lib import ExperimentWithGenerator
 
 from cluster.utils import master
 from cluster.flink import run_jar
-from cluster.hadoop import get_hdfs_address
+from cluster.hadoop import get_hdfs_address, delete_from_hdfs
 
 import generators
 
@@ -19,7 +18,7 @@ class Avro(ExperimentWithGenerator):
 
     def setup(self):
         self.in_path = self.generator.experiment.out
-        self.out_path = get_hdfs_address() + "/avro-benchmark/tpch1-avro%d" % int(time())
+        self.out_path = get_hdfs_address() + "/avro-benchmark/tpch1-avro"
 
         def code():
             run_jar("%s/flink-jobs/target" % generators.Avro.repo.get_absolute_path(),
@@ -46,5 +45,5 @@ class Avro(ExperimentWithGenerator):
         master(code)
 
     def shutdown(self):
-        # TODO clean up
-        pass
+        # delete out_path to be able to restart benchmark
+        master(lambda: delete_from_hdfs(self.out_path))
