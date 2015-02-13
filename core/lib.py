@@ -1,7 +1,7 @@
 from time import sleep, time
 from pprint import pformat
 
-import datetime
+import os
 
 from utils import Timer
 
@@ -222,6 +222,8 @@ class ClusterSuite(Experiment):
                                         benchmark.id,
                                         run_id+1,
                                         system)
+                    # create directories
+                    os.makedirs(unique_full_path)
                     system.save_log(unique_full_path)
                     log_paths[system] = unique_full_path
                 # keep list of results (make copy!)

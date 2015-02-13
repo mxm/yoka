@@ -100,7 +100,6 @@ def run_jar(path, jar_name, args, dop=None, clazz=None, upload=False):
 @task
 @roles('master')
 def copy_log_master(dest_path, yarn=False):
-    local("mkdir -p '%s'" % dest_path)
     path = get_flink_dist_path(yarn) + "/log"
     # flink bug FLINK-1361: either jobmanager or jobManager
     log_file = "flink-*-job[Mm]anager-*"
@@ -112,7 +111,6 @@ def copy_log_master(dest_path, yarn=False):
 @task
 @roles('slaves')
 def copy_log_slaves(dest_path, yarn=False):
-    local("mkdir -p '%s'" % dest_path)
     path = get_flink_dist_path(yarn) + "/log"
     log_file = "flink-*-taskmanager-*"
     for extension in ["log", "out"]:
