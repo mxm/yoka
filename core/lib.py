@@ -275,12 +275,27 @@ class ClusterSuite(Experiment):
                     logger.info("Shutting down cluster")
                     self.shutdown()
             if email_results and not run_failure:
+                filename = None
+                report = ""
                 try:
+                    # generate plot for suite UID
                     filename = results.gen_plot(self.id)
-                    text = "%s" % self
+                    # TODO generate plot for suite ID
+                except:
+                    logger.exception("Failed to generate plot")
+                try:
+                    # generate report by printing us using the __str__ method
+                    report = "%s" % self
+                    path = "results/logs/%s/report.txt" % self.uid
+                    # save report to file
+                    with open(path, "w") as report_file:
+                        report_file.write(report)
+                except:
+                    logger.exception("Failed to generate report")
+                try:
                     if not filename:
-                        text += "Plot could not be generated. See log for more details.\n"
-                    results.send_email(filename, additional_text=text)
+                        report += "Plot could not be generated. See log for more details.\n"
+                    results.send_email(filename, additional_text=report)
                 except:
                     logger.exception("Failed to send results.")
 
