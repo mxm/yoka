@@ -75,7 +75,7 @@ generators = {
             systems = [flink],
             experiment = generators.Avro(
                 parallelism = dop,
-                scale_gb = 1.0
+                scale_factor = 100
             )
         )
 

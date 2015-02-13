@@ -114,8 +114,8 @@ class Avro(FlinkPerf):
     - Run Generate Lineitems: ./flink run -v -p 152 -c com.github.projectflink.avro.GenerateLineitems ../../testjob/flink-jobs/target/flink-jobs-0.1-SNAPSHOT.jar -p 152 -o hdfs:///user/robert/datasets/tpch1/
     """
 
-    def __init__(self, parallelism, scale_gb=1.0):
-        self.scale_gb = scale_gb
+    def __init__(self, parallelism, scale_factor=1.0):
+        self.scale_factor = scale_factor
         self.parallelism = parallelism
 
     def setup(self):
@@ -131,7 +131,7 @@ class Avro(FlinkPerf):
             run_jar("%s/flink-jobs/target" % self.repo.get_absolute_path(),
                     "flink-jobs-*.jar",
                     args=[
-                        "-s", self.scale_gb,
+                        "-s", self.scale_factor,
                         "-p", self.parallelism,
                         "-o", self.out,
                         ],
