@@ -72,6 +72,7 @@ flink_config = {
     'taskmanager_heap' : 512,
     'jobmanager_heap' : 256,
     'taskmanager_num_buffers' : 2048,
+    'taskmanager_temp_dirs' : "%s/tmp" % config['storage_path'],
     'jvm_opts' : "",
     'extra_config_entries' : [
         # additional entries can be added like this:
