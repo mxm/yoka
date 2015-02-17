@@ -158,7 +158,7 @@ def mount_disk():
     # create partition table and partition
     sudo('echo -e "o\nn\np\n1\n\n\n\n\n\nw" | fdisk /dev/sdb')
     # format partition
-    sudo('mkfs -t ext4 /dev/sdb1')
+    sudo('mkfs -t ext4 /dev/sdb1 >/dev/null')
     run("mkdir -p %s" % conf['disk_mount_path'])
     # mount
     sudo("mount -t ext4 /dev/sdb1 %s" % conf['disk_mount_path'])
