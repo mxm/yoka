@@ -6,7 +6,7 @@ from cluster.maintenance import install
 from core.lib import Generator
 from core.utils import GitRepository
 
-flink_perf_repo = "https://github.com/project-flink/flink-perf"
+flink_perf_repo = "https://github.com/mxm/flink-perf"
 
 class FlinkPerf(Generator):
     repo = GitRepository(flink_perf_repo, "flink-perf")
