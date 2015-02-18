@@ -1,5 +1,5 @@
 from fabric.decorators import task, roles, parallel, runs_once
-from fabric.api import sudo, run, execute, env, settings
+from fabric.api import sudo, run, execute, env, hide
 
 from time import sleep
 
@@ -72,7 +72,7 @@ def set_key():
 def set_up_dir(dir):
     # for safety, check if this directory does not exist
     # or delete, if it contains a yoka lock file
-    with settings(warn_only=True):
+    with hide():
         if run("[ -d '%s' ]" % dir).failed:
             logger.info("Creating working directory %s" % dir)
             run("mkdir -p '%s'" % dir)
