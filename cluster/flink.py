@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from fabric.decorators import task, roles, parallel
-from fabric.api import env, local, run, cd, put, settings
+from fabric.api import env, run, cd, put, quiet
 from maintenance import pull_from_master, find_java_home
 from utils import process_template, copy_log, get_slave_id
 
@@ -95,7 +95,7 @@ def run_jar(path, jar_name, args, dop=None, clazz=None, upload=False):
         put("%s/%s" % (path, jar_name), PATH)
         path = PATH
     # figure out if we're running Flink on YARN
-    with settings(warn_only=True):
+    with quiet():
         if run("jps | grep Yarn").failed:
             yarn = False
         else:
