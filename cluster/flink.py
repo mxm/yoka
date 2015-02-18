@@ -51,6 +51,15 @@ def pull():
     pull_from_master(PATH, PATH)
 
 @task
+@roles('slaves')
+@parallel
+def create_temp_dir():
+    temp_dirs = conf["taskmanager_temp_dirs"]
+    if temp_dirs:
+        for dir in temp_dirs.split(":"):
+            run("mkdir -p '%s'" % dir)
+
+@task
 @roles('master')
 def master(action="start", yarn=False):
     path = get_flink_dist_path(yarn=yarn)

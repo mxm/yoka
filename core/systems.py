@@ -101,6 +101,7 @@ class Flink(System):
         if 'configure' not in self.skip_targets:
             execute(flink.configure)
         execute(flink.pull)
+        execute(flink.create_temp_dir)
 
     def reset(self):
         pass
