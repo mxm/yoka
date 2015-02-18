@@ -21,8 +21,8 @@ Install Python 2.7, Virtualenv for Python, and the Python development files. In 
 
 Then run:
 
-    git clone https://github.com/mxm/flink-perf-new
-    cd flink-perf-new
+    git clone https://github.com/mxm/yoka
+    cd yoka
     ./install
 
 The installation script will install the dependencies listed in requirements.txt.
