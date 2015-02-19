@@ -148,6 +148,7 @@ def attach_disk():
         "gcloud compute --project %s" % conf['project_name'],
         "instances attach-disk %s" % host_name,
         "--zone %s" % conf['zone'],
+        "--device-name additional-storage",
         "--disk %s-disk" % host_name,
         "-q"
     ).execute()
@@ -156,12 +157,12 @@ def attach_disk():
 @parallel
 def mount_disk():
     # create partition table and partition
-    sudo('echo -e "o\nn\np\n1\n\n\n\n\n\nw" | fdisk /dev/sdb')
+    sudo('echo -e "o\nn\np\n1\n\n\n\n\n\nw" | fdisk /dev/disk/by-id/google-additional-storage')
     # format partition
-    sudo('mkfs -t ext4 /dev/sdb1 >/dev/null')
+    sudo('mkfs -t ext4 /dev/disk/by-id/google-additional-storage-part1 >/dev/null')
     run("mkdir -p %s" % conf['disk_mount_path'])
     # mount
-    sudo("mount -t ext4 /dev/sdb1 %s" % conf['disk_mount_path'])
+    sudo("mount -t ext4 /dev/disk/by-id/google-additional-storage-part1 %s" % conf['disk_mount_path'])
     user = getuser()
     sudo("chown %s:%s %s" % (user, user, conf['disk_mount_path']))
 
