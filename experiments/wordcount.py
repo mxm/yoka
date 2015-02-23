@@ -62,16 +62,17 @@ class WordCount(Experiment):
 
     def run(self):
         wordcount_in = "%s/text" % get_hdfs_address()
-        wordcount_out = "%s/tmp/wc_out_%d" % (get_hdfs_address(), int(time()))
+        self.wordcount_out = "%s/tmp/wc_out_%d" % (get_hdfs_address(), int(time()))
+
         def code():
             run_jar("%s/examples/" % get_flink_dist_path(),
                     "flink-java-*WordCount.jar",
-                    args = [wordcount_in, wordcount_out],
+                    args = [wordcount_in, self.wordcount_out],
                     clazz = "org.apache.flink.examples.java.wordcount.WordCount")
         master(code)
 
     def shutdown(self):
-        pass
+        master(lambda: delete_from_hdfs(self.wordcount_out))
 
 
 
@@ -92,17 +93,18 @@ class DataFlowWordCount(DataFlowExperiment):
 
     def run(self):
         wordcount_in = "%s/text" % get_hdfs_address()
-        wordcount_out = "%s/tmp/wc_out_%d" % (get_hdfs_address(), int(time()))
+        self.wordcount_out = "%s/tmp/wc_out" % get_hdfs_address()
+
         def code():
             run_jar("%s/target/" % self.repo.get_absolute_path(),
                     "flink-dataflow-*-SNAPSHOT.jar",
                     args = ["--input=%s" % wordcount_in,
-                            "--output=%s" % wordcount_out],
+                            "--output=%s" % self.wordcount_out],
                     clazz = "com.dataartisans.flink.dataflow.examples.DataflowWordCount")
         master(code)
 
     def shutdown(self):
-        pass
+        master(lambda: delete_from_hdfs(self.wordcount_out))
 
 
 class WordCountSlow(DataFlowExperiment):
@@ -118,13 +120,14 @@ class WordCountSlow(DataFlowExperiment):
 
     def run(self):
         wordcount_in = "%s/text" % get_hdfs_address()
-        wordcount_out = "%s/tmp/wc_out_%d" % (get_hdfs_address(), int(time()))
+        self.wordcount_out = "%s/tmp/wc_out" % get_hdfs_address()
+
         def code():
             run_jar("%s/target/" % self.repo.get_absolute_path(),
                     "flink-dataflow-*-SNAPSHOT.jar",
-                    args = [wordcount_in, wordcount_out],
+                    args = [wordcount_in, self.wordcount_out],
                     clazz = "com.dataartisans.flink.dataflow.examples.FlinkWordCount")
         master(code)
 
     def shutdown(self):
-        pass
+        master(lambda: delete_from_hdfs(self.wordcount_out))
