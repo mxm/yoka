@@ -66,7 +66,7 @@ def set_key():
             CheckHostIP=no
             StrictHostKeyChecking=no
         """ % (host, host)
-    run("echo '%s' >> ~/.ssh/config" % ssh_config)
+    run("echo '%s' >> ~/.ssh/config" % ssh_config, quiet=True)
 
 @task
 def set_up_dir(dir):
