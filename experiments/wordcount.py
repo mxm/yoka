@@ -96,7 +96,8 @@ class DataFlowWordCount(DataFlowExperiment):
         def code():
             run_jar("%s/target/" % self.repo.get_absolute_path(),
                     "flink-dataflow-*-SNAPSHOT.jar",
-                    args = [wordcount_in, wordcount_out],
+                    args = ["--input=%s" % wordcount_in,
+                            "--output=%s" % wordcount_out],
                     clazz = "com.dataartisans.flink.dataflow.examples.DataflowWordCount")
         master(code)
 

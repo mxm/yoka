@@ -48,7 +48,8 @@ generators = [
         systems = [flink],
         experiment = generators.Text(
             size_gb = 150, # 5gb * 10 nodes * 3
-            dop = dop
+            dop = dop,
+            git_branch = "flink-0.8"
         )
     ),
 
@@ -57,14 +58,14 @@ generators = [
 benchmarks = [
 
     Benchmark(
-        id = "WordCount",
+        id = "WordCountDataFlow",
         systems = [flink],
         experiment = DataFlowWordCount(),
         times = 3
     ),
 
     Benchmark(
-        id = "WordCount",
+        id = "WordCountFlink",
         systems = [flink],
         experiment = WordCountSlow(),
         times = 3

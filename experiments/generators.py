@@ -19,15 +19,16 @@ class Text(FlinkPerf):
      long finalSizeGB = Integer.valueOf(args[2]);
     """
 
-    def __init__(self, size_gb, dop):
+    def __init__(self, size_gb, dop, git_branch="master"):
         self.dop = dop
         self.size_gb = size_gb
+        self.git_branch = git_branch
 
     def setup(self):
         self.out_path = get_hdfs_address() + "/text"
 
         self.repo.clone()
-        self.repo.checkout("master")
+        self.repo.checkout(self.git_branch)
         self.repo.maven("clean package")
 
     def run(self):
