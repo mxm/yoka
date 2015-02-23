@@ -8,8 +8,8 @@ from core.systems import Hadoop, Flink
 from configs import compute_engine_config, hadoop_config, flink_config
 
 # import experiment's main class
+from experiments.wordcount import WordCountFromJar
 from experiments.wordcount import WordCount
-from experiments.wordcount_new import WordCountNew
 from experiments.grep import Grep
 
 # import data generators for benchmarks
@@ -32,7 +32,7 @@ benchmarks = [
     Benchmark(
         id = "WordCount1000",
         systems = [flink],
-        experiment = WordCount({
+        experiment = WordCountFromJar({
             'num_lines' : 1000
         }),
         times = 5
@@ -41,7 +41,7 @@ benchmarks = [
     Benchmark(
         id = "WordCount1000-custom",
         systems = [custom_flink],
-        experiment = WordCount({
+        experiment = WordCountFromJar({
             'num_lines' : 1000
         }),
         times = 3
@@ -56,7 +56,7 @@ benchmarks = [
     Benchmark(
         id = "WordCount-new",
         systems = [flink],
-        experiment = WordCountNew(),
+        experiment = WordCount(),
         times = 2
     ),
 ]

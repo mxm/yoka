@@ -8,7 +8,7 @@ from core.systems import Hadoop, Flink
 from configs import compute_engine_config, hadoop_config, flink_config
 
 # import experiment's main class
-from experiments.wordcount_new import WordCountNew
+from experiments.wordcount import WordCount
 
 # import data generators for benchmarks
 from experiments import generators
@@ -45,13 +45,13 @@ benchmarks = [
     Benchmark(
         id = "WordCount-heap",
         systems = [flink],
-        experiment = WordCountNew(),
+        experiment = WordCount(),
         times = 1
     ),
     Benchmark(
         id = "WordCount-offheap",
         systems = [flink_custom],
-        experiment = WordCountNew(),
+        experiment = WordCount(),
         times = 1
     ),
 ]

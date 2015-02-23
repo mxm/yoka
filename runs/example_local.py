@@ -8,7 +8,7 @@ from core.systems import Hadoop, Flink
 from configs import local_cluster_config, hadoop_config, flink_config
 
 # import experiment's main class
-from experiments.wordcount import WordCount
+from experiments.wordcount import WordCountFromJar
 
 # import data generators for benchmarks
 from experiments import generators
@@ -24,7 +24,7 @@ benchmarks = [
     Benchmark(
         id = "WordCount1000",
         systems = [flink],
-        experiment = WordCount({
+        experiment = WordCountFromJar({
             'num_lines' : 1000
         }),
         times = 5
