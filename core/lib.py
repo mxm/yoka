@@ -142,6 +142,8 @@ class Cluster(object):
     def shutdown(self):
         raise NotImplementedError()
 
+class ClusterSetupException(Exception):
+    pass
 
 class ClusterSuite(Experiment):
 
@@ -179,6 +181,7 @@ class ClusterSuite(Experiment):
         for i, system in enumerate(all_systems):
             # install path
             system.path = "%s/%s-%d" % (self.cluster.working_dir, system, i)
+            # TODO retry in case of errors (e.g. git clone fails)
             system.install()
             system.configure()
         # start systems that run once per cluster suite
@@ -250,56 +253,71 @@ class ClusterSuite(Experiment):
     def execute(self, retry_setup=0, ignore_failures=True,
                 shutdown_on_success=True, shutdown_on_failure=True,
                 email_results=False):
-        # setup cluster
-        for run_id in range(1, retry_setup+2):
-            try:
-                logger.info("Setting up cluster")
-                self.setup()
-                setup_failure = False
-                break
-            except:
-                logger.exception("Failed to set up cluster for the %d/%d time." % (run_id, retry_setup+1))
-                setup_failure = True
-        if not setup_failure:
+        # catch all critical exceptions and shutdown server
+        run_failure = False
+        try:
+            # setup cluster
+            for run_id in range(1, retry_setup+2):
+                try:
+                    logger.info("Setting up cluster")
+                    self.setup()
+                except:
+                    logger.exception("Failed to set up cluster for the %d/%d time." % (run_id, retry_setup+1))
+                    try:
+                        self.shutdown()
+                    except:
+                        pass
+                else:
+                    break
+                if run_id == retry_setup+1:
+                    raise ClusterSetupException("Failed to set up cluster after %d times." % (retry_setup+1,))
+            # run generators and benchmarks
             try:
                 # generate data
+                logger.info("Generating data")
                 self.generate()
                 # run benchmarks
                 logger.info("Running benchmarks")
                 self.run(ignore_failures)
-                run_failure = False
             except:
                 logger.exception("Exception trying to run suite %s" % self.id)
                 run_failure = True
-            finally:
-                # shutdown
-                if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
-                    logger.info("Shutting down cluster")
+            else:
+                run_failure = False
+        finally:
+            # shutdown
+            if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
+                logger.info("Shutting down cluster")
+                try:
                     self.shutdown()
-            if email_results and not run_failure:
-                filename = None
-                report = ""
-                try:
-                    # generate plot for suite UID
-                    filename = results.gen_plot(self.id)
-                    # TODO generate plot for suite ID
                 except:
-                    logger.exception("Failed to generate plot")
-                try:
-                    # generate report by printing us using the __str__ method
-                    report = "%s" % self
-                    path = "results/logs/%s/report.txt" % self.uid
-                    # save report to file
-                    with open(path, "w") as report_file:
-                        report_file.write(report)
-                except:
-                    logger.exception("Failed to generate report")
-                try:
-                    if not filename:
-                        report += "Plot could not be generated. See log for more details.\n"
-                    results.send_email(filename, additional_text=report)
-                except:
-                    logger.exception("Failed to send results.")
+                    pass
+        # generate and send results
+        # TODO this can fail if run_failure is True but not generating any results is bad for debugging
+        filename = None
+        report = ""
+        try:
+            # generate plot for suite UID
+            filename = results.gen_plot(self.id)
+            # TODO generate plot for suite ID
+        except:
+            logger.exception("Failed to generate plot")
+        try:
+            # generate report by printing us using the __str__ method
+            report = "%s" % self
+            path = "results/logs/%s/report.txt" % self.uid
+            # save report to file
+            with open(path, "w") as report_file:
+                report_file.write(report)
+        except:
+            logger.exception("Failed to generate report")
+        if email_results:
+            try:
+                if not filename:
+                    report += "Plot could not be generated. See log for more details.\n"
+                results.send_email(filename, additional_text=report)
+            except:
+                logger.exception("Failed to send results.")
 
     def __str__(self):
         # print run times
