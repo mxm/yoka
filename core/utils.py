@@ -15,7 +15,7 @@ class GitRepository(object):
 
     def clone(self):
         if not self.cloned:
-            master("git clone %s %s" % (self.url, self.path))
+            master("rm -rf %s && git clone %s %s" % (self.path, self.url, self.path))
             self.cloned = True
 
     def checkout(self, commit):

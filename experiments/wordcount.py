@@ -76,7 +76,7 @@ class WordCount(Experiment):
 
 
 class DataFlowExperiment(Experiment):
-    repo = GitRepository("https://github.com/aljoscha/flink-dataflow.git", "~/aljoschas_repo")
+    repo = GitRepository("https://github.com/aljoscha/flink-dataflow.git", "aljoschas_repo")
 
 
 class DataFlowWordCount(DataFlowExperiment):
@@ -86,7 +86,9 @@ class DataFlowWordCount(DataFlowExperiment):
         pass
 
     def setup(self):
-        pass
+        self.repo.clone()
+        self.repo.checkout("perf")
+        self.repo.maven("clean package -DskipTests")
 
     def run(self):
         wordcount_in = "%s/text" % get_hdfs_address()
