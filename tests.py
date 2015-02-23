@@ -19,11 +19,16 @@ core.lib.sleep_time = 0
 
 class StupidCluster(Cluster):
 
+    fail_setup = False
+    fail_shutdown = False
+
     def setup(self):
-        pass
+        if self.fail_setup:
+            raise Exception("Dummy Exception")
 
     def shutdown(self):
-        pass
+        if self.fail_shutdown:
+            raise Exception("Dummy Exception")
 
 class StupidSystem(System):
 
@@ -54,12 +59,17 @@ systems = [StupidSystem("stupid1"), StupidSystem("stupid2")]
 
 class TestExperiment(Experiment):
 
+    fail = False
+
     def setup(self):
         pass
 
     def run(self):
         print "running experiment"
-        sleep(random.randint(1, 3))
+        if self.fail:
+            raise Exception("Dummy Exception")
+        else:
+            sleep(random.randint(1, 3))
 
     def shutdown(self):
         pass
@@ -84,6 +94,21 @@ benchmarks = [
 
 
 cluster = StupidCluster({})
+
+failing_setup_cluster = StupidCluster({})
+failing_setup_cluster.fail_setup = True
+
+failing_running_cluster = StupidCluster({})
+failing_running_cluster.fail_shutdown = True
+
+failing_experiment = TestExperiment()
+failing_experiment.fail = True
+failing_benchmarks = [Benchmark("Test3",
+                                systems=systems,
+                                experiment = failing_experiment,
+                                times = 3),
+]
+
 name = "TestResults"
 
 class TestResults(unittest.TestCase):
@@ -130,6 +155,24 @@ class TestResults(unittest.TestCase):
     def test_email_plot(self):
         suite = ClusterSuite(name, cluster, systems, [], benchmarks)
         suite.execute(email_results=True)
+
+    def test_failed_setup(self):
+        suite = ClusterSuite(name, failing_setup_cluster, systems, [], benchmarks)
+        try:
+            suite.execute()
+        except core.lib.ClusterSetupException:
+            pass
+
+    def test_failed_shutdown(self):
+        suite = ClusterSuite(name, failing_running_cluster, systems, [], benchmarks)
+        try:
+            suite.execute()
+        except core.lib.ClusterSetupException:
+            pass
+
+    def test_failed_experiment(self):
+        suite = ClusterSuite(name, cluster, systems, [], failing_benchmarks)
+        suite.execute()
 
     def tearDown(self):
         pass
