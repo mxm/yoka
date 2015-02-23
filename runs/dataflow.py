@@ -47,7 +47,7 @@ generators = [
         id = "TextGenerator",
         systems = [flink],
         experiment = generators.Text(
-            size_gb = 150, # 5gb * 10 nodes * 3
+            size_gb = 100,
             dop = dop,
             git_branch = "flink-0.8"
         )
