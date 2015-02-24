@@ -49,7 +49,7 @@ generators = [
         experiment = generators.Text(
             size_gb = 100,
             dop = dop,
-            git_branch = "flink-0.8"
+            git_branch = "flink-0.8.0"
         )
     ),
 
