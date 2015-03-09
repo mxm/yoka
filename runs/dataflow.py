@@ -28,7 +28,8 @@ compute_engine_config['disk_space_gb'] = 200
 
 dop = compute_engine_config['num_workers'] * compute_engine_config['num_cores']
 
-flink_config['git_commit'] = "release-0.8.0"
+flink_config['git_repository'] = "https://github.com/mxm/flink.git"
+flink_config['git_commit'] = "reducePartialOperator"
 flink_config['num_task_slots'] = compute_engine_config['num_cores']
 flink_config['taskmanager_heap'] = 5120 #5gb
 flink_config['jobmanager_heap'] = 5120
@@ -47,9 +48,9 @@ generators = [
         id = "TextGenerator",
         systems = [flink],
         experiment = generators.Text(
-            size_gb = 100,
+            size_gb = 150,
             dop = dop,
-            git_branch = "flink-0.8.0"
+            git_branch = "master"
         )
     ),
 

@@ -77,7 +77,7 @@ class WordCount(Experiment):
 
 
 class DataFlowExperiment(Experiment):
-    repo = GitRepository("https://github.com/aljoscha/flink-dataflow.git", "aljoschas_repo")
+    repo = GitRepository("https://github.com/mxm/flink-dataflow.git", "dataflow-repo")
 
 
 class DataFlowWordCount(DataFlowExperiment):
