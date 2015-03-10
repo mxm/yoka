@@ -85,7 +85,10 @@ class Configuration(object):
 
     @staticmethod
     def delete():
-        os.remove(config_file)
+        try:
+            os.remove(config_file)
+        except OSError:
+            logger.exception("Failed to delete gcloud config file!")
 
 
 @task
@@ -225,15 +228,16 @@ def init():
     env.hosts = []
     env.roles = {}
     config = Configuration.load()
-    if not config:
+    # apply old config only if appropriate
+    if  config and config.config['project_name'] == conf['project_name'] and config.config['prefix'] == conf['prefix']:
+        globals()['conf'] = config.config
+    else:
         config = create_config()
     ips = config.get_ips()
     hostnames = config.get_hostnames()
     master_ip = config.get_master_ip()
     slave_ips = config.get_slave_ips()
     if ips and hostnames:
-        global conf
-        conf = config.config
         env.hosts = ips
         env.master = config.get_master_name()
         env.slaves = config.get_slave_names()

@@ -65,12 +65,12 @@ benchmarks = [
         times = 3
     ),
 
-    Benchmark(
-        id = "WordCountFlink",
-        systems = [flink],
-        experiment = WordCountSlow(),
-        times = 3
-    ),
+#    Benchmark(
+#        id = "WordCountFlink",
+#        systems = [flink],
+#        experiment = WordCountSlow(),
+#        times = 3
+#    ),
 
 ]
 
