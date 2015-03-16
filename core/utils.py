@@ -72,3 +72,13 @@ class Timer(object):
             s += "%s\n%s\n%s hours, %s minutes, %s seconds\n\n" \
                  % (description, time, seconds // 3600, seconds // 60 % 60, seconds % 60)
         return s
+
+class Prompt(object):
+
+    def __init__(self, message, expected=""):
+        self.message = message
+        self.expected = expected
+
+    def prompt(self):
+        input = raw_input(self.message)
+        return input == self.expected

@@ -2,6 +2,8 @@ from lib import Cluster
 
 from cluster import gcloud, local, maintenance
 
+from core.utils import Prompt
+
 from fabric.api import execute
 
 import log
@@ -25,7 +27,9 @@ class ComputeEngine(Cluster):
             execute(gcloud.attach_disk)
             execute(gcloud.mount_disk)
         except gcloud.ExistingInstancesException:
-            pass
+            prompt = Prompt("Resume cluster with the following configuration? (y/n) %s" % self.config, "y")
+            if not prompt:
+                raise Exception("Cluster could not be createcd.")
         execute(maintenance.update_package_cache)
         #execute(maintenance.upgrade)
         execute(maintenance.install_dependencies)
