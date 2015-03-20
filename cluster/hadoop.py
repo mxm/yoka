@@ -8,7 +8,7 @@ from time import sleep
 from configs import hadoop_config as conf
 
 # defaults to home but is set by actual system class
-PATH = "~"
+PATH = "/tmp/hadoop"
 namenode_dir = "hdfs-namenode"
 datanode_dir = "hdfs-datanode"
 
