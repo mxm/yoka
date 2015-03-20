@@ -11,7 +11,7 @@ from configs import tez_config as conf
 """ based on http://tez.apache.org/install.html """
 
 # defaults to home but is set by actual system class
-PATH = "/tmp/hadoop"
+PATH = "/tmp/tez"
 
 @task
 @roles('master')

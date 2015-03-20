@@ -9,7 +9,7 @@ from time import sleep
 from configs import flink_config as conf
 
 # defaults to home but is set by actual system class
-PATH = "/tmp/hadoop"
+PATH = "/tmp/flink"
 
 @task
 @roles('master')

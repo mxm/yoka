@@ -200,4 +200,3 @@ def gen_plot(suite_id):
         figure.tight_layout()
         plt.savefig(filename)
         return filename
-
