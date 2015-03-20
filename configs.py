@@ -25,7 +25,7 @@ local_cluster_config = {
     # in case, this is started from a machine from inside the cluster, internal and external addresses can be identical
 
     # the address of the master machine
-    'master' : ("locahost", "localhost"),
+    'master' : ("localhost", "localhost"),
     # addresses of the slave machines
     'slaves' : [
         # list of machines, e.g.
