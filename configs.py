@@ -113,6 +113,22 @@ tez_config = {
 
 
 """
+Standard Zookeeper config
+
+"""
+zookeeper_config = {
+    'source' : "http://mirror.softaculous.com/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz",
+    'tick_time' : 2000,
+    'init_limit' : 5,
+    'sync_limit' : 2,
+    'data_dir' : "/tmp/zookeeper/data",
+    'client_port' : 2181,
+    # number of zookeeper instances to create (if enough servers available)
+    'num_instances' : 3,
+}
+
+
+"""
 eMail config
 
 """

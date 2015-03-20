@@ -1,7 +1,11 @@
 from core.lib import System
 
-from cluster import hadoop, flink, tez
-from fabric.api import execute
+from cluster import hadoop, flink, tez, zookeeper
+from fabric.api import execute, env
+
+from log import get_logger
+
+logger = get_logger("systems")
 
 class Hadoop(System):
     """
@@ -141,3 +145,43 @@ class FlinkYarn(Flink):
 
     def __str__(self):
         return "flink-yarn"
+
+
+class Zookeeper(System):
+
+    module = zookeeper
+    once_per_suite = True
+
+    def __init__(self, config):
+        self.config = config
+
+    def install(self):
+        self.set_config()
+        execute(zookeeper.install)
+
+    def configure(self):
+        self.set_config()
+        execute(zookeeper.pull)
+        execute(zookeeper.configure)
+        execute(zookeeper.create_myid_file)
+
+    def reset(self):
+        pass
+
+    def start(self):
+        self.set_config()
+        for i in range(self.config['num_instances']):
+            if i < len(env.hosts):
+                execute(zookeeper.nodes, 'start', host=env.hosts[i])
+            else:
+                logger.error("Cannot start more zookeeper instances than servers.")
+
+    def stop(self):
+        self.set_config()
+        execute(zookeeper.nodes, 'stop')
+
+    def save_log(self, unique_full_path):
+        pass
+
+    def __str__(self):
+        return "zookeeper"
