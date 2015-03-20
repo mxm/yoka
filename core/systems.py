@@ -1,6 +1,6 @@
 from core.lib import System
 
-from cluster import hadoop, flink, tez, zookeeper
+from cluster import hadoop, flink, tez, zookeeper, storm
 from fabric.api import execute, env
 
 from log import get_logger
@@ -185,3 +185,42 @@ class Zookeeper(System):
 
     def __str__(self):
         return "zookeeper"
+
+
+class Storm(System):
+
+    module = storm
+    # TODO for now this is ok should be changed when integrated with benchmarks
+    once_per_suite = True
+
+    def __init__(self, config):
+        self.config = config
+
+    def install(self):
+        self.set_config()
+        execute(storm.install)
+
+    def configure(self):
+        self.set_config()
+        execute(storm.pull)
+        execute(storm.configure)
+        execute(storm.create_local_dir)
+
+    def reset(self):
+        pass
+
+    def start(self):
+        self.set_config()
+        execute(storm.master)
+        execute(storm.slaves)
+
+    def stop(self):
+        self.set_config()
+        # TODO
+        # storm has not stop method
+
+    def save_log(self, unique_full_path):
+        pass
+
+    def __str__(self):
+        return "storm"

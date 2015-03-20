@@ -7,7 +7,7 @@ from utils import process_template, get_slave_id
 
 from configs import zookeeper_config as conf
 
-# defaults to home but is set by actual system class
+# defaults to tmp but is set by actual system class
 PATH = "/tmp/zookeeper"
 
 @task

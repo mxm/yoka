@@ -30,6 +30,7 @@ def install_dependencies():
     install("maven")
     install("git")
     install("curl")
+    install("python2.7")
 
 def find_java_home():
     return run("readlink -f /usr/bin/javac | sed 's:bin/javac::'")
