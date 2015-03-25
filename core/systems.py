@@ -17,7 +17,7 @@ class Hadoop(System):
     once_per_suite = True
 
     def __init__(self, config):
-        self.config = config
+        super(Hadoop, self).__init__(config)
 
     def install(self):
         self.set_config()
@@ -59,7 +59,7 @@ class Tez(System):
     once_per_suite = True
 
     def __init__(self, config):
-        self.config = config
+        super(Tez, self).__init__(config)
 
     def install(self):
         self.set_config()
@@ -93,7 +93,7 @@ class Flink(System):
     once_per_suite = False
 
     def __init__(self, config):
-        self.config = config
+        super(Flink, self).__init__(config)
 
     def install(self):
         self.set_config()
@@ -153,7 +153,7 @@ class Zookeeper(System):
     once_per_suite = True
 
     def __init__(self, config):
-        self.config = config
+        super(Zookeeper, self).__init__(config)
 
     def install(self):
         self.set_config()
@@ -194,7 +194,7 @@ class Storm(System):
     once_per_suite = True
 
     def __init__(self, config):
-        self.config = config
+        super(Storm, self).__init__(config)
 
     def install(self):
         self.set_config()
@@ -202,8 +202,8 @@ class Storm(System):
 
     def configure(self):
         self.set_config()
-        execute(storm.pull)
         execute(storm.configure)
+        execute(storm.pull)
         execute(storm.create_local_dir)
 
     def reset(self):

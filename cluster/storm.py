@@ -19,7 +19,7 @@ def install():
     run("mv %s/apache-storm*/* %s" % (PATH, PATH))
 
 @task
-# configure on all hosts
+@roles('master')
 def configure():
     # config
     context = conf.copy()
