@@ -8,7 +8,7 @@ from core.systems import Hadoop, Flink
 from configs import compute_engine_config, hadoop_config, flink_config
 
 # import experiment's main class
-from experiments.wordcount import DataFlowWordCount, WordCountSlow
+from experiments.wordcount import DataFlowWordCount, FlinkWordCount
 
 # import data generators for benchmarks
 from experiments import generators
@@ -65,12 +65,19 @@ benchmarks = [
         times = 3
     ),
 
-#    Benchmark(
-#        id = "WordCountFlink",
-#        systems = [flink],
-#        experiment = WordCountSlow(),
-#        times = 3
-#    ),
+    Benchmark(
+        id = "ImplicitFlinkWordCount",
+        systems = [flink],
+        experiment = FlinkWordCount(implicit_combine=True),
+        times = 3
+    ),
+
+    Benchmark(
+        id = "ExplicitFlinkWordCount",
+        systems = [flink],
+        experiment = FlinkWordCount(implicit_combine=False),
+        times = 3
+    ),
 
 ]
 

@@ -108,11 +108,17 @@ class DataFlowWordCount(DataFlowExperiment):
         master(lambda: delete_from_hdfs(self.wordcount_out))
 
 
-class WordCountSlow(DataFlowExperiment):
-    """Slow WordCount for comparison with the Google Dataflow API"""
+class FlinkWordCount(DataFlowExperiment):
+    """
+        Either implicit or explicit Flink WordCount for comparison with Google Dataflow API.
+        In the implicit version, the combiner is not specified, in the explicit case, a custom
+        combiner is specified.
+    """
+    implicit_clazz = "com.dataartisans.flink.dataflow.examples.FlinkWordCountImplicitCombine"
+    explicit_clazz = "com.dataartisans.flink.dataflow.examples.FlinkWordCountExplicitCombine"
 
-    def __init__(self):
-        pass
+    def __init__(self, implicit_combine=True):
+        self.implicit_combine = implicit_combine
 
     def setup(self):
         self.repo.clone()
@@ -127,7 +133,7 @@ class WordCountSlow(DataFlowExperiment):
             run_jar("%s/target/" % self.repo.get_absolute_path(),
                     "flink-dataflow-*-SNAPSHOT.jar",
                     args = [wordcount_in, self.wordcount_out],
-                    clazz = "com.dataartisans.flink.dataflow.examples.FlinkWordCount")
+                    clazz = self.implicit_clazz if self.implicit_combine else self.explicit_clazz)
         master(code)
 
     def shutdown(self):
