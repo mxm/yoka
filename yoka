@@ -54,7 +54,7 @@ mkdir -p "$LOG_DIR"
 
 if [ "$1" == "shutdown" ] ; then
     source env/bin/activate
-    fab gcloud.delete_instances
+    fab gcloud.delete_instances:True
 elif [ "$1" == "run" ] ; then
     RUN_FILE="runs/$2.py"
     if  [ -e $RUN_FILE ] ; then

@@ -28,7 +28,7 @@ class ComputeEngine(Cluster):
             execute(gcloud.mount_disk)
         except gcloud.ExistingInstancesException:
             prompt = Prompt("Resume cluster with the following configuration? (y/n) %s" % self.config, "y")
-            if not prompt:
+            if not prompt.prompt():
                 raise Exception("Cluster could not be createcd.")
         execute(maintenance.update_package_cache)
         #execute(maintenance.upgrade)

@@ -1,4 +1,5 @@
 from fabric.decorators import task, parallel, runs_once
+from core.utils import Prompt
 from utils import LocalCommand, RemoteCommand
 from getpass import getuser
 import json
@@ -171,10 +172,14 @@ def mount_disk():
 
 @task
 @runs_once
-def delete_instances():
+def delete_instances(prompt=False):
     if not env.hostnames:
         print "No hostnames configured. Cannot delete instances."
         return
+    if prompt:
+        ask = Prompt("Delete cluster with the following hostnames? (y/n) %s" % env.hostnames, "y")
+        if not ask.prompt():
+            return
     LocalCommand(
         "gcloud compute --project %s" % conf['project_name'],
         "instances delete %s" % ' '.join(env.hostnames),
@@ -228,8 +233,8 @@ def init():
     env.hosts = []
     env.roles = {}
     config = Configuration.load()
-    # apply old config only if appropriate
-    if  config and config.config['project_name'] == conf['project_name'] and config.config['prefix'] == conf['prefix']:
+    # apply old config
+    if config:
         globals()['conf'] = config.config
     else:
         config = create_config()
