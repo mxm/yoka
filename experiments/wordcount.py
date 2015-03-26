@@ -88,7 +88,7 @@ class StreamingWordCount(Experiment):
             run_jar("%s/flink-staging/flink-streaming/flink-streaming-examples/target/" % get_flink_path(),
                     "flink-streaming-*WordCount.jar",
                     args = [self.wordcount_in, self.wordcount_out],
-                    clazz = "org.apache.flink.streaming.examples.java.wordcount.WordCount")
+                    clazz = "org.apache.flink.streaming.examples.wordcount.WordCount")
         master(code)
 
     def shutdown(self):
