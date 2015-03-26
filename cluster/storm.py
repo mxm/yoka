@@ -23,7 +23,7 @@ def install():
 def configure():
     # config
     context = conf.copy()
-    context['zookeeper'] = [{'server': address} for address in env.hosts[0:conf['num_zookeeper_instances']]]
+    context['zookeeper'] = [{'server': address} for address in env.hostnames[0:conf['num_zookeeper_instances']]]
     context['master'] = env.master
     destination = "%s/%s" % (PATH, "conf")
     process_template("storm", "storm.yaml.mustache", context, destination)
