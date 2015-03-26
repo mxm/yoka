@@ -17,10 +17,8 @@ def install():
     run("rm -rf '%s'" % PATH)
     run("git clone %s %s" % (conf['git_repository'], PATH))
 
-@task
-@roles('master')
 def get_flink_path():
-    return run("%s;pwd" % PATH)
+    return PATH
 
 @task
 @roles('master')

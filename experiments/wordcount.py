@@ -4,7 +4,7 @@ from cluster.maintenance import install
 from cluster.utils import master, render_template, exec_bash
 from cluster.hadoop import copy_to_hdfs, delete_from_hdfs
 
-from cluster.flink import run_jar, get_flink_dist_path
+from cluster.flink import run_jar, get_flink_dist_path, get_flink_path
 from cluster.hadoop import get_hdfs_address
 
 from core.utils import GitRepository
