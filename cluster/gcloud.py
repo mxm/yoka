@@ -62,8 +62,7 @@ class Configuration(object):
 
     def get_id_dict(self):
         # dictionary which gives each slave an id
-        ids = {}
-        ids[self.get_master_ip()] = 0
+        ids = {self.get_master_ip(): 0}
         for (slave_id, slave) in enumerate(self.get_slave_ips()):
             ids[slave] = slave_id+1
         return ids

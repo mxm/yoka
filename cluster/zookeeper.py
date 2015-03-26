@@ -30,7 +30,7 @@ def pull():
 def configure():
     # config
     context = conf.copy()
-    context['server'] = [{'i': get_slave_id(name), 'name': name} for name in env.slaves + [env.master]]
+    context['server'] = [{'i': i, 'name': name} for i, name in enumerate(env.hosts)]
     destination = "%s/%s" % (PATH, "conf")
     process_template("zookeeper", "zoo.cfg.mustache", context, destination)
     # data dir
