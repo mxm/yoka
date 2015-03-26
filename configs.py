@@ -148,7 +148,7 @@ email_config = {
     'smtp_port' : 587,
     'smtp_account' : "iamthemailer@gmail.com",
     'smtp_password' : '',
-    'addresses' : ["max@data-artisans.com"],
+    'addresses' : ["max@data-artisans.com", "marton@data-artisans.com"],
     'subject' : "Performance test results",
     'text' : "Here are the results."
 }

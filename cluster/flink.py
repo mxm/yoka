@@ -19,6 +19,11 @@ def install():
 
 @task
 @roles('master')
+def get_flink_path():
+    return run("%s;pwd" % PATH)
+
+@task
+@roles('master')
 def get_flink_dist_path(yarn=False):
     if yarn:
         return run("cd %s/flink-dist/target/flink*/flink-yarn*/;pwd" % PATH)

@@ -8,7 +8,7 @@ from core.systems import Hadoop, Flink
 from configs import compute_engine_config, hadoop_config, flink_config
 
 # import experiment's main class
-from experiments.wordcount import WordCount
+from experiments.wordcount import WordCount, StreamingWordCount
 from experiments.grep import Grep
 from experiments.als import ALS
 from experiments.avro import Avro
@@ -91,6 +91,14 @@ benchmarks = [
         experiment = WordCount(),
         times = 3
     ),
+
+    Benchmark(
+        id = "StreamingWordCount",
+        systems = [flink],
+        experiment = StreamingWordCount(),
+        times = 3
+    ),
+
 
     Benchmark(
         id = "Grep",
