@@ -62,9 +62,12 @@ class Configuration(object):
 
     def get_id_dict(self):
         # dictionary which gives each slave an id
-        ids = {self.get_master_ip(): 0}
+        max = 0
+        ids = {}
         for (slave_id, slave) in enumerate(self.get_slave_ips()):
-            ids[slave] = slave_id+1
+            ids[slave] = slave_id
+            max = slave_id
+        ids[self.get_master_ip()] = max + 1
         return ids
 
     def save(self):
