@@ -9,8 +9,6 @@ from cluster.hadoop import get_hdfs_address
 
 from core.utils import GitRepository
 
-from time import time
-
 from fabric.api import env
 
 class WordCountFromJar(Experiment):
@@ -58,16 +56,15 @@ class WordCount(Experiment):
         pass
 
     def setup(self):
-        pass
+        self.wordcount_in = "%s/text" % get_hdfs_address()
+        self.wordcount_out = "%s/tmp/wc_out" % get_hdfs_address()
 
     def run(self):
-        wordcount_in = "%s/text" % get_hdfs_address()
-        self.wordcount_out = "%s/tmp/wc_out_%d" % (get_hdfs_address(), int(time()))
 
         def code():
             run_jar("%s/examples/" % get_flink_dist_path(),
                     "flink-java-*WordCount.jar",
-                    args = [wordcount_in, self.wordcount_out],
+                    args = [self.wordcount_in, self.wordcount_out],
                     clazz = "org.apache.flink.examples.java.wordcount.WordCount")
         master(code)
 
@@ -82,21 +79,21 @@ class StreamingWordCount(Experiment):
         pass
 
     def setup(self):
-        pass
+        self.wordcount_in = "%s/text" % get_hdfs_address()
+        self.wordcount_out = "%s/tmp/wc_out" % get_hdfs_address()
 
     def run(self):
-        wordcount_in = "%s/text" % get_hdfs_address()
-        self.wordcount_out = "%s/tmp/str_wc_out_%d" % (get_hdfs_address(), int(time()))
 
         def code():
             run_jar("%s/flink-staging/flink-streaming/flink-streaming-examples/target/" % get_flink_path(),
                     "flink-streaming-*WordCount.jar",
-                    args = [wordcount_in, self.wordcount_out],
+                    args = [self.wordcount_in, self.wordcount_out],
                     clazz = "org.apache.flink.streaming.examples.java.wordcount.WordCount")
         master(code)
 
     def shutdown(self):
         master(lambda: delete_from_hdfs(self.wordcount_out))
+
 
 class DataFlowExperiment(Experiment):
     repo = GitRepository("https://github.com/mxm/flink-dataflow.git", "dataflow-repo")
@@ -133,8 +130,8 @@ class DataFlowWordCount(DataFlowExperiment):
 class FlinkWordCount(DataFlowExperiment):
     """
         Either implicit or explicit Flink WordCount for comparison with Google Dataflow API.
-        In the implicit version, the combiner is not specified, in the explicit case, a custom
-        combiner is specified.
+        In the implicit version, the combiner is specified in the GroupReduceFunction. In the explicit
+        case, a custom combiner via GroupCombine is specified.
     """
     implicit_clazz = "com.dataartisans.flink.dataflow.examples.FlinkWordCountImplicitCombine"
     explicit_clazz = "com.dataartisans.flink.dataflow.examples.FlinkWordCountExplicitCombine"
