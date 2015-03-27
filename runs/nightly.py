@@ -56,7 +56,19 @@ generators = {
             systems = [flink],
             experiment = generators.Text(
                 size_gb = 150, # 5gb * 10 nodes * 3
-                dop = dop
+                dop = dop,
+                path = "/text"
+            )
+        ),
+
+    'text2':
+        Generator(
+            id = "TextGenerator2",
+            systems = [flink],
+            experiment = generators.Text(
+                size_gb = 10, # 10gb
+                dop = dop,
+                path = "/text2"
             )
         ),
 
@@ -94,7 +106,7 @@ benchmarks = [
 
     Benchmark(
         id = "StreamingWordCount",
-        systems = [flink],
+        systems = [flink_als],
         experiment = StreamingWordCount(),
         times = 3
     ),

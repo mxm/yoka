@@ -19,13 +19,14 @@ class Text(FlinkPerf):
      long finalSizeGB = Integer.valueOf(args[2]);
     """
 
-    def __init__(self, size_gb, dop, git_branch="master"):
+    def __init__(self, size_gb, dop, git_branch="master", path="/text"):
         self.dop = dop
         self.size_gb = size_gb
         self.git_branch = git_branch
+        self.path = path
 
     def setup(self):
-        self.out_path = get_hdfs_address() + "/text"
+        self.out_path = get_hdfs_address() + self.path
 
         self.repo.clone()
         self.repo.checkout(self.git_branch)
