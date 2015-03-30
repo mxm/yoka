@@ -24,8 +24,13 @@ storm.zookeeper.servers:
 nimbus.host: "{{master}}"
 #
 storm.local.dir: "{{local_dir}}"
-# 
-# 
+#
+supervisor.slots.ports:
+{{#supervisor_slots}}
+  - {{slot}}
+{{/supervisor_slots}}
+#
+#
 # ##### These may optionally be filled in:
 #    
 ## List of custom serializations

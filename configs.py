@@ -136,6 +136,7 @@ storm_config = {
     'source' : "http://ftp.halifax.rwth-aachen.de/apache/storm/apache-storm-0.9.3/apache-storm-0.9.3.tar.gz",
     'num_zookeeper_instances' : zookeeper_config['num_instances'],
     'local_dir' : "/tmp/storm/data",
+    'num_supervisor_slots': 2,
 }
 
 

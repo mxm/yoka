@@ -25,6 +25,7 @@ def configure():
     context = conf.copy()
     context['zookeeper'] = [{'server': address} for address in env.hostnames[0:conf['num_zookeeper_instances']]]
     context['master'] = env.master
+    context['supervisor_slots'] = [{'slot': 6700 + i} for i in range(conf['num_supervisor_slots'])]
     destination = "%s/%s" % (PATH, "conf")
     process_template("storm", "storm.yaml.mustache", context, destination)
 
