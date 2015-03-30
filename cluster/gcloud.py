@@ -195,7 +195,6 @@ def delete_instances(prompt=False):
         "-q"
     ).execute()
     Configuration.delete()
-    init()
 
 @task
 def create_config():
