@@ -122,6 +122,7 @@ def copy_log_master(dest_path, yarn=False):
 
 @task
 @roles('slaves')
+@parallel
 def copy_log_slaves(dest_path, yarn=False):
     path = get_flink_dist_path(yarn) + "/log"
     log_file = "flink-*-taskmanager-*"
