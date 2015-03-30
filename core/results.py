@@ -153,35 +153,48 @@ def gen_plot(suite_id):
         suite_uids = [uid for (uid,) in c.fetchall()]
         num_suits = len(suite_uids)
         # plot all benchmarks in one plot, share both axes
-        figure, axes = plt.subplots(num_benchmarks, sharex=True, sharey=True, figsize=(2*num_suits,2*num_benchmarks))
+        step_len = 2
+        figure, axes = plt.subplots(num_benchmarks, sharex=True, sharey=True,
+                                    figsize=(step_len*num_suits, step_len*num_benchmarks))
         for i, bench_id in enumerate(bench_ids):
             axes[i].autoscale_view()
             axes[i].set_title(bench_id)
             axes[i].set_xlabel('date')
             axes[i].set_ylabel('run time (minutes)')
+            # labels on both sides and top
+            axes[i].tick_params(labeltop=False, labelright=True)
         # plot each benchmark (if it exists) for each suite execution
         x = 0
         for (i, suite_uid) in enumerate(suite_uids):
             # select all run times for each suite execution
-            for (bindex, bench_id) in enumerate(bench_ids):
+            for (index, bench_id) in enumerate(bench_ids):
                 # select data for this suite id and bench id
                 c.execute("select duration, failed from results where bench_id=? and suite_uid=?", (bench_id, suite_uid))
                 results = c.fetchall()
                 if not results:
-                    continue
-                maxwidth = 0.8
-                width = maxwidth/len(results)
-                for (ind, (time, failed)) in enumerate(results):
-                    pos = x - (float(ind)/len(results)) + width
-                    if failed:
-                        axes[bindex].text(pos, 1, "failed", color="red", rotation=90, verticalalignment="bottom")
+                    # plot a "no data" notice
+                    results = [(0, -1)]
+                bar_space = float(min(1.5, step_len)) # use max 1.5 of space for ALL results
+                width = bar_space / len(results)
+                pos = x + (step_len - bar_space)/2
+                for (ind, (duration, failed)) in enumerate(results):
+                    if failed == 1:
+                        # benchmark failed
+                        axes[index].text(pos+width/2, 1, "failed", color="red", rotation=90,
+                                          verticalalignment="bottom", horizontalalignment="center")
+                    elif failed == -1:
+                        # no data
+                        axes[index].text(pos+width/2, 1, "no data", color="blue",
+                                          verticalalignment="bottom", horizontalalignment="center")
                     else:
-                        time /= 60
-                        axes[bindex].bar(pos, time, width=width, alpha=0.8, color="green")
-            x += 2
+                        # plot run time
+                        duration /= 60
+                        axes[index].bar(pos, duration, width=width, alpha=0.8, color="green", align="edge")
+                    pos += width
+            x += step_len
         # construct labels, convert suite_uid to timestamp
         labels = [datetime.datetime.fromtimestamp(int(s.split("_")[-1])).strftime("%d.%m.%Y") for s in suite_uids]
-        plt.setp(axes, xticks=range(0, len(labels)*2, 2), xticklabels=labels)
+        plt.setp(axes, xticks=range(step_len/2, len(labels)*step_len, step_len), xticklabels=labels)
         # rest
         figure.autofmt_xdate()
         figure.tight_layout()
