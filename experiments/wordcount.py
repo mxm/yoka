@@ -94,6 +94,28 @@ class StreamingWordCount(Experiment):
     def shutdown(self):
         master(lambda: delete_from_hdfs(self.wordcount_out))
 
+class WindowWordCount(Experiment):
+    """params: <text path> <result path>"""
+
+    def __init__(self):
+        pass
+
+    def setup(self):
+        self.wordcount_in = "%s/text" % get_hdfs_address()
+        self.wordcount_out = "%s/tmp/wc_out" % get_hdfs_address()
+
+    def run(self):
+
+        def code():
+            run_jar("%s/flink-staging/flink-streaming/flink-streaming-examples/target/" % get_flink_path(),
+                    "flink-streaming-*-WindowWordCount.jar",
+                    args = [self.wordcount_in, self.wordcount_out],
+                    clazz = "org.apache.flink.streaming.examples.windowing.WindowWordCount")
+        master(code)
+
+    def shutdown(self):
+        master(lambda: delete_from_hdfs(self.wordcount_out))
+
 
 class DataFlowExperiment(Experiment):
     repo = GitRepository("https://github.com/mxm/flink-dataflow.git", "dataflow-repo")
