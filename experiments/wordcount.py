@@ -101,7 +101,7 @@ class WindowWordCount(Experiment):
         pass
 
     def setup(self):
-        self.wordcount_in = "%s/text" % get_hdfs_address()
+        self.wordcount_in = "%s/text2" % get_hdfs_address()
         self.wordcount_out = "%s/tmp/wc_out" % get_hdfs_address()
 
     def run(self):
