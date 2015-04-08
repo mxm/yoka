@@ -80,5 +80,7 @@ class Prompt(object):
         self.expected = expected
 
     def prompt(self):
-        input = raw_input(self.message)
-        return input == self.expected
+        while True:
+            input = raw_input(self.message)
+            if input:
+                return input.lower() == self.expected
