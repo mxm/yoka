@@ -154,7 +154,7 @@ def gen_plot(suite_id):
         num_suits = len(suite_uids)
         # plot all benchmarks in one plot, share both axes
         step_len = 2
-        figure, axes = plt.subplots(num_benchmarks, sharex=True, sharey=True,
+        figure, axes = plt.subplots(num_benchmarks, sharex=True, sharey=False,
                                     figsize=(step_len*num_suits, step_len*num_benchmarks))
         for i, bench_id in enumerate(bench_ids):
             axes[i].autoscale_view()
