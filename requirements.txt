@@ -1,2 +1,2 @@
-fabric
-pystache
+fabric==1.10.1
+pystache==0.5.4
