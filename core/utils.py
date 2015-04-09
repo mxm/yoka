@@ -1,4 +1,5 @@
 from time import time
+from sys import stdout
 import types, datetime
 from functools import wraps
 
@@ -73,14 +74,23 @@ class Timer(object):
                  % (description, time, seconds // 3600, seconds // 60 % 60, seconds % 60)
         return s
 
+
 class Prompt(object):
 
+    """
+        A simple class to ask the user a question.
+    """
     def __init__(self, message, expected=""):
         self.message = message
         self.expected = expected
 
     def prompt(self):
         while True:
-            input = raw_input(self.message)
-            if input:
-                return input.lower() == self.expected
+            print self.message, "(enter '" + self.expected + "' to confirm.)"
+            stdout.flush()
+            try:
+                input = raw_input()
+                if input:
+                    return input.lower() == self.expected.lower()
+            except EOFError:
+                return False
