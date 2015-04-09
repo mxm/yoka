@@ -161,34 +161,45 @@ class ClusterSuite(Experiment):
         self.run_times.clear()
 
     @Timer(run_times, "Setup")
-    def setup(self):
-        # first set up cluster
-        self.cluster.setup()
-        # aggregate all unique systems
-        all_systems = set()
-        # systems of cluster suite
-        for system in self.systems:
-            all_systems.add(system)
-        # systems for generators
-        for generator in self.generators:
-            for system in generator.systems:
-                all_systems.add(system)
-        # systems of benchmarks
-        for benchmark in self.benchmarks:
-            for system in benchmark.systems:
-                all_systems.add(system)
-        # install & configure unique systems
-        for i, system in enumerate(all_systems):
-            # install path
-            system.path = "%s/%s-%d" % (self.cluster.working_dir, system, i)
-            # TODO retry in case of errors (e.g. git clone fails)
-            system.install()
-            system.configure()
-        # start systems that run once per cluster suite
-        for system in all_systems:
-            if system.once_per_suite:
-                system.start()
-        sleep(sleep_time)
+    def setup(self, retry_setup=0):
+        # setup cluster
+        for run_id in range(1, retry_setup+2):
+            try:
+                logger.info("Setting up cluster")
+                # first set up cluster
+                self.cluster.setup()
+                # aggregate all unique systems
+                all_systems = set()
+                # systems of cluster suite
+                for system in self.systems:
+                    all_systems.add(system)
+                # systems for generators
+                for generator in self.generators:
+                    for system in generator.systems:
+                        all_systems.add(system)
+                # systems of benchmarks
+                for benchmark in self.benchmarks:
+                    for system in benchmark.systems:
+                        all_systems.add(system)
+                # install & configure unique systems
+                for i, system in enumerate(all_systems):
+                    # install path
+                    system.path = "%s/%s-%d" % (self.cluster.working_dir, system, i)
+                    # TODO retry in case of errors (e.g. git clone fails)
+                    system.install()
+                    system.configure()
+                # start systems that run once per cluster suite
+                for system in all_systems:
+                    if system.once_per_suite:
+                        system.start()
+                sleep(sleep_time)
+            except:
+                logger.exception("Failed to set up cluster for the %d/%d time." % (run_id, retry_setup+1))
+                self.shutdown()
+            else:
+                break
+            if run_id == retry_setup+1:
+                raise ClusterSetupException("Failed to set up cluster after %d times." % (retry_setup+1,))
 
     @Timer(run_times, "Data generation")
     def generate(self):
@@ -246,31 +257,23 @@ class ClusterSuite(Experiment):
     def shutdown(self):
         for system in self.systems:
             if system.once_per_suite:
-                system.stop()
-        self.cluster.shutdown()
+                try:
+                    system.stop()
+                except:
+                    logger.exception("Failed to shutdown system")
+        try:
+            self.cluster.shutdown()
+        except:
+            logger.exception("Failed to shutdown cluster")
 
 
     def execute(self, retry_setup=0, ignore_failures=True,
                 shutdown_on_success=True, shutdown_on_failure=True,
                 email_results=False):
+        self.setup(retry_setup)
         # catch all critical exceptions and shutdown server
         run_failure = False
         try:
-            # setup cluster
-            for run_id in range(1, retry_setup+2):
-                try:
-                    logger.info("Setting up cluster")
-                    self.setup()
-                except:
-                    logger.exception("Failed to set up cluster for the %d/%d time." % (run_id, retry_setup+1))
-                    try:
-                        self.shutdown()
-                    except:
-                        pass
-                else:
-                    break
-                if run_id == retry_setup+1:
-                    raise ClusterSetupException("Failed to set up cluster after %d times." % (retry_setup+1,))
             # run generators and benchmarks
             try:
                 # generate data
@@ -288,12 +291,12 @@ class ClusterSuite(Experiment):
             # shutdown
             if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
                 logger.info("Shutting down cluster")
-                try:
-                    self.shutdown()
-                except:
-                    pass
-        # generate and send results
+                self.shutdown()
         # TODO this can fail if run_failure is True but not generating any results is bad for debugging
+        self.gen_results(email_results)
+
+    def gen_results(self, email_results=False):
+        # generate and send results
         filename = None
         report = ""
         try:
