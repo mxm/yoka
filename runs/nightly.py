@@ -46,7 +46,7 @@ hadoop = Hadoop(hadoop_config)
 flink = Flink(flink_config)
 flink_als = Flink(flink_als_config)
 
-systems = [hadoop, flink]
+systems = [hadoop]
 
 generators = {
 
@@ -150,3 +150,7 @@ suite = ClusterSuite("NightlySuite", cluster, systems, generators.values(), benc
 suite.execute(retry_setup=0,
               shutdown_on_failure=True,
               email_results=True)
+
+env = ExecutionEnvironment()
+
+env.register(suite)

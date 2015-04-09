@@ -31,9 +31,10 @@ rotateLogFile() {
 }
 
 printUsage(){
-    echo "usage: yoka [run <run_name> | shutdown | serve ]"
+    echo "usage: yoka [run <run_name> | resume <run_name> | shutdown <run_name> | serve ]"
     echo "    run - runs a run file with performance tests"
-    echo "    shutdown - shuts down a cloud experiment (if still running)"
+    echo "    resume - resumes a run file with performance tests"
+    echo "    shutdown - shuts down a cloud experiment"
     echo "    serve - opens a http server to serve the results directory"
 }
 

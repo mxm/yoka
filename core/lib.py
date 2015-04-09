@@ -3,7 +3,7 @@ from pprint import pformat
 
 import os
 
-from utils import Timer
+from utils import Timer, Prompt
 
 import results
 
@@ -204,6 +204,7 @@ class ClusterSuite(Experiment):
     @Timer(run_times, "Data generation")
     def generate(self):
         # generate data
+        logger.info("Generating data")
         for generator in self.generators:
             generator.setup()
             generator.run()
@@ -212,6 +213,7 @@ class ClusterSuite(Experiment):
     @Timer(run_times, "Benchmark")
     def run(self, ignore_failures=False):
         # execute benchmarks
+        logger.info("Running benchmarks")
         for benchmark in self.benchmarks:
             # in case this class got reused
             benchmark.runs = []
@@ -255,6 +257,7 @@ class ClusterSuite(Experiment):
 
     @Timer(run_times, "Shutdown")
     def shutdown(self):
+        logger.info("Shutting down cluster")
         for system in self.systems:
             if system.once_per_suite:
                 try:
@@ -277,10 +280,8 @@ class ClusterSuite(Experiment):
             # run generators and benchmarks
             try:
                 # generate data
-                logger.info("Generating data")
                 self.generate()
                 # run benchmarks
-                logger.info("Running benchmarks")
                 self.run(ignore_failures)
             except:
                 logger.exception("Exception trying to run suite %s" % self.id)
@@ -290,13 +291,13 @@ class ClusterSuite(Experiment):
         finally:
             # shutdown
             if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
-                logger.info("Shutting down cluster")
                 self.shutdown()
         # TODO this can fail if run_failure is True but not generating any results is bad for debugging
         self.gen_results(email_results)
 
     def gen_results(self, email_results=False):
         # generate and send results
+        logger.info("Generating results.")
         filename = None
         report = ""
         try:
@@ -322,6 +323,19 @@ class ClusterSuite(Experiment):
             except:
                 logger.exception("Failed to send results.")
 
+
+    # TODO resume this suite
+    def resume(self):
+        setup = False
+        generation = False
+        run = False
+        if Prompt("Resume setup of cluster?", "y").prompt():
+            self.setup()
+        if Prompt("Resume generation?", "y").prompt():
+            self.generate()
+        if Prompt("Resume benchmark runs?", "y").prompt():
+            self.run()
+
     def __str__(self):
         # print run times
         s = "Cluster suite %s\n\n" % self.id
@@ -336,3 +350,17 @@ class ClusterSuite(Experiment):
         for benchmark in self.benchmarks:
             s += "%s\n\n" % benchmark
         return s
+
+
+class ExecutionEnvironment(object):
+
+    class SuiteAction(object):
+        def __init__(self, suite, action):
+            self.suite = suite
+            self.action = action
+
+    def __init__(self):
+        self.suite_actions = []
+
+    def register(self, suite, action, **kargs):
+        self.suite_actions.append(self.SuiteAction(suite, action))

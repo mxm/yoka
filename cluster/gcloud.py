@@ -215,8 +215,7 @@ def create_config():
         else:
             slaves[name] = ip
     config = Configuration(conf, master, slaves)
-    config.save()
-    return Configuration.load()
+    return config
 
 def get_master_hostname():
     return conf['prefix'] + "master"
@@ -234,11 +233,7 @@ def init():
     env.hosts = []
     env.roles = {}
     config = Configuration.load()
-    # apply old config
-    if config:
-        globals()['conf'] = config.config
-    else:
-        config = create_config()
+    config = create_config()
     ips = config.get_ips()
     hostnames = config.get_hostnames()
     master_ip = config.get_master_ip()
