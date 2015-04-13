@@ -1,7 +1,7 @@
 from time import sleep, time
 from pprint import pformat
 
-import os
+import os, re
 
 from utils import Timer
 
@@ -230,7 +230,7 @@ class ClusterSuite(Experiment):
                         pass
                 # get system logs
                 log_paths = {}
-                for system in self.systems:
+                for system in benchmark.systems:
                     unique_full_path = "results/logs/%s/%s/%d/%s" % (
                                         self.uid,
                                         benchmark.id,
@@ -240,6 +240,19 @@ class ClusterSuite(Experiment):
                     os.makedirs(unique_full_path)
                     system.save_log(unique_full_path)
                     log_paths[system] = unique_full_path
+                    # check log for exceptions
+                    if not failed:
+                        try:
+                            for filename in os.listdir(unique_full_path):
+                                with open(unique_full_path + "/" + filename) as file:
+                                    for number, line in enumerate(file):
+                                        if re.search("(error|exception)", line, flags=re.IGNORECASE):
+                                            logger.info("Error detected in line %d:\n%s" % (number, line))
+                                            # for now, just fail the benchmark an error has been detected
+                                            failed = True
+                                            break
+                        except:
+                            logger.exception("Failed to scan log for errors.")
                 # keep list of results (make copy!)
                 benchmark.runs.append(benchmark.run_times.copy())
                 # save current result immediately
