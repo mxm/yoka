@@ -292,14 +292,17 @@ class ClusterSuite(Experiment):
                 # generate data
                 logger.info("Generating data")
                 self.generate()
-                # run benchmarks
-                logger.info("Running benchmarks")
-                self.run(ignore_failures)
             except:
-                logger.exception("Exception trying to run suite %s" % self.id)
+                logger.exception("Exception trying to generate data for suite %s" % self.id)
                 run_failure = True
             else:
-                run_failure = False
+                try:
+                    # run benchmarks
+                    logger.info("Running benchmarks")
+                    self.run(ignore_failures)
+                except:
+                    logger.exception("Exception trying to run suite %s" % self.id)
+                    run_failure = True
         finally:
             # shutdown
             if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
