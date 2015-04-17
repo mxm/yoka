@@ -62,6 +62,18 @@ class Timer(object):
                 self.timings[method.__name__] = value
 
         return timing
+
+    @staticmethod
+    def get_run_times(run_time_dict, key):
+        try:
+            # safely get the main method's run time
+            # if an exception occurred in the main method, it will be available
+            _description, start_time, duration = run_time_dict[key]
+        except:
+            # if an exception occurred in the setup, it will not be available
+            start_time = 0
+            duration = 0
+        return start_time, duration
     
     @staticmethod
     def format_run_times(run_times):

@@ -115,7 +115,7 @@ class TestResults(unittest.TestCase):
 
     def setUp(self):
         try:
-            os.remove(results.DB_FILE)
+            os.remove(results.RESULTS_DIR + "/" +results.DB_FILE)
         except:
             pass
 
@@ -125,15 +125,14 @@ class TestResults(unittest.TestCase):
         suite.execute()
         #check corresponding db entries
         suite_id = suite.id
-        suite_uid = suite.uid
         for b in suite.benchmarks:
-            data = (suite_uid, suite_id, b.id)
+            data = (suite_id, b.id)
             with results.DB() as db:
                 c = db.cursor()
                 c.execute("""
-                SELECT * FROM results
-                WHERE suite_uid = ? and suite_id = ? and
-                bench_id = ?
+                SELECT * FROM runs
+                join suites s
+                WHERE s.name = ? and s.id = suite_id and bench_name = ?
                 """, data)
                 self.assertEquals(c.fetchall().__len__(), b.times)
     

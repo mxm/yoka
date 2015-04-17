@@ -151,8 +151,7 @@ class ClusterSuite(Experiment):
 
     def __init__(self, id, cluster, systems, generators, benchmarks):
         self.id = id
-        # generate unique cluster id
-        self.uid = "%s_%d" % (id, int(time()))
+        self.start_time = int(time())
         self.cluster = cluster
         self.systems = systems
         self.generators = generators
@@ -199,6 +198,7 @@ class ClusterSuite(Experiment):
             else:
                 break
             if run_id == retry_setup+1:
+                Result(self).save(suite_failed=True)
                 raise ClusterSetupException("Failed to set up cluster after %d times." % (retry_setup+1,))
 
     @Timer(run_times, "Data generation")
@@ -231,8 +231,8 @@ class ClusterSuite(Experiment):
                 # get system logs
                 log_paths = {}
                 for system in benchmark.systems:
-                    unique_full_path = "results/logs/%s/%s/%d/%s" % (
-                                        self.uid,
+                    unique_full_path = "results/logs/%s_%d/%s/%d/%s" % (
+                                        self.id, self.start_time,
                                         benchmark.id,
                                         run_id+1,
                                         system)
@@ -257,7 +257,7 @@ class ClusterSuite(Experiment):
                 benchmark.runs.append(benchmark.run_times.copy())
                 # save current result immediately
                 result = Result(self, benchmark, log_paths)
-                result.save(failed)
+                result.save(benchmark_failed=failed)
                 # TODO this could be re-initialized somewhere else
                 # CAUTION: run_times holds the same pointer as the decorator Timer
                 #          if run_times gets reassigned, this pointer is lost
@@ -286,28 +286,27 @@ class ClusterSuite(Experiment):
         self.setup(retry_setup)
         # catch all critical exceptions and shutdown server
         run_failure = False
+        # run generators and benchmarks
         try:
-            # run generators and benchmarks
+            # generate data
+            logger.info("Generating data")
+            self.generate()
+        except:
+            logger.exception("Exception trying to generate data for suite %s" % self.id)
+            run_failure = True
+            Result(self).save(suite_failed=True)
+        else:
             try:
-                # generate data
-                logger.info("Generating data")
-                self.generate()
+                # run benchmarks
+                logger.info("Running benchmarks")
+                self.run(ignore_failures)
             except:
-                logger.exception("Exception trying to generate data for suite %s" % self.id)
+                logger.exception("Exception trying to run suite %s" % self.id)
                 run_failure = True
-            else:
-                try:
-                    # run benchmarks
-                    logger.info("Running benchmarks")
-                    self.run(ignore_failures)
-                except:
-                    logger.exception("Exception trying to run suite %s" % self.id)
-                    run_failure = True
-        finally:
-            # shutdown
-            if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
-                logger.info("Shutting down cluster")
-                self.shutdown()
+        # shutdown
+        if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
+            logger.info("Shutting down cluster")
+            self.shutdown()
         # TODO this can fail if run_failure is True but not generating any results is bad for debugging
         self.gen_results(email_results)
 
@@ -316,7 +315,7 @@ class ClusterSuite(Experiment):
         filename = None
         report = ""
         try:
-            # generate plot for suite UID
+            # generate plot for suite id
             filename = results.gen_plot(self.id)
             # TODO generate plot for suite ID
         except:
@@ -324,7 +323,7 @@ class ClusterSuite(Experiment):
         try:
             # generate report by printing us using the __str__ method
             report = "%s" % self
-            path = "results/logs/%s/report.txt" % self.uid
+            path = "results/logs/%s_%d/report.txt" % (self.id, self.start_time)
             # save report to file
             with open(path, "w") as report_file:
                 report_file.write(report)
