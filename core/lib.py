@@ -164,6 +164,7 @@ class ClusterSuite(Experiment):
     def setup(self, retry_setup=0):
         # setup cluster
         for run_id in range(1, retry_setup+2):
+            is_last_try = run_id == retry_setup+1
             try:
                 logger.info("Setting up cluster")
                 # first set up cluster
@@ -195,10 +196,11 @@ class ClusterSuite(Experiment):
                 sleep(sleep_time)
             except:
                 logger.exception("Failed to set up cluster for the %d/%d time." % (run_id, retry_setup+1))
-                self.shutdown()
+                if not is_last_try:
+                    self.shutdown()
             else:
                 break
-            if run_id == retry_setup+1:
+            if is_last_try:
                 raise ClusterSetupException("Failed to set up cluster after %d times." % (retry_setup+1,))
 
     @Timer(run_times, "Data generation")
@@ -283,26 +285,31 @@ class ClusterSuite(Experiment):
     def execute(self, retry_setup=0, ignore_failures=True,
                 shutdown_on_success=True, shutdown_on_failure=True,
                 email_results=False):
-        self.setup(retry_setup)
         # catch all critical exceptions and shutdown server
         run_failure = False
         try:
-            # run generators and benchmarks
             try:
-                # generate data
-                logger.info("Generating data")
-                self.generate()
+                self.setup(retry_setup)
             except:
-                logger.exception("Exception trying to generate data for suite %s" % self.id)
+                logger.exception("Exception trying to setup the cluster for suite %s" % self.id)
                 run_failure = True
             else:
+                # run generators and benchmarks
                 try:
-                    # run benchmarks
-                    logger.info("Running benchmarks")
-                    self.run(ignore_failures)
+                    # generate data
+                    logger.info("Generating data")
+                    self.generate()
                 except:
-                    logger.exception("Exception trying to run suite %s" % self.id)
+                    logger.exception("Exception trying to generate data for suite %s" % self.id)
                     run_failure = True
+                else:
+                    try:
+                        # run benchmarks
+                        logger.info("Running benchmarks")
+                        self.run(ignore_failures)
+                    except:
+                        logger.exception("Exception trying to run suite %s" % self.id)
+                        run_failure = True
         finally:
             # shutdown
             if (not run_failure and shutdown_on_success) or (run_failure and shutdown_on_failure):
