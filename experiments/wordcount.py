@@ -179,3 +179,54 @@ class FlinkWordCount(DataFlowExperiment):
 
     def shutdown(self):
         master(lambda: delete_from_hdfs(self.wordcount_out))
+
+class StreamingDataFlowExperiment(Experiment):
+    repo = GitRepository("https://github.com/mbalassi/flink-dataflow.git", "dataflow-repo")
+
+class WindowWordCountFlinkDataFlow(StreamingDataFlowExperiment):
+
+    def __init__(self):
+        pass
+
+    def setup(self):
+        self.repo.clone()
+        self.repo.checkout("perf")
+        self.repo.maven("clean package -DskipTests")
+
+    def run(self):
+        wordcount_in = "%s/text" % get_hdfs_address()
+        self.wordcount_out = "%s/tmp/wc_out" % get_hdfs_address()
+
+        def code():
+            run_jar("%s/target/" % self.repo.get_absolute_path(),
+                    "flink-dataflow-*-SNAPSHOT.jar",
+                    args = [wordcount_in, self.wordcount_out],
+                    clazz = "com.dataartisans.flink.dataflow.examples.StreamingPipeline")
+        master(code)
+
+    def shutdown(self):
+        master(lambda: delete_from_hdfs(self.wordcount_out))
+
+class WindowWordCountGoogleDataFlow(StreamingDataFlowExperiment):
+
+    def __init__(self):
+        pass
+
+    def setup(self):
+        self.repo.clone()
+        self.repo.checkout("perf")
+        self.repo.maven("clean package -DskipTests")
+
+    def run(self):
+        wordcount_in = "%s/text" % get_hdfs_address()
+        self.wordcount_out = "%s/tmp/wc_out" % get_hdfs_address()
+
+        def code():
+            run_jar("%s/target/" % self.repo.get_absolute_path(),
+                    "flink-dataflow-*-SNAPSHOT.jar",
+                    args = [wordcount_in, self.wordcount_out],
+                    clazz = "com.dataartisans.flink.dataflow.GoogleStreamingPipeline.examples")
+        master(code)
+
+    def shutdown(self):
+        master(lambda: delete_from_hdfs(self.wordcount_out))
