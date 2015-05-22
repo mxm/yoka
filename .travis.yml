@@ -4,8 +4,16 @@ sudo: false
 
 install: true
 
+matrix:
+  include:
+    - python: "2.7"
+      env: PLOTTING="with_plotting"
+      
+    - python: "2.7"
+      env: PLOTTING=""
+      
 before_script:
-    - "./install"
+    - "./install with_plotting $PLOTTING"
     - "source env/bin/activate"
 
 script: "python tests.py"
