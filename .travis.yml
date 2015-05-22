@@ -1,0 +1,11 @@
+language: python
+
+sudo: false
+
+install: true
+
+before_script:
+    - "./install"
+    - "source env/bin/activate"
+
+script: "python tests.py"
