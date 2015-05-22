@@ -13,7 +13,7 @@ matrix:
       env: PLOTTING=""
       
 before_script:
-    - "./install with_plotting $PLOTTING"
+    - "./install $PLOTTING"
     - "source env/bin/activate"
 
 script: "python tests.py"
