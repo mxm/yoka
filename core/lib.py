@@ -282,7 +282,7 @@ class ClusterSuite(Experiment):
             logger.exception("Failed to shutdown cluster")
 
 
-    def execute(self, retry_setup=0, ignore_failures=True,
+    def execute(self, retry_setup=0, ignore_benchmark_failures=True,
                 shutdown_on_success=True, shutdown_on_failure=True,
                 email_results=False):
         # catch all critical exceptions and shutdown server
@@ -306,7 +306,7 @@ class ClusterSuite(Experiment):
                     try:
                         # run benchmarks
                         logger.info("Running benchmarks")
-                        self.run(ignore_failures)
+                        self.run(ignore_benchmark_failures)
                     except:
                         logger.exception("Exception trying to run suite %s" % self.id)
                         run_failure = True
