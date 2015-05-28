@@ -285,6 +285,23 @@ class ClusterSuite(Experiment):
     def execute(self, retry_setup=0, ignore_benchmark_failures=True,
                 shutdown_on_success=True, shutdown_on_failure=True,
                 email_results=False):
+        """
+        Runs a full performance test.
+        :param retry_setup:
+        Retry up to a number of times (default: 0 => do not retry)
+        :param ignore_benchmark_failures:
+        True: Ignore failures occurring during a benchmark (but log them).
+        False: Fail the ClusterSuite on the first failure in a benchmark.
+        :param shutdown_on_success:
+        True: If no errors occurred, shutdown the cluster after running the performance test.
+        False: Leave the cluster online in a state if it was just setup.
+        :param shutdown_on_failure:
+        True: If errors occurred, shutdown the cluster immediately.
+        False: Leave cluster in error state.
+        :param email_results:
+        True: Email results using the configuration in configs.py.
+        False: Do not send an email.
+        """
         # catch all critical exceptions and shutdown server
         run_failure = False
         try:
