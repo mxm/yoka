@@ -138,12 +138,6 @@ class FlinkYarn(Flink):
     def stop(self):
         execute(flink.master, 'stop', yarn=True)
 
-    def save_log(self, unique_full_path):
-        pass
-        # TODO
-        #execute(flink.copy_log_master, unique_full_path, yarn=True)
-        #execute(flink.copy_log_slaves, unique_full_path, yarn=True)
-
     def __str__(self):
         return "flink-yarn"
 
