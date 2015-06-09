@@ -22,11 +22,8 @@ def get_flink_path():
 
 @task
 @roles('master')
-def get_flink_dist_path(yarn=False):
-    if yarn:
-        return run("cd %s/flink-dist/target/flink*/flink-yarn*/;pwd" % PATH)
-    else:
-        return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % PATH)
+def get_flink_dist_path():
+    return run("cd %s/flink-dist/target/flink*/flink*/;pwd" % PATH)
 
 @task
 @roles('master')
@@ -65,7 +62,7 @@ def create_temp_dir():
 @task
 @roles('master')
 def master(action="start", yarn=False):
-    path = get_flink_dist_path(yarn=yarn)
+    path = get_flink_dist_path()
     with cd(path):
         if not yarn:
             run('nohup bash bin/jobmanager.sh %s cluster' % action)
@@ -82,7 +79,7 @@ def master(action="start", yarn=False):
 @roles('slaves')
 @parallel
 def slaves(action="start", yarn=False):
-    path = get_flink_dist_path(yarn=yarn)
+    path = get_flink_dist_path()
     with cd(path):
         if not yarn:
             run('nohup bash bin/taskmanager.sh %s' % action)
@@ -97,13 +94,7 @@ def run_jar(path, jar_name, args, dop=None, clazz=None, upload=False):
     if upload:
         put("%s/%s" % (path, jar_name), PATH)
         path = PATH
-    # figure out if we're running Flink on YARN
-    with quiet():
-        if run("jps | grep Yarn").failed:
-            yarn = False
-        else:
-            yarn = True
-    with cd(get_flink_dist_path(yarn)):
+    with cd(get_flink_dist_path()):
         class_loader = "-c '%s'" % clazz if clazz else ""
         dop = dop if dop else get_degree_of_parallelism()
         run("bin/flink run -v -p %d %s %s/%s %s"
@@ -111,8 +102,8 @@ def run_jar(path, jar_name, args, dop=None, clazz=None, upload=False):
 
 @task
 @roles('master')
-def copy_log_master(dest_path, yarn=False):
-    path = get_flink_dist_path(yarn) + "/log"
+def copy_log_master(dest_path):
+    path = get_flink_dist_path() + "/log"
     # flink bug FLINK-1361: either jobmanager or jobManager
     log_file = "flink-*-job[Mm]anager-*"
     for extension in ["log", "out"]:
@@ -123,8 +114,8 @@ def copy_log_master(dest_path, yarn=False):
 @task
 @roles('slaves')
 @parallel
-def copy_log_slaves(dest_path, yarn=False):
-    path = get_flink_dist_path(yarn) + "/log"
+def copy_log_slaves(dest_path):
+    path = get_flink_dist_path() + "/log"
     log_file = "flink-*-taskmanager-*"
     for extension in ["log", "out"]:
         copy_log("%s/%s.%s" % (path, log_file, extension),
