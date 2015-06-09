@@ -65,7 +65,8 @@ Standard Flink config
 
 """
 flink_config = {
-    'git_repository' : "https://github.com/apache/flink.git",
+    #'git_repository' : "https://github.com/apache/flink.git",
+    'git_repository' : "https://git-wip-us.apache.org/repos/asf/flink.git",
     'git_commit' : "master",
     'num_task_slots' : 8,
     'parallelization' : 1,
