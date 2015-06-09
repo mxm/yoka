@@ -11,9 +11,11 @@ from configs import local_cluster_config as conf
 def get_slave_id_dict(master, slaves):
     # dictionary which gives each slave an id
     ids = {}
-    ids[master] = 0
+    max = 0
     for (slave_id, slave) in enumerate(slaves):
-        ids[slave] = slave_id+1
+        ids[slave] = slave_id
+        max = slave_id
+    ids[master] = max + 1
     return ids
 
 def init():

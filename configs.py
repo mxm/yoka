@@ -140,6 +140,16 @@ storm_config = {
     'num_supervisor_slots': 2,
 }
 
+"""
+Standard Kafka config
+
+"""
+kafka_config = {
+    'source' : "ftp://ftp.fu-berlin.de/unix/www/apache/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz",
+    # TODO currently has to be less or equal to the number of zookeeper instances
+    'num_instances' : 3
+}
+
 
 """
 eMail config

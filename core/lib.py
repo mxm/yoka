@@ -98,6 +98,9 @@ class System(object):
     skip_targets = []
     # path to install directory (set by cluster suite)
     path = None
+    # global priority
+    # TODO this should be changed to a dependency
+    priority = 1
 
     def __init__(self, config):
         self.config = config
@@ -190,7 +193,7 @@ class ClusterSuite(Experiment):
                     system.install()
                     system.configure()
                 # start systems that run once per cluster suite
-                for system in all_systems:
+                for system in sorted(all_systems, key=lambda system: system.priority):
                     if system.once_per_suite:
                         system.start()
                 sleep(sleep_time)

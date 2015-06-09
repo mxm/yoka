@@ -1,6 +1,6 @@
 from core.lib import System
 
-from cluster import hadoop, flink, tez, zookeeper, storm
+from cluster import hadoop, flink, tez, zookeeper, storm, kafka
 from fabric.api import execute, env
 
 from log import get_logger
@@ -146,6 +146,8 @@ class Zookeeper(System):
 
     module = zookeeper
     once_per_suite = True
+    # should be started before other systems
+    priority = -1
 
     def __init__(self, config):
         super(Zookeeper, self).__init__(config)
@@ -180,6 +182,45 @@ class Zookeeper(System):
 
     def __str__(self):
         return "zookeeper"
+
+
+class Kafka(System):
+
+    module = kafka
+    once_per_suite = True
+
+    def __init__(self, config):
+        super(Kafka, self).__init__(config)
+
+    def install(self):
+        self.set_config()
+        execute(kafka.install)
+
+    def configure(self):
+        self.set_config()
+        execute(kafka.pull)
+        execute(kafka.configure)
+
+    def reset(self):
+        pass
+
+    def start(self):
+        self.set_config()
+        for i in range(self.config['num_instances']):
+            if i < len(env.hosts):
+                execute(kafka.nodes, 'start', host=env.hosts[i])
+            else:
+                logger.error("Cannot start more kafka instances than servers.")
+
+    def stop(self):
+        self.set_config()
+        execute(kafka.nodes, 'stop')
+
+    def save_log(self, unique_full_path):
+        pass
+
+    def __str__(self):
+        return "kafka"
 
 
 class Storm(System):
