@@ -39,4 +39,4 @@ def configure():
 @parallel
 def nodes(action="start"):
     with cd(PATH):
-        run("./bin/kafka-server-%s.sh config/server.properties" % action)
+        run("nohup ./bin/kafka-server-%s.sh config/server.properties" % action)
