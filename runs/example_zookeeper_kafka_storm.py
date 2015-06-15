@@ -1,7 +1,7 @@
 from core.lib import ClusterSuite
 
 # import cluster and systems classes
-from core.clusters import Cluster
+from core.clusters import ComputeEngine
 from core.systems import Hadoop, Flink, Zookeeper, Storm, Kafka
 
 # import standard configs
@@ -18,7 +18,7 @@ compute_engine_config['size_mem'] = 7500
 compute_engine_config['num_workers'] = 10
 compute_engine_config['disk_space_gb'] = 200
 
-cluster = Cluster(compute_engine_config)
+cluster = ComputeEngine(compute_engine_config)
 hadoop = Hadoop(hadoop_config)
 
 zookeeper = Zookeeper(zookeeper_config)
