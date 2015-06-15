@@ -25,7 +25,7 @@ compute_engine_config['machine_type'] = "n1-standard-2"
 # num cores to use
 compute_engine_config['num_cores'] = 2
 compute_engine_config['size_mem'] = 7500
-# 16 workers + 1 master
+# 10 workers + 1 master
 compute_engine_config['num_workers'] = 10
 compute_engine_config['disk_space_gb'] = 200
 
