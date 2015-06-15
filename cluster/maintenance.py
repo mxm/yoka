@@ -31,6 +31,8 @@ def install_dependencies():
     install("git")
     install("curl")
     install("python2.7")
+    install("vim")
+    install("less")
 
 def find_java_home():
     return run("readlink -f /usr/bin/javac | sed 's:bin/javac::'")
