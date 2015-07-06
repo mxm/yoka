@@ -179,7 +179,8 @@ def delete_instances(prompt=False):
         print "No hostnames configured. Cannot delete instances."
         return
     if prompt:
-        ask = Prompt("Delete cluster with the following hostnames? (y/n) %s" % env.hostnames, "y")
+        ask = Prompt("Delete cluster with the following hostnames?\n%s"
+                     % '\n'.join([str(elem) for elem in env.hostnames]), "y")
         if not ask.prompt():
             return
     LocalCommand(

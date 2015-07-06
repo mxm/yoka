@@ -86,7 +86,7 @@ class Prompt(object):
 
     def prompt(self):
         while True:
-            print self.message, "(enter '" + self.expected + "' to confirm.)"
+            print self.message, "\n", "(enter '" + self.expected + "' to confirm.)"
             stdout.flush()
             try:
                 input = raw_input()
