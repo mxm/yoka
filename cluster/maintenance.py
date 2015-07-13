@@ -26,6 +26,9 @@ def install(package):
 @task
 @parallel
 def install_dependencies():
+    # fix for broken kill on debian
+    sudo("echo -e '#!/bin/bash\n\n/bin/kill -- $@' > /usr/local/bin/kill && chmod 755 /usr/local/bin/kill")
+
     install("openjdk-7-jdk")
     install("maven")
     install("git")
