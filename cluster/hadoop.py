@@ -57,6 +57,7 @@ def configure():
 @task
 @parallel
 def set_environment_variables(file="~/.profile"):
+    run("echo export PATH=$PATH:'%s'/bin >> %s" % (PATH, file))
     run("echo export HADOOP_HOME='%s' >> %s" % (PATH, file))
     run("echo export HADOOP_COMMON_HOME='%s' >> %s" % (PATH, file))
     run("echo export HADOOP_CONF_DIR='%s/etc/hadoop' >> %s" % (PATH, file))
