@@ -36,6 +36,8 @@ def install_dependencies():
     install("python2.7")
     install("vim")
     install("less")
+    install("bc")
+    install("tmux")
 
 def find_java_home():
     return run("readlink -f /usr/bin/javac | sed 's:bin/javac::'")
