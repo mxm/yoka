@@ -11,4 +11,15 @@
         <name>mapreduce.jobhistory.webapp.address</name>
         <value>{{master}}:19888</value>
     </property>
+
+    <property>
+        <name>mapreduce.map.memory.mb</name>
+        <value>{{nodemanager_max_mem}}</value>
+    </property>
+
+    <property>
+        <name>mapreduce.reduce.memory.mb</name>
+        <value>{{nodemanager_max_mem}}</value>
+    </property>
+
 </configuration>
