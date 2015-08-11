@@ -25,7 +25,8 @@ def install():
     install_pkg("bzip2")
     # modify pom.xml to build on debian
     with cd(PATH):
-        run("sed -i 's/<protobuf.version>2.5.0<\/protobuf.version>/<protobuf.version>2.4.1<\/protobuf.version>/' pom.xml")
+        if run("uname -a").__contains__("Debian"):
+            run("sed -i 's/<protobuf.version>2.5.0<\/protobuf.version>/<protobuf.version>2.4.1<\/protobuf.version>/' pom.xml")
 
 @task
 @roles('master')
@@ -53,5 +54,6 @@ def configure():
     tarball_location = get_tez_tarball_path("tez*-minimal.tar.gz")
     run("mkdir -p %s" % conf['path_client'])
     run("tar -xzf %s -C %s" % (tarball_location, conf['path_client']))
-    run("echo 'export TEZ_CONF_DIR=%s' >> ~/.profile" % path)
+    run("echo 'export TEZ_CONF_DIR=%s' >> ~/.profile" % PATH)
+    run("echo 'export TEZ_JARS=%s' >> ~/.profile" % conf['path_client'])
     run("echo 'export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:${TEZ_CONF_DIR}:${TEZ_JARS}/*:${TEZ_JARS}/lib/*' >> ~/.profile")

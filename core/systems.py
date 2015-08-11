@@ -15,6 +15,7 @@ class Hadoop(System):
 
     module = hadoop
     once_per_suite = True
+    priority = 0
 
     def __init__(self, config):
         super(Hadoop, self).__init__(config)
@@ -63,13 +64,11 @@ class Tez(System):
 
     def install(self):
         self.set_config()
-        if 'install' not in self.skip_targets:
-            execute(tez.install)
+        execute(tez.install)
 
     def configure(self):
         self.set_config()
-        if 'configure' not in self.skip_targets:
-            execute(tez.configure)
+        execute(tez.configure)
 
     def reset(self):
         pass
