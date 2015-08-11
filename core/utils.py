@@ -78,7 +78,7 @@ class Timer(object):
 class Prompt(object):
 
     """
-        A simple class to ask the user a question.
+        A simple class to ask the user a question and return True if the expected answer was given.
     """
     def __init__(self, message, expected=""):
         self.message = message
@@ -93,4 +93,23 @@ class Prompt(object):
                 if input:
                     return input.lower() == self.expected.lower()
             except EOFError:
-                return False
+                pass
+
+class MultiPrompt(object):
+
+    """
+        A simple class to ask the user a question and return the answer.
+    """
+    def __init__(self, message):
+        self.message = message
+
+    def prompt(self):
+        while True:
+            print self.message, "\n"
+            stdout.flush()
+            try:
+                input = raw_input()
+                if input:
+                    return input.lower()
+            except EOFError:
+                pass

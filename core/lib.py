@@ -2,6 +2,7 @@ from time import sleep, time
 from pprint import pformat
 
 import os, re
+from fabric.context_managers import hide
 
 from utils import Timer
 
@@ -14,6 +15,8 @@ logger = log.get_logger(__name__)
 from results import Result
 
 sleep_time = 10
+
+from fabric.api import settings
 
 class Experiment(object):
 
@@ -148,6 +151,19 @@ class Cluster(object):
 class ClusterSetupException(Exception):
     pass
 
+
+class ResumeMode(object):
+    """
+    Enum to hold the resume mode for the cluster
+
+        FULL_SETUP - install and configure systems
+        CONFIGURE - only reconfigure systems
+        RESUME - assume correct setup, do not configure, just stop benchmark systems
+    """
+    FULL_SETUP = 1
+    CONFIGURE = 2
+    RESUME = 3
+
 class ClusterSuite(Experiment):
 
     run_times = {}
@@ -171,7 +187,7 @@ class ClusterSuite(Experiment):
             try:
                 logger.info("Setting up cluster")
                 # first set up cluster
-                self.cluster.setup()
+                resume_mode = self.cluster.setup()
                 # aggregate all unique systems
                 all_systems = set()
                 # systems of cluster suite
@@ -186,16 +202,26 @@ class ClusterSuite(Experiment):
                     for system in benchmark.systems:
                         all_systems.add(system)
                 # install & configure unique systems
-                for i, system in enumerate(all_systems):
+                for i, system in enumerate(sorted(all_systems, key=lambda sys: sys.priority)):
                     # install path
                     system.path = "%s/%s-%d" % (self.cluster.working_dir, system, i)
-                    # TODO retry in case of errors (e.g. git clone fails)
-                    system.install()
-                    system.configure()
-                # start systems that run once per cluster suite
-                for system in sorted(all_systems, key=lambda system: system.priority):
-                    if system.once_per_suite:
-                        system.start()
+                    if resume_mode == ResumeMode.FULL_SETUP or resume_mode == ResumeMode.CONFIGURE:
+                        # clean up everything in case there are old processes
+                        with settings(warn_only=True), hide():
+                            system.stop()
+                        if resume_mode == ResumeMode.FULL_SETUP:
+                            system.install()
+                        system.configure()
+                        # start systems that run once per cluster suite
+                        if system.once_per_suite:
+                            system.start()
+                    elif resume_mode == ResumeMode.RESUME:
+                        # only clean up systems which are part of benchmarks and are not running all the time
+                        if not system.once_per_suite:
+                            with settings(warn_only=True), hide():
+                                system.stop()
+                    else:
+                        raise Exception("Unknown resume mode specified: "+ resume_mode)
                 sleep(sleep_time)
             except:
                 logger.exception("Failed to set up cluster for the %d/%d time." % (run_id, retry_setup+1))
