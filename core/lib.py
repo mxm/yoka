@@ -4,7 +4,7 @@ from pprint import pformat
 import os, re
 from fabric.context_managers import hide
 
-from utils import Timer
+from utils import Timer, Prompt
 
 import results
 
@@ -158,11 +158,13 @@ class ResumeMode(object):
 
         FULL_SETUP - install and configure systems
         CONFIGURE - only reconfigure systems
-        RESUME - assume correct setup, do not configure, just stop benchmark systems
+        RESTART - just restart all systems
+        RESUME - assume correct setup, do not configure, just stop any running benchmark systems
     """
     FULL_SETUP = 1
     CONFIGURE = 2
-    RESUME = 3
+    RESTART = 3
+    RESUME = 4
 
 class ClusterSuite(Experiment):
 
@@ -205,7 +207,19 @@ class ClusterSuite(Experiment):
                 for i, system in enumerate(sorted(all_systems, key=lambda sys: sys.priority)):
                     # install path
                     system.path = "%s/%s-%d" % (self.cluster.working_dir, system, i)
-                    if resume_mode == ResumeMode.FULL_SETUP or resume_mode == ResumeMode.CONFIGURE:
+                    # systems should be configured individually, ask the user here
+                    if not resume_mode:
+                        print "System %s" % system
+                        if not Prompt("%s: Simply reuse and do not stop/start/install/configure?" % system, "y").prompt():
+                            if Prompt("%s: Stop?" % system, "y").prompt():
+                                system.stop()
+                            if Prompt("%s: Install?" % system, "y").prompt():
+                                system.install()
+                            if Prompt("%s: Configure?" % system, "y").prompt():
+                                system.configure()
+                            if Prompt("%s: Start?" % system, "y").prompt() and system.once_per_suite:
+                                system.start()
+                    elif resume_mode == ResumeMode.FULL_SETUP or resume_mode == ResumeMode.CONFIGURE:
                         # clean up everything in case there are old processes
                         with settings(warn_only=True), hide():
                             system.stop()
@@ -215,11 +229,13 @@ class ClusterSuite(Experiment):
                         # start systems that run once per cluster suite
                         if system.once_per_suite:
                             system.start()
-                    elif resume_mode == ResumeMode.RESUME:
+                    elif resume_mode == ResumeMode.RESTART or resume_mode == ResumeMode.RESUME:
                         # only clean up systems which are part of benchmarks and are not running all the time
-                        if not system.once_per_suite:
+                        if resume_mode == ResumeMode.RESTART or not system.once_per_suite:
                             with settings(warn_only=True), hide():
                                 system.stop()
+                        if resume_mode == ResumeMode.RESTART and system.once_per_suite:
+                            system.start()
                     else:
                         raise Exception("Unknown resume mode specified: "+ resume_mode)
                 sleep(sleep_time)
@@ -296,6 +312,7 @@ class ClusterSuite(Experiment):
                 # raise exception if desired
                 if failed and not ignore_failures:
                     raise Exception("Exception raised in %s run %d (see logs)." % (benchmark, run_id))
+
 
     @Timer(run_times, "Shutdown")
     def shutdown(self):

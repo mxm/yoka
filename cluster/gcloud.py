@@ -161,11 +161,15 @@ def attach_disk():
 
 @task
 @parallel
-def mount_disk():
+def format_disk():
     # create partition table and partition
     sudo('echo -e "o\nn\np\n1\n\n\n\n\n\nw" | fdisk /dev/disk/by-id/google-additional-storage')
     # format partition
     sudo('mkfs -t ext4 /dev/disk/by-id/google-additional-storage-part1 >/dev/null')
+
+@task
+@parallel
+def mount_disk():
     run("mkdir -p %s" % conf['disk_mount_path'])
     # mount
     sudo("mount -t ext4 /dev/disk/by-id/google-additional-storage-part1 %s" % conf['disk_mount_path'])

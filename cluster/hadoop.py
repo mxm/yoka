@@ -46,6 +46,7 @@ def configure():
     context['slaves'] = slaves
     process_template("hadoop", "slaves.mustache", context, destination)
     # delete all data and ensure consistent state
+    # TODO check if we really need to format (in case of resume)
     execute(format_hdfs_master)
     execute(delete_data_slaves)
     # configure YARN

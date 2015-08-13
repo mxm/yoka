@@ -27,15 +27,29 @@ class ComputeEngine(Cluster):
         try:
             execute(gcloud.create_instances)
             execute(gcloud.attach_disk)
+            execute(gcloud.format_disk)
             execute(gcloud.mount_disk)
         except gcloud.ExistingInstancesException:
             resume = Prompt("Resume cluster with the following configuration? (y/n) %s" % self.config, "y")
             if not resume.prompt():
                 raise Exception("Cluster could not be createcd.")
-            resume_mode = MultiPrompt("Reuse cluster instances but fully install/configure (f), configure only (p), or assume complete setup (c),? (f/p/c)")
+
+            #if Prompt("Reattach external storage? (only say 'y' if the cluster has been shutdown before)", "y").prompt():
+            #    execute(gcloud.attach_disk)
+            if Prompt("Mount external storage? (only say 'y' if the cluster has been shutdown before)", "y").prompt():
+                execute(gcloud.mount_disk)
+
+            interactive = Prompt("Do you want to configure the resume mode for each system? (y/n)", "y")
+            if interactive.prompt():
+                # ask later when setting up the systems
+                return None
+
+            resume_mode = MultiPrompt("Reuse cluster instances but fully install/configure (f), configure only (p), restart systems (r), or assume complete setup (c),? (f/p/r/c)")
             resume_mode_answer = resume_mode.prompt()
             if resume_mode_answer == "p":
                 return ResumeMode.CONFIGURE
+            elif resume_mode_answer == "r":
+                return ResumeMode.RESTART
             elif resume_mode_answer == "c":
                 return ResumeMode.RESUME
 
