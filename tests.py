@@ -4,7 +4,7 @@ import random
 from time import sleep
 
 import core.lib
-from core.lib import Cluster, System, Experiment, Benchmark, ClusterSuite
+from core.lib import Cluster, System, Experiment, Benchmark, ClusterSuite, ResumeMode
 from core.clusters import ComputeEngine
 #from systems import Hadoop, Flink
 from configs import compute_engine_config, hadoop_config, flink_config
@@ -25,6 +25,7 @@ class StupidCluster(Cluster):
     def setup(self):
         if self.fail_setup:
             raise Exception("Dummy Exception")
+        return ResumeMode.FULL_SETUP
 
     def shutdown(self):
         if self.fail_shutdown:
