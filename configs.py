@@ -7,7 +7,7 @@ General config
 """
 config = {
     # path where system are set up
-    'working_dir' : "/tmp/yoka-dir/",
+    'working_dir' : "/home/%s/yoka-dir/",
     # path where additional storage is mounted (e.g. for hdfs)
     'storage_path' : "/home/%s/mnt" % USER,
     'size_mem' : 7500,
@@ -73,7 +73,7 @@ flink_config = {
     'taskmanager_heap' : 512,
     'jobmanager_heap' : 256,
     'taskmanager_num_buffers' : 2048,
-    'taskmanager_temp_dirs' : "%s/tmp" % config['storage_path'],
+    'taskmanager_temp_dirs' : "%s/flink_tmp" % config['storage_path'],
     'jvm_opts' : "",
     'extra_config_entries' : [
         # additional entries can be added like this:
@@ -122,7 +122,7 @@ zookeeper_config = {
     'tick_time' : 2000,
     'init_limit' : 5,
     'sync_limit' : 2,
-    'data_dir' : "/tmp/zookeeper/data",
+    'data_dir' : "%s/zookeeper/data" % config['storage_path'],
     'client_port' : 2181,
     # number of zookeeper instances to create (if enough servers available)
     'num_instances' : 3,
@@ -136,7 +136,7 @@ Standard Storm config
 storm_config = {
     'source' : "http://ftp.halifax.rwth-aachen.de/apache/storm/apache-storm-0.9.3/apache-storm-0.9.3.tar.gz",
     'num_zookeeper_instances' : zookeeper_config['num_instances'],
-    'local_dir' : "/tmp/storm/data",
+    'local_dir' : "%s/storm/data" % config['storage_path'],
     'num_supervisor_slots': 2,
 }
 
