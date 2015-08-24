@@ -43,6 +43,8 @@ def configure():
     slaves = '\n'.join(env.slaves)
     context2 = {'slaves' : slaves}
     process_template("flink", "slaves.mustache", context2, destination)
+    # update the PATH variable
+    run("echo export PATH=$PATH:'%s'/bin >> %s" % (PATH, "~/.profile"))
 
 @task
 @roles('slaves')
