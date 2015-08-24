@@ -7,7 +7,7 @@ General config
 """
 config = {
     # path where system are set up
-    'working_dir' : "/home/%s/yoka-dir/",
+    'working_dir' : "/home/%s/yoka-dir/" % USER,
     # path where additional storage is mounted (e.g. for hdfs)
     'storage_path' : "/home/%s/mnt" % USER,
     'size_mem' : 7500,
