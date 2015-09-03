@@ -127,7 +127,7 @@ class System(object):
     def stop(self):
         raise NotImplementedError()
 
-    def save_log(self, destination):
+    def save_log(self, destination_dir):
         raise NotImplementedError()
 
     def __str__(self):
@@ -285,7 +285,13 @@ class ClusterSuite(Experiment):
                                         system)
                     # create directories
                     os.makedirs(unique_full_path)
-                    system.save_log(unique_full_path)
+                    # retry at most three times to fetch the log
+                    for i in range(1, 3+1):
+                        try:
+                            system.save_log(unique_full_path)
+                            break
+                        except:
+                            logger.exception("Couldn't fetch log, trying again (%d/3)" % i)
                     log_paths[system] = unique_full_path
                     # check log for exceptions
                     if not failed:
