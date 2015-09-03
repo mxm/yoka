@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from fabric.decorators import task, roles, parallel
-from fabric.api import env, run, cd, put, quiet
+from fabric.api import env, run, cd, put, settings
 from maintenance import pull_from_master, find_java_home
 from utils import process_template, copy_log, get_slave_id
 
@@ -127,3 +127,9 @@ def copy_log_slaves(dest_path):
 def get_degree_of_parallelism():
     #return conf['num_workers'] * conf['num_cores']
     return conf['parallelization']
+
+@task
+@parallel
+def kill_taskmanager():
+    with settings(warn_only=True):
+        run("kill -9 `jps | grep TaskManager | cut -d' ' -f1`")

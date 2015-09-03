@@ -1,3 +1,4 @@
+from threading import Thread
 from time import sleep, time
 from pprint import pformat
 
@@ -43,7 +44,7 @@ class Benchmark(Experiment):
     # timings for each execution's phases
     run_times = {}
 
-    def __init__(self, id, systems, experiment, times=1):
+    def __init__(self, id, systems, experiment, times=1, fault_tolerant_systems=[]):
         # unique name of this benchmark
         self.id = id
         self.systems = systems
@@ -54,6 +55,8 @@ class Benchmark(Experiment):
         self.runs = []
         # clear the dict (if this class gets reused)
         self.run_times.clear()
+        # calls the test_fault_tolerance method of the system and tolerates exceptions in logs
+        self.fault_tolerant_systems = fault_tolerant_systems
 
     @Timer(run_times, "Setup")
     def setup(self):
@@ -64,7 +67,20 @@ class Benchmark(Experiment):
 
     @Timer(run_times, "Benchmark")
     def run(self):
-        self.experiment.run()
+        if self.fault_tolerant_systems:
+            #setup thread which may fail the system
+            fault_tolerance_thread = Thread(
+                name="fault-tolerance-thread",
+                target=self.fail_systems,
+                args=[self.fault_tolerant_systems, 30])
+            fault_tolerance_thread.start()
+        else:
+            fault_tolerance_thread = None
+        try:
+            self.experiment.run()
+        finally:
+            if fault_tolerance_thread:
+                fault_tolerance_thread.join()
 
     @Timer(run_times, "Shutdown")
     def shutdown(self):
@@ -76,6 +92,11 @@ class Benchmark(Experiment):
             system.stop()
             system.reset()
 
+    def fail_systems(self, systems, delayInSeconds):
+        sleep(delayInSeconds)
+        for system in systems:
+            system.test_fault_tolerance()
+
     def __str__(self):
         s = "%s:\n\n" % self.id
         for system in self.systems:
@@ -86,6 +107,7 @@ class Benchmark(Experiment):
             s += "\n"
         s += "\n"
         return s
+
 
 # reuse the same logic the Benchmark class
 class Generator(Benchmark):
@@ -128,6 +150,12 @@ class System(object):
         raise NotImplementedError()
 
     def save_log(self, destination_dir):
+        raise NotImplementedError()
+
+    def test_fault_tolerance(self):
+        """
+        May only be overridden if the system is fault-tolerant
+        """
         raise NotImplementedError()
 
     def __str__(self):
@@ -294,7 +322,7 @@ class ClusterSuite(Experiment):
                             logger.exception("Couldn't fetch log, trying again (%d/3)" % i)
                     log_paths[system] = unique_full_path
                     # check log for exceptions
-                    if not failed:
+                    if not failed and system not in benchmark.fault_tolerant_systems:
                         try:
                             for filename in os.listdir(unique_full_path):
                                 with open(unique_full_path + "/" + filename) as file:

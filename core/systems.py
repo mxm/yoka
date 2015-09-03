@@ -1,3 +1,5 @@
+import random
+from time import sleep
 from core.lib import System
 
 from cluster import hadoop, flink, tez, zookeeper, storm, kafka
@@ -123,6 +125,13 @@ class Flink(System):
         self.set_config()
         execute(flink.copy_log_master, unique_full_path)
         execute(flink.copy_log_slaves, unique_full_path)
+
+    def test_fault_tolerance(self):
+        self.set_config()
+        random_taskmanager = random.choice(env.roledefs['slaves'])
+        execute(flink.kill_taskmanager, host=random_taskmanager)
+        sleep(30)
+        execute(flink.slaves, "start", host=random_taskmanager)
 
     def __str__(self):
         return "flink"
