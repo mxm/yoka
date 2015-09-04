@@ -34,6 +34,7 @@ class StupidCluster(Cluster):
 class StupidSystem(System):
 
     def __init__(self, name):
+        super(StupidSystem, self).__init__(name)
         self.config = {'this': 'is_a_config', 'value': 42}
         self.name = name
         self.configured = 0

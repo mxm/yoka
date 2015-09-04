@@ -212,6 +212,7 @@ class ClusterSuite(Experiment):
     @Timer(run_times, "Setup")
     def setup(self, retry_setup=0):
         # setup cluster
+        resume_mode = ResumeMode.FULL_SETUP
         for run_id in range(1, retry_setup+2):
             is_last_try = run_id == retry_setup+1
             try:
@@ -275,6 +276,7 @@ class ClusterSuite(Experiment):
                 break
             if is_last_try:
                 raise ClusterSetupException("Failed to set up cluster after %d times." % (retry_setup+1,))
+        return resume_mode
 
     @Timer(run_times, "Data generation")
     def generate(self):
@@ -386,16 +388,16 @@ class ClusterSuite(Experiment):
         run_failure = False
         try:
             try:
-                self.setup(retry_setup)
+                resume_mode = self.setup(retry_setup)
             except:
                 logger.exception("Exception trying to setup the cluster for suite %s" % self.id)
                 run_failure = True
             else:
                 # run generators and benchmarks
                 try:
-                    # generate data
-                    logger.info("Generating data")
-                    self.generate()
+                    if resume_mode == ResumeMode.FULL_SETUP or Prompt("Run generators? (y/n)", "y").prompt():
+                        logger.info("Generating data")
+                        self.generate()
                 except:
                     logger.exception("Exception trying to generate data for suite %s" % self.id)
                     run_failure = True
