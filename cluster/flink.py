@@ -15,7 +15,16 @@ PATH = "/tmp/hadoop"
 @roles('master')
 def install():
     run("rm -rf '%s'" % PATH)
-    run("git clone %s %s" % (conf['git_repository'], PATH))
+    if conf['build_from_source']:
+        run("git clone %s %s" % (conf['git_repository'], PATH))
+        with cd(PATH):
+            run("git checkout %s" % conf['git_commit'])
+            run("echo commit: ")
+            run("git rev-parse HEAD")
+            run("mvn clean install -DskipTests > build.log")
+    else:
+        run("curl %s | tar xz -C %s" % (conf['binaries'], PATH))
+        run("mv %s/flink*/* %s" % (PATH, PATH))
 
 def get_flink_path():
     return PATH
@@ -28,11 +37,6 @@ def get_flink_dist_path():
 @task
 @roles('master')
 def configure():
-    with cd(PATH):
-        run("git checkout %s" % conf['git_commit'])
-        run("echo commit: ")
-        run("git rev-parse HEAD")
-        run("mvn clean install -DskipTests > build.log")
     context = conf.copy()
     context['java_home'] = find_java_home()
     context['master'] = env.master

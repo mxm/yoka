@@ -15,7 +15,7 @@ PATH = "/tmp/zookeeper"
 def install():
     run("rm -rf '%s'" % PATH)
     run("mkdir -p '%s'" % PATH)
-    run("curl %s | tar xz -C %s" % (conf['source'], PATH))
+    run("curl %s | tar xz -C %s" % (conf['binaries'], PATH))
     run("mv %s/zookeeper*/* %s" % (PATH, PATH))
 
 

@@ -66,6 +66,8 @@ Standard Flink config
 """
 flink_config = {
     #'git_repository' : "https://github.com/apache/flink.git",
+    'binaries' : 'ftp://ftp.fu-berlin.de/unix/www/apache//flink/flink-0.9.1/flink-0.9.1-bin-hadoop24.tgz',
+    'build_from_source' : True,
     'git_repository' : "https://git-wip-us.apache.org/repos/asf/flink.git",
     'git_commit' : "master",
     'num_task_slots' : 8,
@@ -88,7 +90,7 @@ Standard Hadoop config
 
 """
 hadoop_config = {
-    'source' : "http://mirror.arcor-online.net/www.apache.org/hadoop/common/hadoop-2.5.2/hadoop-2.5.2.tar.gz",
+    'binaries' : "http://mirror.arcor-online.net/www.apache.org/hadoop/common/hadoop-2.5.2/hadoop-2.5.2.tar.gz",
     'data_path' : config['storage_path'],
     'replication_factor' : 3,
     # memory in mb
@@ -118,7 +120,7 @@ Standard Zookeeper config
 
 """
 zookeeper_config = {
-    'source' : "http://mirror.softaculous.com/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz",
+    'binaries' : "http://mirror.softaculous.com/apache/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz",
     'tick_time' : 2000,
     'init_limit' : 5,
     'sync_limit' : 2,
@@ -134,7 +136,7 @@ Standard Storm config
 
 """
 storm_config = {
-    'source' : "http://ftp.halifax.rwth-aachen.de/apache/storm/apache-storm-0.9.3/apache-storm-0.9.3.tar.gz",
+    'binaries' : "http://ftp.halifax.rwth-aachen.de/apache/storm/apache-storm-0.9.3/apache-storm-0.9.3.tar.gz",
     'num_zookeeper_instances' : zookeeper_config['num_instances'],
     'local_dir' : "%s/storm/data" % config['storage_path'],
     'num_supervisor_slots': 2,
@@ -145,7 +147,7 @@ Standard Kafka config
 
 """
 kafka_config = {
-    'source' : "ftp://ftp.fu-berlin.de/unix/www/apache/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz",
+    'binaries' : "ftp://ftp.fu-berlin.de/unix/www/apache/kafka/0.8.2.1/kafka_2.10-0.8.2.1.tgz",
     # TODO currently has to be less or equal to the number of zookeeper instances
     'num_instances' : 3
 }
