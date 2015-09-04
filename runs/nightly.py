@@ -126,6 +126,14 @@ benchmarks = [
         times = 3
     ),
 
+    Benchmark(
+        id = "FaultTolerantGrep",
+        systems = [flink],
+        experiment = Grep(),
+        times = 3,
+        fault_tolerant_systems = [flink]
+    ),
+
     # KMeans
     # PageRank
 
