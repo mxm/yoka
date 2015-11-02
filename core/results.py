@@ -149,8 +149,10 @@ def gen_plot(suite_id):
         bench_ids = [bid for (bid,) in c.fetchall()]
         num_benchmarks = len(bench_ids)
         # collect all suite executions
-        c.execute("select distinct suite_uid from results where suite_id = ?", (suite_id,))
+        c.execute("select distinct suite_uid from results where suite_id = ? order by suite_uid DESC limit 0,15", (suite_id,))
         suite_uids = [uid for (uid,) in c.fetchall()]
+        # display recent results last
+        suite_uids.reverse()
         num_suits = len(suite_uids)
         # plot all benchmarks in one plot, share both axes
         step_len = 2
@@ -165,7 +167,7 @@ def gen_plot(suite_id):
             axes[i].tick_params(labeltop=False, labelright=True)
         # plot each benchmark (if it exists) for each suite execution
         x = 0
-        for (i, suite_uid) in enumerate(suite_uids):
+        for suite_uid in suite_uids:
             # select all run times for each suite execution
             for (index, bench_id) in enumerate(bench_ids):
                 # select data for this suite id and bench id
@@ -177,15 +179,16 @@ def gen_plot(suite_id):
                 bar_space = float(min(1.5, step_len)) # use max 1.5 of space for ALL results
                 width = bar_space / len(results)
                 pos = x + (step_len - bar_space)/2
-                for (ind, (duration, failed)) in enumerate(results):
+                for duration, failed in results:
+                    # set a default y limit
                     if failed == 1:
                         # benchmark failed
-                        axes[index].text(pos+width/2, 1, "failed", color="red", rotation=90,
-                                          verticalalignment="bottom", horizontalalignment="center")
+                        axes[index].text(pos+width/2, 0, "failed", color="red", rotation=90,
+                                         verticalalignment="bottom", horizontalalignment="center")
                     elif failed == -1:
                         # no data
-                        axes[index].text(pos+width/2, 1, "no data", color="blue",
-                                          verticalalignment="bottom", horizontalalignment="center")
+                        axes[index].text(pos+width/2, 0, "no data", color="blue",
+                                         verticalalignment="bottom", horizontalalignment="center")
                     else:
                         # plot run time
                         duration /= 60
@@ -198,6 +201,7 @@ def gen_plot(suite_id):
         # rest
         figure.autofmt_xdate()
         figure.tight_layout()
+        plt.ylim(ymin=0)
         plt.savefig(filename)
         return filename
 
