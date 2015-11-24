@@ -65,10 +65,10 @@ Standard Flink config
 
 """
 flink_config = {
-    #'git_repository' : "https://github.com/apache/flink.git",
-    'binaries' : 'ftp://ftp.fu-berlin.de/unix/www/apache//flink/flink-0.9.1/flink-0.9.1-bin-hadoop24.tgz',
+    'binaries' : 'ftp://ftp.fu-berlin.de/unix/www/apache/flink/flink-0.10.0/flink-0.10.0-bin-hadoop2-scala_2.10.tgz',
     'build_from_source' : True,
     'git_repository' : "https://git-wip-us.apache.org/repos/asf/flink.git",
+    #'git_repository' : "https://github.com/apache/flink.git",
     'git_commit' : "master",
     'num_task_slots' : 8,
     'parallelization' : 1,
@@ -162,7 +162,7 @@ email_config = {
     'smtp_port' : 587,
     'smtp_account' : "iamthemailer@gmail.com",
     'smtp_password' : '',
-    'addresses' : ["max@data-artisans.com", "marton@data-artisans.com"],
+    'addresses' : ["max@data-artisans.com"],
     'subject' : "Performance test results",
     'text' : "Here are the results."
 }
