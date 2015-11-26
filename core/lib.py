@@ -1,25 +1,27 @@
+from abc import ABCMeta
 from threading import Thread
 from time import sleep, time
 from pprint import pformat
+import os
+import re
 
-import os, re
+from fabric.api import settings
 from fabric.context_managers import hide
 
 from utils import Timer, Prompt
 
 import results
+from results import Result
 
 import log
 
 logger = log.get_logger(__name__)
 
-from results import Result
-
 sleep_time = 10
 
-from fabric.api import settings
 
 class Experiment(object):
+    __metaclass__ = ABCMeta
 
     def setup(self):
         raise NotImplementedError()
@@ -44,7 +46,7 @@ class Benchmark(Experiment):
     # timings for each execution's phases
     run_times = {}
 
-    def __init__(self, id, systems, experiment, times=1, fault_tolerant_systems=[]):
+    def __init__(self, id, systems, experiment, times=1, fault_tolerant_systems=()):
         # unique name of this benchmark
         self.id = id
         self.systems = systems
@@ -114,6 +116,7 @@ class Generator(Benchmark):
     pass
 
 class System(object):
+    __metaclass__ = ABCMeta
 
     # the module for the execution functions and config
     module = None
@@ -163,6 +166,7 @@ class System(object):
 
 
 class Cluster(object):
+    __metaclass__ = ABCMeta
 
     # working dir for all files
     working_dir = None
