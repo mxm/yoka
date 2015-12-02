@@ -337,7 +337,7 @@ class ClusterSuite(Experiment):
                                             logger.info("Error detected in line %d:\n%s" % (number, line))
                                             # for now, just fail the benchmark an error has been detected
                                             failed = True
-                                            break
+                                            # continue to look for more errors
                         except:
                             logger.exception("Failed to scan log for errors.")
                 # keep list of results (make copy!)
