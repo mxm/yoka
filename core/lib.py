@@ -203,8 +203,9 @@ class ClusterSuite(Experiment):
     run_times = {}
 
     def __init__(self, id, cluster, systems, generators, benchmarks):
+        # the name of the cluster suite
         self.id = id
-        # generate unique cluster id
+        # generate unique cluster id for this run
         self.uid = "%s_%d" % (id, int(time()))
         self.cluster = cluster
         self.systems = systems
@@ -428,7 +429,7 @@ class ClusterSuite(Experiment):
         try:
             # generate plot for suite UID
             filename = results.gen_plot(self.id)
-            # TODO generate plot for suite ID
+            # TODO generate plot for suite ID (only one run)
         except:
             logger.exception("Failed to generate plot")
         try:
