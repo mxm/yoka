@@ -165,6 +165,7 @@ def gen_plot(suite_id):
             axes[i].set_ylabel('run time (minutes)')
             # labels on both sides and top
             axes[i].tick_params(labeltop=False, labelright=True)
+            axes[i].set_ylim(bottom=0)
         # plot each benchmark (if it exists) for each suite execution
         x = 0
         for suite_uid in suite_uids:
@@ -201,7 +202,6 @@ def gen_plot(suite_id):
         # rest
         figure.autofmt_xdate()
         figure.tight_layout()
-        plt.ylim(ymin=0)
         plt.savefig(filename)
         return filename
 
