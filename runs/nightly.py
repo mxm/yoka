@@ -113,7 +113,7 @@ benchmarks = [
 
     Benchmark(
         id = "WindowWordCount",
-        systems = [flink],
+        systems = [flink_als],
         experiment = WindowWordCount(),
         times = 3
     ),
