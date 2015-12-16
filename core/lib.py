@@ -286,10 +286,15 @@ class ClusterSuite(Experiment):
     @Timer(run_times, "Data generation")
     def generate(self):
         # generate data
+        logger.info("Generating data")
         for generator in self.generators:
-            generator.setup()
-            generator.run()
-            generator.shutdown()
+            try:
+                generator.setup()
+                generator.run()
+                generator.shutdown()
+            finally:
+                self.save_logs(generator)
+
 
     @Timer(run_times, "Benchmark")
     def run(self, ignore_failures=False):
@@ -310,37 +315,8 @@ class ClusterSuite(Experiment):
                         benchmark.shutdown()
                     except:
                         pass
-                # get system logs
-                log_paths = {}
-                for system in benchmark.systems:
-                    unique_full_path = "results/logs/%s/%s/%d/%s" % (
-                                        self.uid,
-                                        benchmark.id,
-                                        run_id+1,
-                                        system)
-                    # create directories
-                    os.makedirs(unique_full_path)
-                    # retry at most three times to fetch the log
-                    for i in range(1, 3+1):
-                        try:
-                            system.save_log(unique_full_path)
-                            break
-                        except:
-                            logger.exception("Couldn't fetch log, trying again (%d/3)" % i)
-                    log_paths[system] = unique_full_path
-                    # check log for exceptions
-                    if not failed and system not in benchmark.fault_tolerant_systems:
-                        try:
-                            for filename in os.listdir(unique_full_path):
-                                with open(unique_full_path + "/" + filename) as file:
-                                    for number, line in enumerate(file):
-                                        if re.search("(error|exception)", line, flags=re.IGNORECASE):
-                                            logger.info("Error detected in line %d:\n%s" % (number, line))
-                                            # for now, just fail the benchmark an error has been detected
-                                            failed = True
-                                            # continue to look for more errors
-                        except:
-                            logger.exception("Failed to scan log for errors.")
+                # save logs
+                log_paths, failed = self.save_logs(benchmark, run_id+1, failed)
                 # keep list of results (make copy!)
                 benchmark.runs.append(benchmark.run_times.copy())
                 # save current result immediately
@@ -353,6 +329,41 @@ class ClusterSuite(Experiment):
                 # raise exception if desired
                 if failed and not ignore_failures:
                     raise Exception("Exception raised in %s run %d (see logs)." % (benchmark, run_id))
+
+    def save_logs(self, benchmark, attempt=1, failed=False):
+        # get system logs
+        log_paths = {}
+        for system in benchmark.systems:
+            unique_full_path = "results/logs/%s/%s/%d/%s" % (
+                self.uid,
+                benchmark.id,
+                attempt,
+                system)
+            # create directories
+            os.makedirs(unique_full_path)
+            # retry at most three times to fetch the log
+            for i in range(1, 3+1):
+                try:
+                    system.save_log(unique_full_path)
+                    break
+                except:
+                    logger.exception("Couldn't fetch log, trying again (%d/3)" % i)
+            log_paths[system] = unique_full_path
+            # check log for exceptions
+            if not failed and system not in benchmark.fault_tolerant_systems:
+                try:
+                    for filename in os.listdir(unique_full_path):
+                        with open(unique_full_path + "/" + filename) as file:
+                            for number, line in enumerate(file):
+                                if re.search("(error|exception)", line, flags=re.IGNORECASE):
+                                    logger.info("Error detected in line %d:\n%s" % (number, line))
+                                    # for now, just fail the benchmark an error has been detected
+                                    failed = True
+                                    # continue to look for more errors
+                except:
+                    logger.exception("Failed to scan log for errors.")
+
+        return (log_paths, failed)
 
 
     @Timer(run_times, "Shutdown")
@@ -401,7 +412,6 @@ class ClusterSuite(Experiment):
                 # run generators and benchmarks
                 try:
                     if resume_mode == ResumeMode.FULL_SETUP or Prompt("Run generators? (y/n)", "y").prompt():
-                        logger.info("Generating data")
                         self.generate()
                 except:
                     logger.exception("Exception trying to generate data for suite %s" % self.id)
