@@ -71,12 +71,12 @@ def master(action="start", yarn=False):
     path = get_flink_dist_path()
     with cd(path):
         if not yarn:
-            run('nohup bash bin/jobmanager.sh %s cluster' % action)
+            run('nohup bash bin/jobmanager.sh %s cluster' % action, pty=False)
         else:
             if action == 'start':
-                # the sleep is necessaray
+                # pty=False is necessary
                 # see https://github.com/fabric/fabric/issues/1158
-                run("nohup bin/yarn-session.sh -n %d & sleep 1" % conf['num_task_slots'])
+                run("nohup bin/yarn-session.sh -n %d" % conf['num_task_slots'], pty=False)
             elif action == 'stop':
                 run("kill -s SIGINT `jps | grep FlinkYarn | cut -d' ' -f1`")
     sleep(10)
@@ -88,7 +88,7 @@ def slaves(action="start", yarn=False):
     path = get_flink_dist_path()
     with cd(path):
         if not yarn:
-            run('nohup bash bin/taskmanager.sh %s' % action)
+            run('nohup bash bin/taskmanager.sh %s' % action, pty=False)
     sleep(1)
 
 @task
